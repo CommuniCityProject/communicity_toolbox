@@ -1,0 +1,11 @@
+{
+  "id": "Image:mMPzYd3PEe2xkn0DPT8lZA",
+  "type": "Image",
+  "dateObserved": "2023-04-20T17:58:59Z",
+  "height": 512,
+  "path": "/a/b/c.jpg",
+  "purpose": "FaceRecognition",
+  "source": "Camera:123",
+  "url": "http://a.b/c.jpg",
+  "width": 512
+}

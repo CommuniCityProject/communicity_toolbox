@@ -1,0 +1,32 @@
+{
+  "id": "Image:mMPzYd3PEe2xkn0DPT8lZA",
+  "type": "Image",
+  "dateObserved": {
+    "type": "DateTime",
+    "value": "2023-04-18T09:58:40Z"
+  },
+  "height": {
+    "type": "Number",
+    "value": 512
+  },
+  "path": {
+    "type": "Property",
+    "value": "/a/b/c.jpg"
+  },
+  "purpose": {
+    "type": "Property",
+    "value": "FaceRecognition"
+  },
+  "source": {
+    "type": "Property",
+    "value": "Camera:123"
+  },
+  "url": {
+    "type": "Property",
+    "value": "http://a.b/c.jpg"
+  },
+  "width": {
+    "type": "Number",
+    "value": 512
+  }
+}

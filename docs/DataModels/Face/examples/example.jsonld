@@ -1,0 +1,31 @@
+{
+  "id": "urn:ngsi-ld:Face:vdNSGeAtEe2RsjCcI__G6g",
+  "type": "Face",
+  "dateObserved": {
+    "@type": "DateTime",
+    "@value": "2023-04-21T12:17:37Z"
+  },
+  "image": "urn:ngsi-ld:Image:123",
+  "boundingBox": {
+    "xmin": 0.1,
+    "ymin": 0.1,
+    "xmax": 0.2,
+    "ymax": 0.2
+  },
+  "detectionConfidence": 0.9,
+  "age": 35,
+  "gender": "FEMALE",
+  "genderConfidence": 0.99,
+  "emotion": "HAPPINESS",
+  "emotionConfidence": 0.99,
+  "features": [
+    0.1,
+    0.2,
+    0.3
+  ],
+  "featuresAlgorithm": "FaceNet",
+  "recognitionDomain": "Celeb",
+  "recognized": true,
+  "recognizedDistance": 0.77,
+  "recognizedPerson": "Person:123"
+}

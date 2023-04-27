@@ -1,0 +1,70 @@
+age_gender:
+  model_name: age_gender
+  params:
+    age_model_path: ../../../data/models/age_gender/age_model.onnx
+    gender_model_path: ../../../data/models/age_gender/gender_model.onnx
+    do_age: True
+    do_gender: True
+    use_cuda: False
+
+face_detector:
+  face_box_scale: 1.2
+  # model_name: face_detector_opencv
+  # params:
+  #   txt_path: ../../Models/face_detector_opencv/models/res10_ssd/deploy.prototxt
+  #   weights_path: ../../Models/face_detector_opencv/models/res10_ssd/res10_300x300_ssd_iter_140000.caffemodel
+  #   confidence_threshold: 0.5
+  #   use_cuda: False
+  # model_name: face_detector_ultraface
+  # params:
+  #   model_path: ../../Models/face_detector_ultraface/models/version-RFB-320.onnx
+  #   input_size: [320, 240] # [640, 480] # [320, 240]
+  #   use_cuda: False
+  # model_name: face_detector_mtcnn
+  # params:
+  #   model_path: ../../../data/models/face_detector_mtcnn/mtcnn.pb
+  #   use_cuda: True
+  model_name: face_detector_retinaface
+  params:
+    weights_path: ../../../data/models/face_detector_retinaface/Resnet50_Final.pth
+    model_name: resnet50
+    confidence_threshold: 0.7
+    landmarks: False
+    nms_threshold: 0.4
+    use_cuda: False
+
+context_broker:
+  host: 192.168.0.100
+  port: 1026
+  # URI where notifications will be sent
+  notification_uri: http://192.168.0.100:9002/ngsi-ld/v1/notify
+
+api:
+  host: 0.0.0.0
+  port: 8080
+  
+  # List of origins that should be permitted to make cross-origin requests.
+  allowed_origins: []
+  
+  # If the images are stored locally and can be accessed by their path.
+  local_image_storage: False
+
+  # Create a new Face entity in the context broker with the predicted age and
+  # gender when processing a Face entity.
+  post_new_entity: False
+
+  # Update the Face entity in the context broker with the predicted age and
+  # gender when processing a Face entity.
+  update_entity: True
+
+subscriptions:
+  - entity_type: Image
+    watched_attributes: ["purpose"]
+    query: "purpose==%22AgeGender%22"
+  - entity_type: Face
+    watched_attributes: ["dateCreated"]
+    query: ""
+
+visualization:
+  image_width: 1500
+  Face: {}

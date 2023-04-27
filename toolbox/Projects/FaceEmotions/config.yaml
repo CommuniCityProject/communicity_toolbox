@@ -1,0 +1,51 @@
+face_emotions:
+  model_name: emotions_hse
+  params:
+    model_path: ../../../data/models/emotions_hse/mobilenet_7.h5
+    use_cuda: False
+
+face_detector:
+  face_box_scale: 1.2 
+  model_name: face_detector_retinaface
+  params:
+    weights_path: ../../../data/models/face_detector_retinaface/Resnet50_Final.pth
+    model_name: resnet50
+    confidence_threshold: 0.7
+    landmarks: False
+    nms_threshold: 0.4
+    use_cuda: False
+
+context_broker:
+  host: 158.109.9.60
+  port: 1026
+  # URI where notifications will be sent
+  notification_uri: http://158.109.9.60:9002/ngsi-ld/v1/notify
+
+api:
+  host: 0.0.0.0
+  port: 9002
+  
+  # List of origins that should be permitted to make cross-origin requests.
+  allowed_origins: []
+  
+  # If the images are stored locally and can be accessed by their path.
+  local_image_storage: False
+
+  # Create a new Face entity in the context broker with the predicted emotion
+  # when processing a Face entity; otherwise, update the original entity.
+  post_new_entity: False
+
+  # Update the Face entity in the context broker with the predicted emotion
+  # when processing a Face entity.
+  update_entity: True
+
+subscriptions:
+  - entity_type: Image
+    watched_attributes: ["purpose"]
+    query: "purpose==%22FaceEmotions%22"
+  - entity_type: Face
+    watched_attributes: ["dateCreated"]
+    query: ""
+
+visualization:
+  image_width: 1000

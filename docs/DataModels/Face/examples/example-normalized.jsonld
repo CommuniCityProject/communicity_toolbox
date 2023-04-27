@@ -1,0 +1,76 @@
+{
+  "id": "urn:ngsi-ld:Face:vdNSGeAtEe2RsjCcI__G6g",
+  "type": "Face",
+  "dateObserved": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "@value": "2023-04-21T12:17:37Z"
+    }
+  },
+  "image": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Image:123"
+  },
+  "boundingBox": {
+    "type": "Property",
+    "value": {
+      "xmin": 0.1,
+      "ymin": 0.1,
+      "xmax": 0.2,
+      "ymax": 0.2
+    }
+  },
+  "detectionConfidence": {
+    "type": "Property",
+    "value": 0.9
+  },
+  "age": {
+    "type": "Property",
+    "value": 35
+  },
+  "gender": {
+    "type": "Property",
+    "value": "FEMALE"
+  },
+  "genderConfidence": {
+    "type": "Property",
+    "value": 0.99
+  },
+  "emotion": {
+    "type": "Property",
+    "value": "HAPPINESS"
+  },
+  "emotionConfidence": {
+    "type": "Property",
+    "value": 0.99
+  },
+  "features": {
+    "type": "Property",
+    "value": [
+      0.1,
+      0.2,
+      0.3
+    ]
+  },
+  "featuresAlgorithm": {
+    "type": "Property",
+    "value": "FaceNet"
+  },
+  "recognitionDomain": {
+    "type": "Property",
+    "value": "Celeb"
+  },
+  "recognized": {
+    "type": "Property",
+    "value": true
+  },
+  "recognizedDistance": {
+    "type": "Property",
+    "value": 0.77
+  },
+  "recognizedPerson": {
+    "type": "Property",
+    "value": "Person:123"
+  }
+}

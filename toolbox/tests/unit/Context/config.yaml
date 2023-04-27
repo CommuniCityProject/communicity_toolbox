@@ -1,0 +1,5 @@
+context_broker:
+  host: 192.168.0.100
+  port: 1026
+  notification_uri: http://192.168.0.100:9000/test    # URI where notifications will be sent
+  check_subscription_conflicts: False

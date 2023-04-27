@@ -1,0 +1,28 @@
+{
+  "id": "Face:vdNSGeAtEe2RsjCcI__G6g",
+  "type": "Face",
+  "age": 35,
+  "boundingBox": {
+    "xmin": 0.1,
+    "ymin": 0.1,
+    "xmax": 0.2,
+    "ymax": 0.2
+  },
+  "dateObserved": "2023-04-21T12:17:37Z",
+  "detectionConfidence": 0.9,
+  "emotion": "HAPPINESS",
+  "emotionConfidence": 0.99,
+  "features": [
+    0.1,
+    0.2,
+    0.3
+  ],
+  "featuresAlgorithm": "FaceNet",
+  "gender": "FEMALE",
+  "genderConfidence": 0.99,
+  "image": "Image:123",
+  "recognitionDomain": "Celeb",
+  "recognized": true,
+  "recognizedDistance": 0.77,
+  "recognizedPerson": "Person:123"
+}

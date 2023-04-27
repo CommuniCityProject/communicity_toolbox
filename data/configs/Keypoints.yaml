@@ -1,0 +1,18 @@
+__BASE__: base.yaml
+
+keypoints:
+  model_name: detectron2
+  params:
+    model_config: !ENV ${TOOLBOX_DATA}/models/detectron2/COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x/keypoint_rcnn_R_50_FPN_3x.yaml
+    model_weights: !ENV ${TOOLBOX_DATA}/models/detectron2/COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x/model_final_a6e10b.pkl
+    confidence_threshold: 0.5
+    use_cuda: False
+
+context_broker:
+  notification_uri: http://${HOST}:8080/ngsi-ld/v1/notify
+
+subscriptions:
+  - entity_type: Image
+    watched_attributes: ["purpose"]
+    query: "purpose==%22Keypoints%22"
+

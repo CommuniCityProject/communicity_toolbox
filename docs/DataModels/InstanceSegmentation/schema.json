@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "modelTags": "",
+  "$schemaVersion": "0.0.2",
+  "title": "CommuniCity Toolbox - InstanceSegmentation",
+  "description": "This entity stores information about segmented objects on an image. It is intended to be used with instance segmentation algorithms to detect objects and infer a segmentation mask.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "https://smart-data-models.github.io/data-models/common-schema.json#/definitions/GSMA-Commons"
+    },
+    {
+      "$ref": "https://smart-data-models.github.io/data-models/common-schema.json#/definitions/Location-Commons"
+    },
+    {
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "InstanceSegmentation"
+          ],
+          "description": "Property. It must be equal to `InstanceSegmentation`"
+        },
+        "dateObserved": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Property. Model:'http://schema.org/DateTime'. The date on which the segmentation was performed."
+        },
+        "image": {
+          "allOf": [
+            {
+              "$ref": "https://smart-data-models.github.io/data-models/common-schema.json#/definitions/EntityIdentifierType"
+            }
+          ],
+          "description": "Relationship. Id of the source image entity."
+        },
+        "boundingBox": {
+          "type": "object",
+          "properties": {
+            "xmin": {
+              "type": "number"
+            },
+            "ymin": {
+              "type": "number"
+            },
+            "xmax": {
+              "type": "number"
+            },
+            "ymax": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "xmin",
+            "ymin",
+            "xmax",
+            "ymax"
+          ],
+          "description": "Property. Model:'https://schema.org/StructuredValue'. Relative coordinates of the bounding box around the detected object."
+        },
+        "mask": {
+          "type": "object",
+          "properties": {
+            "size": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "description": "Width and height of the mask in pixels."
+            },
+            "counts": {
+              "type": "string",
+              "description": "RLE compressed binary mask with hexadecimal encoding."
+            }
+          },
+          "required": [
+            "size",
+            "counts"
+          ],
+          "description": "Property. Model:'https://schema.org/StructuredValue'. Binary segmentation mask."
+        },
+        "label": {
+          "type": "string",
+          "description": "Property. Model:'https://schema.org/Text'. Name of the detected object."
+        },
+        "labelId": {
+          "type": "integer",
+          "description": "Property. Model:'https://schema.org/Integer'. Numerical identifier of the label."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Property. Model:'http://schema.org/Number'. Units:'0 to 1'. Confidence of the object detection."
+        }
+      }
+    }
+  ],
+  "required": [
+    "id",
+    "type",
+    "dateObserved",
+    "boundingBox",
+    "mask",
+    "label",
+    "labelId",
+    "confidence"
+  ]
+}

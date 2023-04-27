@@ -1,0 +1,2 @@
+Known limitations: The model may struggle to detect large faces since it was trained with anchors of sizes from ~16 to ~512 pixels.
+A solution for this problem could be to resize the input images to a smaller size, but this could involve a decrease in performance with the smaller faces.

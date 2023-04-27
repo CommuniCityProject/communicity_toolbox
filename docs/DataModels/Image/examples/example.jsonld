@@ -1,0 +1,14 @@
+{
+  "id": "urn:ngsi-ld:Image:mMPzYd3PEe2xkn0DPT8lZA",
+  "type": "Image",
+  "dateObserved": {
+    "@type": "DateTime",
+    "@value": "2023-04-18T09:58:40Z"
+  },
+  "width": 512,
+  "height": 512,
+  "path": "/a/b/c.jpg",
+  "url": "http://a.b/c.jpg",
+  "source": "Camera:123",
+  "purpose": "FaceRecognition"
+}

@@ -1,0 +1,15 @@
+__BASE__: base.yaml
+
+face_detector:
+  model_name: face_detector_mtcnn
+  params:
+    model_path: !ENV ${TOOLBOX_DATA}/models/face_detector_mtcnn/mtcnn.pb
+    use_cuda: True
+
+context_broker:
+  notification_uri: !ENV http://${HOST}:${PORT}/ngsi-ld/v1/notify
+
+subscriptions:
+  - entity_type: Image
+    watched_attributes: ["purpose"]
+    query: "purpose==%22FaceDetection%22"

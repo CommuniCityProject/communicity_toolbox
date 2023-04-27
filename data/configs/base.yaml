@@ -1,0 +1,16 @@
+context_broker:
+  host: !ENV ${BROKER_HOST}
+  port: !ENV ${BROKER_PORT}
+  
+  # Check for conflicting subscriptions before creating a new one
+  check_subscription_conflicts: True
+
+api:
+  host: 0.0.0.0
+  port: 8080
+  
+  # List of origins that should be permitted to make cross-origin requests.
+  allowed_origins: []
+
+  # If the images are stored locally and can be accessed by their path.
+  local_image_storage: True

@@ -1,0 +1,34 @@
+instance_segmentation:
+  model_name: detectron2
+  params:
+    model_config: ../../../data/models/detectron2/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/mask_rcnn_R_50_FPN_3x.yaml
+    model_weights: ../../../data/models/detectron2/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/model_final_f10217.pkl
+    confidence_threshold: 0.5
+    use_cuda: False
+
+context_broker:
+  host: 192.168.0.69
+  port: 1026
+  # URI where notifications will be sent
+  notification_uri: http://192.168.0.69:7799/ngsi-ld/v1/notify
+
+api:
+  host: 0.0.0.0
+  port: 9001
+  
+  # List of origins that should be permitted to make cross-origin requests.
+  allowed_origins: []
+  
+  # If the images are stored locally and can be accessed by their path.
+  local_image_storage: False
+
+subscriptions:
+  - entity_type: Image
+    watched_attributes: ["purpose"]
+    query: "purpose==%22InstanceSegmentation%22"
+
+visualization:
+  image_width: 2000
+  InstanceSegmentation:
+    text_background: True
+    mask_color_alpha: 0.7

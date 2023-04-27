@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "modelTags": "",
+  "$schemaVersion": "0.0.2",
+  "title": "CommuniCity Toolbox - Image",
+  "description": "This entity stores information about an image file that is uploaded to a server from a camera or any other source, and that is available to other services.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "https://smart-data-models.github.io/data-models/common-schema.json#/definitions/GSMA-Commons"
+    },
+    {
+      "$ref": "https://smart-data-models.github.io/data-models/common-schema.json#/definitions/Location-Commons"
+    },
+    {
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Image"
+          ],
+          "description": "Property. It must be equal to `Image`"
+        },
+        "width": {
+          "type": "integer",
+          "description": "Property. Model:'https://schema.org/Integer'. Units:'Pixels'. The width of the image."
+        },
+        "height": {
+          "type": "integer",
+          "description": "Property. Model:'https://schema.org/Integer'. Units:'Pixels'. The height of the image."
+        },
+        "dateObserved": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Property. Model:'http://schema.org/DateTime'. The date on which the image was created."
+        },
+        "url": {
+          "type": "string",
+          "description": "Property. Model:'https://schema.org/url'. URL to the image."
+        },
+        "path": {
+          "type": "string",
+          "description": "Property. Model:'https://schema.org/Text'. Local file path to the image within the storage host."
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "https://smart-data-models.github.io/data-models/common-schema.json#/definitions/EntityIdentifierType"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "Property. The ID of the entity that created the image or a text describing the source of the image."
+        },
+        "purpose": {
+          "type": "string",
+          "description": "Model:'http://schema.org/Text'. The purpose of the image, if any."
+        }
+      }
+    }
+  ],
+  "required": [
+    "id",
+    "type",
+    "dateObserved",
+    "width",
+    "height"
+  ]
+}

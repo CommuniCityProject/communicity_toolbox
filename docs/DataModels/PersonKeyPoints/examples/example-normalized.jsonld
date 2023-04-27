@@ -1,0 +1,118 @@
+{
+  "id": "urn:ngsi-ld:PersonKeyPoints:KD7rYd3bEe2Fln0DPT8lZA",
+  "type": "PersonKeyPoints",
+  "dateObserved": {
+    "type": "Property",
+    "value": {
+      "@type": "DateTime",
+      "@value": "2023-04-18T11:21:25Z"
+    }
+  },
+  "image": {
+    "type": "Property",
+    "value": "Image:123"
+  },
+  "boundingBox": {
+    "type": "Property",
+    "value": {
+      "xmin": 0.1,
+      "ymin": 0.1,
+      "xmax": 0.2,
+      "ymax": 0.2
+    }
+  },
+  "confidence": {
+    "type": "Property",
+    "value": 0.99
+  },
+  "keypoints": {
+    "type": "Property",
+    "value": {
+      "nose": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "left_eye": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "right_eye": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "left_ear": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "right_ear": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "left_shoulder": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "right_shoulder": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "left_elbow": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "right_elbow": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "left_wrist": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "right_wrist": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "left_hip": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "right_hip": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "left_knee": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "right_knee": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "left_ankle": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "right_ankle": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    }
+  }
+}

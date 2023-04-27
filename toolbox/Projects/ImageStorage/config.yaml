@@ -1,0 +1,59 @@
+context_broker:
+  host: 192.168.0.69
+  port: 1026  
+
+api:
+  host: 0.0.0.0
+  port: 9002
+  external_url: http://192.168.0.69:9002/
+  ngsild_urn: "urn:ngsi-ld:Image:{}"
+  
+  # List of origins that should be permitted to make cross-origin requests.
+  allowed_origins: []
+  
+  allowed_mime:
+    - image/png
+    - image/jpeg
+    - image/JPEG
+    - image/bmp
+    - image/jp2
+    - image/tiff
+  
+  # Maximum size of uploaded files in bytes. Set to null to disable.
+  max_upload_size: 10e6
+
+  # Path where save the images. Files on this path may be deleted!!
+  storage_path: /home/user/toolbox/storage
+
+  # Whether the image entities should be deleted from the context broker when
+  # they are deleted from disk.
+  delete_from_broker: True
+
+  # Delete all files in `storage_path` when stopping the server
+  cleanup_on_end: False
+
+  # Maximum number of files in the storage path. If reached, the oldest files
+  # will be deleted. Set to null to disable.
+  max_n_files: 1e3
+
+  # Maximum size of the storage directory in bytes. If reached, the oldest
+  # files will be deleted. Set to null to disable.
+  max_dir_size: 10e9
+
+  # Maximum amount of seconds a file can exist. If a file was created more than
+  # `max_file_time` seconds ago, it will be deleted. Set to null to disable.
+  max_file_time: 2.592e+6 # 30 days
+
+  # When using `max_file_time`, the creation time of files will be checked
+  # periodically every `update_time` seconds.
+  update_time: 86400 # 1 day
+
+  # Allow upload images to the server.
+  allow_uploads: True
+
+  # Allow the generation of images with the data of the entities visualized.
+  allow_entity_visualization: True
+
+  # Maximum allowed number of entities to visualize in one image.
+  # Set to null to disable.
+  max_entities_visualize: 100

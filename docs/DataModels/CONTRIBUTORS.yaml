@@ -1,0 +1,10 @@
+description: This is a compilation list of all CONTRIBUTORS across different objects (data models) alphabetically ordered. All fields are non mandatory
+contributors:
+-
+ name: Edgar
+ surname: Gracia
+ mail: egracia@cvc.uab.cat
+ organization: Computer Vision Center (CVC). http://www.cvc.uab.es/
+ project: CommuniCity Project. https://communicity-project.eu/
+ comments: 
+ year: 2023

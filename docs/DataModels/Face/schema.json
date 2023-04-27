@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "modelTags": "",
+  "$schemaVersion": "0.0.2",
+  "title": "CommuniCity Toolbox - Face",
+  "description": "This entity stores information about a face, such as its estimated age, gender or identity. It is intended to be used with computer vision algorithms to infer common properties from a facial image.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "https://smart-data-models.github.io/data-models/common-schema.json#/definitions/GSMA-Commons"
+    },
+    {
+      "$ref": "https://smart-data-models.github.io/data-models/common-schema.json#/definitions/Location-Commons"
+    },
+    {
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Face"
+          ],
+          "description": "Property. It must be equal to `Face`"
+        },
+        "age": {
+          "type": "number",
+          "description": "Property. Model:'https://schema.org/Number'. Units:'years'. The estimated age of the face."
+        },
+        "boundingBox": {
+          "type": "object",
+          "properties": {
+            "xmin": {
+              "type": "number"
+            },
+            "ymin": {
+              "type": "number"
+            },
+            "xmax": {
+              "type": "number"
+            },
+            "ymax": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "xmin",
+            "ymin",
+            "xmax",
+            "ymax"
+          ],
+          "description": "Property. Model:'https://schema.org/StructuredValue'. Relative coordinates of the bounding box around the detected face."
+        },
+        "dateObserved": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Property. Model:'http://schema.org/DateTime'. The date on which the facial analysis was performed."
+        },
+        "detectionConfidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Property. Model:'http://schema.org/Number'. Units:'0 to 1'. Confidence of the face detection."
+        },
+        "emotion": {
+          "type": "string",
+          "enum": [
+            "ANGER",
+            "DISGUST",
+            "FEAR",
+            "HAPPINESS",
+            "NEUTRAL",
+            "SADNESS",
+            "SURPRISE"
+          ],
+          "description": "Property. Model:'http://schema.org/Text'. The inferred emotion of the face."
+        },
+        "emotionConfidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Property. Model:'http://schema.org/Number'. Units:'0 to 1'. Confidence of the emotion classification."
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Property. Model:'http://schema.org/Number'. Facial features extracted with a computer vision algorithm used for face recognition tasks."
+        },
+        "featuresAlgorithm": {
+          "type": "string",
+          "description": "Property. Model:'http://schema.org/Text'. Name of the algorithm used to generate the features."
+        },
+        "gender": {
+          "type": "string",
+          "enum": [
+            "FEMALE",
+            "MALE",
+            "OTHER"
+          ],
+          "description": "Property. Model:'https://schema.org/gender'. The inferred gender of the face."
+        },
+        "genderConfidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Property. Model:'http://schema.org/Number'. Units:'0 to 1'. Confidence of the gender classification."
+        },
+        "image": {
+          "allOf": [
+            {
+              "$ref": "https://smart-data-models.github.io/data-models/common-schema.json#/definitions/EntityIdentifierType"
+            }
+          ],
+          "description": "Relationship. Id of the source image entity."
+        },
+        "recognitionDomain": {
+          "type": "string",
+          "description": "Property. Model:'http://schema.org/Text'. The face recognition domain. I.e. name of the group of people to recognize."
+        },
+        "recognized": {
+          "type": "boolean",
+          "description": "Property. Model:'http://schema.org/Boolean'. Flags whether a face recognition task has been performed."
+        },
+        "recognizedDistance": {
+          "type": "number",
+          "description": "Property. Model:'http://schema.org/Number'. Distance between the extracted features and the most similar face on the face recognition dataset. Less distance means more similarity."
+        },
+        "recognizedPerson": {
+          "anyOf": [
+            {
+              "$ref": "https://smart-data-models.github.io/data-models/common-schema.json#/definitions/EntityIdentifierType"
+            },
+            {
+              "type": "string",
+              "description": "Property. Model:'http://schema.org/Number'. The name of the recognized person."
+            }
+          ],
+          "description": "Property. Name or ID of the recognized person."
+        }
+      }
+    }
+  ],
+  "required": [
+    "id",
+    "type",
+    "dateObserved"
+  ]
+}
