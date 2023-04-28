@@ -1,11 +1,15 @@
 # Docker
 
-First of all download the toolbox project and its data:
+This guide shows how to run the Toolbox with Docker.
+
+Requirements:
+- Docker
+- Optional for GPU support: CUDA >=10.1 
 
 1. Clone the repository and navigate to the project directory.
 
     ```
-    git clone https://github.com/edgarGracia/communicity_toolbox.git
+    git clone https://github.com/CommuniCityProject/communicity_toolbox.git
     cd communicity_toolbox
     ```
 
@@ -38,10 +42,18 @@ To run the toolbox inside a container, first build the Docker image:
 docker build -t toolbox .
 ```
 
-Then create a container from the toolbox image. For example:
+Then create a container from the toolbox image.
+
+With GPU support:
 
 ```
 docker run -it -v <path_to_the_toolbox>/data:/home/user/communicity_toolbox/data -p 8080:8080 --gpus all --name toolbox toolbox bash
+```
+
+Without GPU:
+
+```
+docker run -it -v <path_to_the_toolbox>/data:/home/user/communicity_toolbox/data -p 8080:8080 --name toolbox toolbox bash
 ```
 
 ## Use Docker compose
