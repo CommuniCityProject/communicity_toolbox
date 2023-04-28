@@ -1,10 +1,15 @@
 from .age_gender import AgeGenderPredictor as age_gender
 from .face_detector_ultraface import FaceDetector as face_detector_ultraface
 from .face_detector_mtcnn import FaceDetector as face_detector_mtcnn
-from .detectron2 import Detectron2
 from .emotions_hse import EmotionsClassifier as emotions_hse
 from .face_recognition_facenet import FaceRecognition as face_recognition_facenet
 from .face_detector_retinaface import FaceDetector as face_detector_retinaface
+
+try:
+    from .detectron2 import Detectron2
+except:
+    print("Warning: Detectron2 not found.")
+    Detectron2 = None
 
 model_catalog = {
     "age_gender": age_gender,

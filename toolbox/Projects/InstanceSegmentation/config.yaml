@@ -4,7 +4,7 @@ instance_segmentation:
     model_config: ../../../data/models/detectron2/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/mask_rcnn_R_50_FPN_3x.yaml
     model_weights: ../../../data/models/detectron2/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/model_final_f10217.pkl
     confidence_threshold: 0.5
-    use_cuda: False
+    use_cuda: True
 
 context_broker:
   host: 192.168.0.69

@@ -87,7 +87,7 @@ class Detectron2:
             if det_instances.has("pred_keypoints"):
                 keypoints = det_instances.pred_keypoints.cpu().numpy()
             if det_instances.has("pred_masks"):
-                masks = np.asarray(det_instances.pred_masks)
+                masks = np.asarray(det_instances.pred_masks.cpu().numpy())
 
             # Parse the detection results
             for i in range(len(det_instances)):
