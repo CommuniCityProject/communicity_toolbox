@@ -1,11 +1,9 @@
 import unittest
 import requests
-import pytest
 
 import config
 
-
-class test_API_FaceDetection:
+class test_API_FaceDetection(unittest.TestCase):
 
     URL = f"http://{config.HOST}:{config.FACE_DETECTION_API_PORT}"
 

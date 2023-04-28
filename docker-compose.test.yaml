@@ -1,8 +1,8 @@
 version: "3.9"
 
 x-common-env: &common-env
-  HOST: 158.109.9.60
-  BROKER_HOST: 158.109.9.60
+  HOST: 192.168.0.100
+  BROKER_HOST: 192.168.0.100
   BROKER_PORT: 1026
   TOOLBOX_DATA: /etc/communicity_toolbox
 
@@ -112,7 +112,7 @@ services:
 
   # Orion context broker
   orion:
-    image: fiware/orion-ld:1.2.0-PRE-1296-debug
+    image: fiware/orion-ld:1.1.0
     hostname: orion
     restart: always
     depends_on:

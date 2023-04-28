@@ -281,8 +281,6 @@ class ImageStorage:
                     )
 
                 # Visualize the data models
-                print(params)
-                print(self._visualizer.config)
                 vis_image = self._visualizer.visualize_data_models(
                     image.image,
                     dms,
