@@ -61,10 +61,10 @@ class TestImageStorage(unittest.TestCase):
 
         # Get image from API
         self._test_get_image(API_URL + img_id, config.IMG_FACES_PATH)
-        
+
         # Get image by url
         self._test_get_image(entity["url"]["value"], config.IMG_FACES_PATH)
-            
+
     def test_post_errors(self):
         # Create a non image file
         with tempfile.TemporaryFile() as fp:
@@ -80,7 +80,7 @@ class TestImageStorage(unittest.TestCase):
             r = requests.post(API_URL, headers=headers, data=data, files=files)
             self.assertEqual(r.status_code, 422)
 
-            # Post non image file 
+            # Post non image file
             files = {"file": ("test.png", fp, "text/plain")}
             data = {
                 "source": "test_source",
@@ -98,7 +98,7 @@ class TestImageStorage(unittest.TestCase):
             headers = {"accept": "application/json"}
             r = requests.post(API_URL, headers=headers, data=data)
             self.assertEqual(r.status_code, 422)
-        
+
         # Post a large file
         with tempfile.TemporaryFile() as fp:
             # Write n bytes to file
@@ -114,7 +114,6 @@ class TestImageStorage(unittest.TestCase):
             headers = {"accept": "application/json"}
             r = requests.post(API_URL, headers=headers, data=data, files=files)
             self.assertEqual(r.status_code, 413)
-
 
 
 if __name__ == "__main__":

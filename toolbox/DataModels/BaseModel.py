@@ -35,6 +35,8 @@ class BaseModel(PydanticBaseModel):
     __entity_type__ = "BaseModel"
     __rel_attrs__ = set()
 
+    type: str = Field("BaseModel")
+
     id: Optional[str] = Field(
         None,
         description="Unique identifier of the entity"

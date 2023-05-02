@@ -285,6 +285,7 @@ class ApiBase:
             else:
                 ret = self.context_producer.to_json(data_models)
             return JSONResponse(ret, media_type="application/ld+json")
+        # Default JSON
         return data_models
 
     def _set_route_post_predict(self, app: FastAPI,

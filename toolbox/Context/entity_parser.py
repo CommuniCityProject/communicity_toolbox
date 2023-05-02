@@ -85,7 +85,7 @@ def create_entity(data_model: typing.Type[BaseModel]) -> Entity:
 
     # Set the rest of attributes
     data_model_dict = data_model.dict(
-        exclude={"id", "dateObserved"}.union(rel_attrs),
+        exclude={"id", "dateObserved", "type"}.union(rel_attrs),
         by_alias=True
     )
     for name, value in data_model_dict.items():
