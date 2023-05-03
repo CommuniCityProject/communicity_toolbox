@@ -3,6 +3,7 @@ import unittest
 import hashlib
 import cv2
 import tempfile
+from pathlib import Path
 
 import config
 
@@ -13,6 +14,9 @@ BROKER_URL = f"http://{config.HOST}:{config.CONTEXT_BROKER_PORT}/ngsi-ld/v1/enti
 class TestImageStorage(unittest.TestCase):
 
     def _test_get_image(self, url: str, path: str):
+        """Test that the image at the given url is the same as the one at
+        the given path.
+        """
         r = requests.get(url)
         self.assertTrue(r.ok, r.text)
         with open(path, "rb") as f:
@@ -21,14 +25,20 @@ class TestImageStorage(unittest.TestCase):
         self.assertEqual(hash_local, hash_api)
 
     def test_docs(self):
+        """Test /docs
+        """
         r = requests.get(API_URL + "docs")
         self.assertTrue(r.ok, r.text)
 
     def test_redoc(self):
+        """Test /redoc
+        """
         r = requests.get(API_URL + "redoc")
         self.assertTrue(r.ok, r.text)
 
     def test_post_get(self):
+        """Test post an image file and get it back.
+        """
         # Get image width and height
         img = cv2.imread(config.IMG_FACES_PATH)
         img_h, img_w = img.shape[:2]
@@ -66,6 +76,8 @@ class TestImageStorage(unittest.TestCase):
         self._test_get_image(entity["url"]["value"], config.IMG_FACES_PATH)
 
     def test_post_errors(self):
+        """Test generated errors when uploading non allowed files.
+        """
         # Create a non image file
         with tempfile.TemporaryFile() as fp:
             fp.write(b"not an image")

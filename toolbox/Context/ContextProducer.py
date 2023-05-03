@@ -29,7 +29,10 @@ class ContextProducer:
         """Initialize the ContextProducer.
 
         Args:
-            config (dict): Configuration dictionary.
+            config (dict): Configuration dictionary with the following keys:
+                "context_broker":
+                    "host": (str) The host of the context broker.
+                    "port": (int) The port of the context broker.
         """
         self._broker_host = config["context_broker"]["host"]
         self._broker_port = config["context_broker"]["port"]
