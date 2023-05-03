@@ -10,25 +10,34 @@ from .DataModelsCatalog import register_data_model
 
 @register_data_model
 class PersonKeyPoints(BaseModel):
-    """A data model for person-keypoints predictions.
+    """This entity stores information about a set of body-keypoints of an
+    image of a person. It is intended to be used with computer vision
+    algorithms to infer the position of different parts of the body from an
+    image.
 
     Attributes:
-        id (str): Unique identifier of the entity.
-        dateObserved (datetime): Entity creation time.
-        image (str): Optional source image.
-        bounding_box (BoundingBox): Bounding box of the detected person.
-        confidence (float): Confidence of the detection.
-        keypoints: (Keypoints.COCOKeypoints): Keypoints of the
-            detected person.
+        id (str)
+        dateObserved (datetime)
+        type (str)
+        image (str)
+        bounding_box (BoundingBox)
+        confidence (float)
+        keypoints (Keypoints.COCOKeypoints)
 
     Methods:
-        get_context() -> List[str]
         pretty()
 
-    Properties (read-only):    
-        entity_type (str): Name of the entity type.
+    Properties (read-only):
+        rel_attrs (Set[str])
+        context (Set[str])
+    
+    Static methods:
+        get_type()
     """
-    __entity_type__ = "PersonKeyPoints"
+    __rel_attrs__ = {"image"}
+    __context__ = set()
+
+    type: str = Field("PersonKeyPoints")
 
     image: Optional[str] = Field(
         None,
@@ -45,13 +54,10 @@ class PersonKeyPoints(BaseModel):
         description="Keypoints of the detected person"
     )
 
-    __rel_attrs__ = {"image"}
-
-    def get_context(self) -> List[str]:
-        return []
-
     class Config:
         schema_extra = {
-            "description": """Data model intended to store information about
-                the predicted keypoints of a person."""
+            "description": "This entity stores information about a set of "
+            "body-keypoints of an image of a person. It is intended to be "
+            "used with computer vision algorithms to infer the position of "
+            "different parts of the body from an image"
         }

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import Field
 
@@ -10,26 +10,35 @@ from .DataModelsCatalog import register_data_model
 
 @register_data_model
 class InstanceSegmentation(BaseModel):
-    """A data model for instance segmentation tasks.
+    """This entity stores information about segmented objects on an image.
+    It is intended to be used with instance segmentation algorithms to detect
+    objects and infer a segmentation mask.
 
     Attributes:
-        id (str): Unique identifier of the entity.
-        dateObserved (datetime): Entity creation time.
-        image (str): Optional source image.
-        mask (SegmentationMask): Segmentation mask of the detected instance.
-        bounding_box (BoundingBox): Bounding box of the detected instance.
-        label (str): Name of the predicted class.
-        label_id (int): Id of the label.
-        confidence (float): Confidence of the detection.
+        id (str)
+        dateObserved (datetime)
+        type (str)
+        image (str)
+        mask (SegmentationMask)
+        bounding_box (BoundingBox)
+        label (str)
+        label_id (int)
+        confidence (float)
 
     Methods:
-        get_context() -> List[str]
         pretty()
 
-    Properties (read-only):    
-        entity_type (str): Name of the entity type.
+    Properties (read-only):
+        rel_attrs (Set[str])
+        context (Set[str])
+
+    Static methods:
+        get_type()
     """
-    __entity_type__ = "InstanceSegmentation"
+    __rel_attrs__ = {"image"}
+    __context__ = set()
+
+    type: str = Field("InstanceSegmentation")
 
     image: Optional[str] = Field(
         None,
@@ -58,13 +67,10 @@ class InstanceSegmentation(BaseModel):
         description="Confidence of the detection",
     )
 
-    __rel_attrs__ = {"image"}
-
-    def get_context(self) -> List[str]:
-        return []
-
     class Config:
         schema_extra = {
-            "description": """Data model intended to store information about
-                an instance segmentation."""
+            "description": "This entity stores information about segmented "
+            "objects on an image. It is intended to be used with instance "
+            "segmentation algorithms to detect objects and infer a "
+            "segmentation mask"
         }

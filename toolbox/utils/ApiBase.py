@@ -307,7 +307,6 @@ class ApiBase:
             "/predict",
             description=description,
             responses={
-                404: {"description": "Entity not found"},
                 200: self._get_default_ok_response()
             }
         )
@@ -320,13 +319,7 @@ class ApiBase:
             accept = request.headers.get("accept", "application/json")
             try:
                 data_model = self.context_consumer.parse_entity(entity_id)
-            except ValueError as e:
-                logger.error(e, exc_info=True)
-                raise HTTPException(
-                    status.HTTP_404_NOT_FOUND,
-                    "Entity not found"
-                )
-            except KeyError as e:
+            except (KeyError, ValueError) as e:
                 logger.error(e, exc_info=True)
                 raise HTTPException(
                     status.HTTP_422_UNPROCESSABLE_ENTITY,

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import Field
 
@@ -10,36 +10,43 @@ from .DataModelsCatalog import register_data_model
 
 @register_data_model
 class Face(BaseModel):
-    """Data model intended to store information about a face.
+    """This entity stores information about a face, such as its estimated
+    age, gender or identity. It is intended to be used with computer vision
+    algorithms to infer common properties from a facial image.
 
     Attributes:
-        id (str): Unique identifier of the entity.
-        dateObserved (datetime): Entity creation time.
-        image (Image): Source image.
-        bounding_box (BoundingBox): Bounding box of the detected face.
-        detection_confidence (float): Confidence of the face detection.
-        age (float): Predicted age.
-        gender (Gender): Predicted gender.
-        gender_confidence (float): Confidence of the gender classification.
-        emotion (Emotion): Predicted emotion.
-        emotion_confidence (float): Confidence of the emotion classification.
-        features (list): Feature vector.
-        recognition_domain (str): Name of the group of people to recognize.
-        recognized (bool): If a face recognition has been performed.
-        recognized_person (str): Name or id of the recognized person.
-        features_algorithm (str): Name of the algorithm used to generate
-            the features.
-        recognized_distance (float): Distance between the extracted features
-            and the most similar face on the dataset.
+        id (str)
+        dateObserved (datetime)
+        type (str)
+        image (str)
+        bounding_box (BoundingBox)
+        detection_confidence (float)
+        age (float)
+        gender (Gender)
+        gender_confidence (float)
+        emotion (Emotion)
+        emotion_confidence (float)
+        features (list)
+        recognition_domain (str)
+        recognized (bool)
+        recognized_person (str)
+        features_algorithm (str)
+        recognized_distance (float)
 
     Methods:
-        get_context() -> List[str]
         pretty()
-
-    Properties (read-only):    
-        entity_type (str): Name of the entity type.
+    
+    Properties (read-only):
+        rel_attrs (Set[str])
+        context (Set[str])
+    
+    Static methods:
+        get_type()
     """
-    __entity_type__ = "Face"
+    __rel_attrs__ = {"image"}
+    __context__ = set()
+
+    type: str = Field("Face")
 
     image: Optional[str] = Field(
         None,
@@ -57,11 +64,11 @@ class Face(BaseModel):
     )
     age: Optional[float] = Field(
         None,
-        description="Predicted age"
+        description="The estimated age of the face"
     )
     gender: Optional[Gender] = Field(
         None,
-        description="Predicted gender"
+        description="The inferred gender of the face"
     )
     gender_confidence: Optional[float] = Field(
         None,
@@ -70,7 +77,7 @@ class Face(BaseModel):
     )
     emotion: Optional[Emotion] = Field(
         None,
-        description="Predicted emotion"
+        description="The inferred emotion of the face"
     )
     emotion_confidence: Optional[float] = Field(
         None,
@@ -79,7 +86,8 @@ class Face(BaseModel):
     )
     features: Optional[list] = Field(
         None,
-        description="Feature vector",
+        description="Facial features extracted with a computer vision "
+            "algorithm used for face recognition tasks",
     )
     features_algorithm: Optional[str] = Field(
         None,
@@ -88,12 +96,13 @@ class Face(BaseModel):
     )
     recognition_domain: Optional[str] = Field(
         None,
-        description="Name of the group of people to recognize",
+        description="The face recognition domain. I.e. name of the group of "
+            "people to recognize",
         alias="recognitionDomain"
     )
     recognized: Optional[bool] = Field(
         False,
-        description="If a face recognition has been performed",
+        description="Flags whether a face recognition task has been performed",
     )
     recognized_distance: Optional[float] = Field(
         None,
@@ -108,13 +117,10 @@ class Face(BaseModel):
         alias="recognizedPerson"
     )
 
-    __rel_attrs__ = {"image"}
-
-    def get_context(self) -> List[str]:
-        return []
-
     class Config:
         schema_extra = {
-            "description": "Data model intended to store information about "
-            "a face."
+            "description": "This entity stores information about a face, such "
+                "as its estimated age, gender or identity. It is intended to "
+                "be used with computer vision algorithms to infer common "
+                "properties from a facial image"
         }

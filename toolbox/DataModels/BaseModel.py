@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from datetime import datetime
-from typing import List, Optional, Set
+from typing import Optional, Set
 
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import Field
@@ -13,29 +13,28 @@ from toolbox.utils.utils import str_separator
 class BaseModel(PydanticBaseModel):
     """Base class for the toolbox data models.
 
-    Methods to be implemented:
-        get_context() -> List[str]
-
     Attributes to override:
-        __entity_type__
-
-    Raises:
-        NotImplementedError
+        __rel_attrs__
+        __context__
+        type
 
     Attributes:
-        id (str)
-        dateObserved (datetime)
+        id (str): Unique identifier of the entity.
+        dateObserved (datetime): Entity creation time.
+        type (str): Name of the entity type.
 
     Methods:
         pretty()
 
     Properties (read-only):
-        entity_type (str): Name of the entity type.
+        rel_attrs (Set[str])
+        context (Set[str])
+    
+    Static methods:
+        get_type()
     """
-    __entity_type__ = "BaseModel"
     __rel_attrs__ = set()
-
-    type: str = Field("BaseModel")
+    __context__ = set()
 
     id: Optional[str] = Field(
         None,
@@ -47,29 +46,28 @@ class BaseModel(PydanticBaseModel):
         description="Entity creation time"
     )
 
+    type: str = Field(
+        "BaseModel",
+        const=True,
+        description="Name of the entity type"
+    )
+
     class Config:
+        # Pydantic configuration
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    @classmethod
-    @property
-    def entity_type(cls) -> str:
-        return cls.__entity_type__
-
     @property
     def rel_attrs(self) -> Set[str]:
+        """Return a set with the names of the attributes that are relationships.
+        """
         return self.__rel_attrs__
 
-    def get_context(self) -> List[str]:
-        """Return a list with the context of the entities.
-
-        Raises:
-            NotImplementedError: To be implemented.
-
-        Returns:
-            List[str]: A list of URIs.
+    @property
+    def context(self) -> Set[str]:
+        """Return a set with the context URLs of the entity.
         """
-        raise NotImplementedError
+        return self.__context__
 
     def pretty(self) -> str:
         """Return a pretty description of the object. 
@@ -80,7 +78,7 @@ class BaseModel(PydanticBaseModel):
         extra_tab = 1
         length = math.ceil((max_n + (tab_size*extra_tab)) / 8) * tab_size
 
-        r = str_separator(title=self.entity_type)
+        r = str_separator(title=self.type)
         for name in names:
             r += name
             r += "\t" * math.ceil((length - len(name))/tab_size)
@@ -88,3 +86,9 @@ class BaseModel(PydanticBaseModel):
             r += "\n"
         r += str_separator()
         return r
+
+    @classmethod
+    def get_type(cls) -> str:
+        """Static methods to get the data model type name.
+        """
+        return cls.__fields__["type"].default

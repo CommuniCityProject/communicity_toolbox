@@ -172,7 +172,7 @@ class TestContextConsumer(unittest.TestCase):
         )
         ret_dm = cc.parse_entity(e_id)
         self.assertEqual(e_id, ret_dm.id)
-        self.assertEqual(e_type, ret_dm.entity_type)
+        self.assertEqual(e_type, ret_dm.type)
         self.assertEqual(datetime.datetime.fromisoformat(
             date_observed[:-1]), ret_dm.dateObserved)
         self.assertEqual(image, ret_dm.image)
@@ -235,7 +235,7 @@ class TestContextConsumer(unittest.TestCase):
         }
         dm = cc.parse_dict(entity)
         self.assertEqual(e_id, dm.id)
-        self.assertEqual(e_type, dm.entity_type)
+        self.assertEqual(e_type, dm.type)
         self.assertEqual(datetime.datetime.fromisoformat(
             date_observed[:-1]), dm.dateObserved)
         self.assertEqual(image, dm.image)

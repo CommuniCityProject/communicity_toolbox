@@ -68,12 +68,12 @@ def create_entity(data_model: typing.Type[BaseModel]) -> Entity:
     """
     if not data_model.id:
         data_model.id = create_random_id(
-            entity_type=data_model.entity_type
+            entity_type=data_model.type
         )
-    entity = Entity(data_model.entity_type, data_model.id)
-    
+    entity = Entity(data_model.type, data_model.id)
+
     # Set the context
-    entity.ctx += data_model.get_context()
+    entity.ctx += data_model.context
     # Set dateObserved attribute
     entity.tprop("dateObserved", data_model.dateObserved)
     # Set relationship attributes
@@ -148,6 +148,11 @@ def parse_entity(entity: typing.Union[Entity, dict],
     for name, field in data_model_type.__fields__.items():
         if name == "id":
             params["id"] = entity["id"]
+        elif name == "type":
+            if entity["type"] != data_model_type.get_type():
+                raise ValueError(f"Entity type {entity['type']} does not "
+                                 f"match with data model type {data_model_type}"
+                                 f" ({data_model_type.get_type()})")
         elif field.alias in entity:
             if "value" in entity[field.alias]:
                 k = "value"
@@ -156,7 +161,10 @@ def parse_entity(entity: typing.Union[Entity, dict],
             elif "object" in entity[field.alias]:
                 k = "object"
             else:
-                raise ValueError(f"Can not parse field {entity[field.alias]}")
+                raise ValueError(
+                    f"Can not parse field {field.alias} "
+                    f"({entity[field.alias]}) from {entity} to "
+                    f"{data_model_type} type)")
             params[field.alias] = get_entity_field(
                 entity[field.alias][k], field.type_
             )
