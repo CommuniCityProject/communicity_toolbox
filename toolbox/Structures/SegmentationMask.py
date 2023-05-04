@@ -66,7 +66,7 @@ class SegmentationMask:
         return self.mask.shape[0]
 
     def resize(self, width: int, height: int) -> SegmentationMask:
-        """Resize the mask.
+        """Return a resized copy of the mask.
 
         Args:
             width (int): Target width of the mask.
@@ -79,6 +79,8 @@ class SegmentationMask:
         if mask_h != height or mask_w != width:
             mask = cv2.resize(
                 self.mask.astype("uint8"), (width, height)).astype(bool)
+        else:
+            mask = self.mask
         return SegmentationMask(mask=mask)
 
     def __str__(self) -> str:

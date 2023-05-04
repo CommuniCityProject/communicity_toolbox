@@ -44,18 +44,13 @@ keypoints:
 context_broker:
   host: 192.168.0.100
   port: 1026
-  # URI where notifications will be sent
   notification_uri: http://192.168.0.100:8080/ngsi-ld/v1/notify
 
 api:
   host: 0.0.0.0
   port: 8080
-  
-  # List of origins that should be permitted to make cross-origin requests.
   allowed_origins: []
-  
-  # If the images are stored locally and can be accessed by their path.
-  local_image_storage: False
+  local_image_storage: True
 
 subscriptions:
   - entity_type: Image

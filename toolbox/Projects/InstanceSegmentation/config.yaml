@@ -7,14 +7,14 @@ instance_segmentation:
     use_cuda: True
 
 context_broker:
-  host: 192.168.0.69
+  host: 192.168.0.100
   port: 1026
   # URI where notifications will be sent
-  notification_uri: http://192.168.0.69:7799/ngsi-ld/v1/notify
+  notification_uri: http://192.168.0.100:8080/ngsi-ld/v1/notify
 
 api:
   host: 0.0.0.0
-  port: 9001
+  port: 8080
   
   # List of origins that should be permitted to make cross-origin requests.
   allowed_origins: []
@@ -28,7 +28,7 @@ subscriptions:
     query: "purpose==%22InstanceSegmentation%22"
 
 visualization:
-  image_width: 2000
+  image_width: 1000
   InstanceSegmentation:
     text_background: True
     mask_color_alpha: 0.7
