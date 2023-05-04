@@ -21,7 +21,7 @@ This project uses a configuration YAML with the following fields:
     - ``notification_uri``:  URI where the subscription notifications will be sent
 - ``api``:
     - ``host``:  Bind IP address of the API server
-    - ``port``:  Bind Port of the API server
+    - ``port``:  Bind port of the API server
     - ``allowed_origins``: List of origins that should be permitted to make cross-origin requests
     - ``local_image_storage``: Flags if the images are stored locally and can be accessed by their path or must be retrieved from a URL
 - ``subscriptions``:  List of subscriptions to create on the context broker. Each element can have the following fields:
@@ -68,7 +68,7 @@ subscriptions:
 
 ## API
 
-The API allows to execute the Project as a service. It has automatic and interactive documentation generated with [swagger-ui](https://github.com/swagger-api/swagger-ui) on ``/docs`` and [redoc](https://github.com/Redocly/redoc) on ``/redoc``.
+The API allows the Project to be executed as a service. It has automatic and interactive documentation generated with [swagger-ui](https://github.com/swagger-api/swagger-ui) on ``/docs`` and [redoc](https://github.com/Redocly/redoc) on ``/redoc``.
 
 ### Endpoints
 
@@ -99,7 +99,7 @@ The API allows to execute the Project as a service. It has automatic and interac
       A json with the following fields:
 
       - ``entity_id``:  The id of an image entity in the context broker to predict the keypoints of
-      - ``post_to_broker``:  Flag if the generated data models should be posted to the context broker. Defualts to ``true``
+      - ``post_to_broker``:  Flag if the generated data models should be posted to the context broker. Defaults to ``true``
     
       </br>
       <details>
@@ -230,7 +230,7 @@ The API allows to execute the Project as a service. It has automatic and interac
 
 - **``POST``** _/ngsi-ld/v1/notify_
   
-  It is used by the context broker to notify the activation of a subscription.
+  Route to notify the activation of a subscription (usually used by a context broker)
 
   - **Query parameters**
     
