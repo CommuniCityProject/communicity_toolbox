@@ -255,7 +255,7 @@ The API allows to execute the Project as a service. It has automatic and interac
         "id": "string",
         "type": "Notification",
         "subscriptionId": "string",
-        "notifiedAt": "2023-05-04T13:17:16.096Z",
+        "notifiedAt": "string",
         "data": []
       }
       ```
