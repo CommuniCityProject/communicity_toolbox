@@ -2,8 +2,8 @@ face_recognition:
   model_name: face_recognition_facenet
   params:
     distance_threshold: 0.75
-  model_path: ../../../data/models/face_recognition_facenet/squeezenet_VGGFace2/model-20180204-160909.ckpt-266000
-  use_cuda: False
+    model_path: ../../../data/models/face_recognition_facenet/squeezenet_VGGFace2/model-20180204-160909.ckpt-266000
+    use_cuda: False
   dataset_path: ../../../data/samples/face_recognition_datasets/facenet_celeb_single.pkl
   unknown_label: "<unk>"
   domain: Celeb
@@ -15,16 +15,16 @@ face_detector:
     use_cuda: True
 
 context_broker:
-  host: 158.109.9.60
+  host: 192.168.0.100
   port: 1026
   # URI where notifications will be sent
-  notification_uri: http://158.109.9.60:9002/ngsi-ld/v1/notify
+  notification_uri: http://192.168.0.100:8080/ngsi-ld/v1/notify
   # Check for conflicting subscriptions before creating a new one
   check_subscription_conflicts: True
 
 api:
   host: 0.0.0.0
-  port: 9002
+  port: 8080
 
   # Wether the api should extract features of faces
   load_dataset: True
@@ -58,6 +58,6 @@ subscriptions:
     query: "purpose==%22FaceRecognition%22"
 
 visualization:
-  image_width: 800
+  image_height: 800
   Face:
     {}

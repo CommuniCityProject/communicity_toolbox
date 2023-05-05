@@ -51,11 +51,8 @@ class FaceRecognition:
         self._do_recognition = do_recognition
 
         if do_extraction:
-            self._face_recognition.load_model(
-                Path(config["face_recognition"]["model_path"]),
-                config["face_recognition"]["use_cuda"]
-            )
             logger.info("Loading face recognition model")
+            self._face_recognition.load_model()
 
             face_model = config["face_detector"]["model_name"]
             face_params = config["face_detector"]["params"]
@@ -86,7 +83,7 @@ class FaceRecognition:
             image = bb.crop_image(image)
         features = self._face_recognition.predict_features(image)
         face.features = features.tolist()
-        face.features_algorithm = self._face_recognition.ALGORITHM_NAME
+        face.features_algorithm = self._face_recognition.algorithm_name
         return face
     
     def predict(self, image: Image
@@ -110,7 +107,7 @@ class FaceRecognition:
                     bounding_box=face_ins.bounding_box,
                     detection_confidence=float(face_ins.confidence),
                     features=features.tolist(),
-                    features_algorithm=self._face_recognition.ALGORITHM_NAME,
+                    features_algorithm=self._face_recognition.algorithm_name,
                     image=image.id
                 )
             )

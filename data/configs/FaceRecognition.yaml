@@ -4,9 +4,9 @@ face_recognition:
   model_name: face_recognition_facenet
   params:
     distance_threshold: 0.75
-  model_path: !ENV ${TOOLBOX_DATA}/models/face_recognition_facenet/squeezenet_VGGFace2/model-20180204-160909.ckpt-266000
-  use_cuda: False
-  dataset_path: !ENV ${TOOLBOX_DATA}/samples/face_recognition_datasets/facenet_celeb_single.pkl # /home/user/facenet_celeb_single.pkl # !ENV ${TOOLBOX_DATA}/samples/face_recognition_datasets/facenet_celeb_single.pkl
+    model_path: !ENV ${TOOLBOX_DATA}/models/face_recognition_facenet/squeezenet_VGGFace2/model-20180204-160909.ckpt-266000
+    use_cuda: False
+  dataset_path: !ENV ${TOOLBOX_DATA}/samples/face_recognition_datasets/facenet_celeb_single.pkl
   unknown_label: "<unk>"
   domain: Celeb
 

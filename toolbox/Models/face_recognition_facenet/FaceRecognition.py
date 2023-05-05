@@ -1,7 +1,7 @@
 import os
 import pickle
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 import cv2
 import numpy as np
@@ -17,7 +17,7 @@ class FaceRecognition:
     them with a local dataset.
 
     Methods:
-        load_model(model_path, use_cuda)
+        load_model()
         predict_features(image) -> np.ndarray
         load_features(features_path)
         add_features(name, features)
@@ -26,35 +26,43 @@ class FaceRecognition:
         recognize_image(image) -> List[Instance]
 
     Attributes:
-        ALGORITHM_NAME (str): The name of the algorithm used.
         distance_threshold (float): Maximum distance between two
             features vector to consider them from the same person.
+    
+    Properties (read-only):
+        algorithm_name (str): Name of the face recognition algorithm.
     """
 
-    ALGORITHM_NAME = "FaceNet"
+    __algorithm_name__ = "FaceNet"
 
-    def __init__(self, distance_threshold: float = 0.75):
-        """
+    def __init__(self, distance_threshold: float = 0.75,
+                 model_path: Optional[Path] = None, use_cuda: bool = False):
+        """Create the FaceRecognition model.
+
         Args:
             distance_threshold (float, optional): Maximum distance between two
                 features vector to consider them from the same person.
                 Defaults to 0.75.
-        """
-        self.distance_threshold = distance_threshold
-        self._session = None
-        self._face_features: Dict[str, np.ndarray] = {}
-
-    def load_model(self, model_path: Path, use_cuda: bool = False):
-        """Load the model from a checkpoint file.
-
-        Args:
-            model_path (Path): Path to the model checkpoint.
-                (.ckpt-..., without the ".data-...").
+            model_path (Optional[Path], optional): Path to the model checkpoint.
+                (.ckpt-..., without the ".data-..."). Defaults to None.
             use_cuda (bool, optional): Execute the model on a cuda device.
                 Defaults to False.
         """
-        model_path = Path(model_path)
-        if not use_cuda:
+        self.distance_threshold = distance_threshold
+        self._model_path = model_path
+        self._use_cuda = use_cuda
+        self._session = None
+        self._face_features: Dict[str, np.ndarray] = {}
+
+    def load_model(self):
+        """Load the model from a checkpoint file.
+        """
+        if self._model_path is None:
+            raise ValueError("Model path is not defined")
+        
+        model_path = Path(self._model_path)
+        
+        if not self._use_cuda:
             os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
         tf.compat.v1.disable_eager_execution()
@@ -191,3 +199,9 @@ class FaceRecognition:
         features = self.predict_features(image)
         instances = self.recognize_features(features)
         return instances
+
+    @property
+    def algorithm_name(self) -> str:
+        """Get the name of the face recognition algorithm.
+        """
+        return self.__algorithm_name__

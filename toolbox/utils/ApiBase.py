@@ -1,25 +1,22 @@
-from typing import Any, List, Type, Union, Optional
-from pathlib import Path
 import argparse
 import logging
+from pathlib import Path
+from typing import Any, List, Optional, Type, Union
 
 import uvicorn
-from fastapi import (FastAPI, Body, Query, Response, status, HTTPException,
-    Response, Request)
+from fastapi import (Body, FastAPI, HTTPException, Query, Request, Response,
+                     status)
 from fastapi.responses import JSONResponse
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 
-from toolbox import DataModels
-from toolbox.DataModels import Notification, BaseModel
-from toolbox.Context.entity_parser import parse_entity
-from toolbox.utils.config_utils import parse_config
+from toolbox import DataModels, Structures
 from toolbox.Context import ContextConsumer, ContextProducer
-from toolbox import Structures
+from toolbox.DataModels import BaseModel, Notification
+from toolbox.utils.config_utils import parse_config
 from toolbox.utils.utils import get_logger
 
 logger = get_logger("toolbox.Api")
-
 
 
 class ApiBase:
@@ -28,7 +25,7 @@ class ApiBase:
     Attributes to override:
         VERSION (str): The version of the API.
         TITLE (str): The title of the API.
-    
+
     Attributes:
         host (str): The bind host.
         port (int): The bind port.
@@ -40,7 +37,7 @@ class ApiBase:
         context_producer (ContextProducer): The ContextProducer.
         config (dict): The config of the API.
         base_dm (Optional[Type[BaseModel]]): Data model class that will be send.
-    
+
     Raises:
         NotImplementedError
 
@@ -86,7 +83,7 @@ class ApiBase:
         ap.add_argument(
             "--log-level",
             help="Log level (default: INFO)",
-            choices = ["DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"],
+            choices=["DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"],
             default="INFO"
         )
         args = ap.parse_args()
@@ -124,7 +121,7 @@ class ApiBase:
         self.context_consumer.unsubscribe()
 
     def _process_notified_models(self, data_models: List[Type[BaseModel]],
-        subscription_id: str):
+                                 subscription_id: str):
         """Process the notified data models from a subscription.
 
         Args:
@@ -133,14 +130,14 @@ class ApiBase:
                 the notification.
         """
         if subscription_id not in self.context_consumer.subscription_ids:
-            logger.warning(f"Received a notification from a foreign " \
-                f"subscription: {subscription_id}") 
+            logger.warning(f"Received a notification from a foreign "
+                           f"subscription: {subscription_id}")
         for dm in data_models:
             try:
                 self._predict_entity(dm, post_to_broker=True)
             except HTTPException as e:
                 logger.error(str(e))
-    
+
     def _get_image_from_dm(self, image_dm: DataModels.Image) -> Structures.Image:
         """Get an Image structure from an Image data model.
 
@@ -173,7 +170,7 @@ class ApiBase:
 
         Args:
             image_id (str): The id of an image entity.
-        
+
         Raises:
             HTTPException
 
@@ -230,10 +227,10 @@ class ApiBase:
         """
         @app.post("/ngsi-ld/v1/notify", status_code=204)
         def notify(
-            subscriptionId: str = Query(description="The subscription id " \
-                "that triggered the notification"),
-            notification: Notification = Body(description="The notification" \
-                " data")
+            subscriptionId: str = Query(description="The subscription id "
+                                        "that triggered the notification"),
+            notification: Notification = Body(description="The notification"
+                                              " data")
         ):
             """Notify the activation of a subscription.
             """
@@ -244,9 +241,9 @@ class ApiBase:
             self._process_notified_models(data_models, subscriptionId)
             return Response(status_code=status.HTTP_204_NO_CONTENT)
         return app
-    
+
     def _predict_entity(self, data_model: Type[BaseModel],
-        post_to_broker: bool) -> List[Type[BaseModel]]:
+                        post_to_broker: bool) -> List[Type[BaseModel]]:
         """Predict a data model.
 
         Args:
@@ -273,7 +270,7 @@ class ApiBase:
                 }
             }
         }
-    
+
     def _return_data_model_for_accept(
         self,
         data_models: Union[List[Type[DataModels.BaseModel]], Type[DataModels.BaseModel]],
@@ -289,7 +286,7 @@ class ApiBase:
         return data_models
 
     def _set_route_post_predict(self, app: FastAPI,
-        description: str = "Predict an entity") -> FastAPI:
+                                description: str = "Predict an entity") -> FastAPI:
         """Set the post-predict route.
 
         Args:
@@ -313,8 +310,8 @@ class ApiBase:
         def predict(
             request: Request,
             entity_id: str = Body(description="Id of an entity"),
-            post_to_broker: bool = Body(True, description="Post the " \
-                "predicted entity to the context broker"),
+            post_to_broker: bool = Body(True, description="Post the "
+                                        "predicted entity to the context broker"),
         ) -> Union[List[self.base_dm], Any]:
             accept = request.headers.get("accept", "application/json")
             try:
@@ -326,7 +323,7 @@ class ApiBase:
                     f"Unprocessable entity type: {entity_id}"
                 )
             dms = self._predict_entity(
-                data_model = data_model,
+                data_model=data_model,
                 post_to_broker=post_to_broker
             )
             return self._return_data_model_for_accept(dms, accept)

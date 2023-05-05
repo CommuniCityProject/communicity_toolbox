@@ -30,8 +30,8 @@ def benchmark_model(model_name: str, method: str, n: int, call_input: any,
     times = {"load": 0., "min": 0, "mean": 0, "max": 0, "total": 0, "op/s": 0}
 
     if model_name == "face_recognition_facenet":
-        model = model_catalog[model_name]()
-        times["load"], _ = count_time(lambda: model.load_model(**model_params))
+        model = model_catalog[model_name](**model_params)
+        times["load"], _ = count_time(lambda: model.load_model())
     else:
         times["load"], model = count_time(
             lambda: model_catalog[model_name](**model_params))

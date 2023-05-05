@@ -1,8 +1,7 @@
-from typing import List, Any, Union, Optional
+from typing import List, Any, Union
 import argparse
 
-from fastapi import FastAPI, Body, HTTPException, status, Header, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Body, HTTPException, status, Request
 
 from toolbox import DataModels
 from toolbox.Projects.FaceRecognition import FaceRecognition
@@ -228,11 +227,11 @@ class FaceRecognitionApi(ApiBase):
         def recognize(
             request: Request,
             entity_id: str = Body(
-                description="Id of a FaceRecognition entity"),
+                description="Id of a Face entity"),
             post_to_broker: bool = Body(True,
                 description="Post the predicted entity to the context broker")
         ) -> Union[self.base_dm, Any]:
-            """Recognize the features of a Face or an Image entity.
+            """Recognize the features of a Face entity.
             """
             accept = request.headers.get("accept", "application/json")
             try:

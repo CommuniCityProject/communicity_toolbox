@@ -28,8 +28,8 @@ This project uses a configuration YAML with the following fields:
     - ``port``:  Bind port of the API server.
     - ``allowed_origins``: List of origins that should be permitted to make cross-origin requests.
     - ``local_image_storage``: Flags if the images are stored locally and can be accessed by their path or must be retrieved from a URL.
-    - ``post_new_entity``: Create a new Face entity in the context broker with the predicted age and gender when processing a Face entity.
-    - ``update_entity``: Update the Face entity in the context broker with the predicted age and gender when processing a Face entity.
+    - ``post_new_entity``: Create a new _Face_ entity in the context broker with the predicted age and gender when processing a _Face_ entity.
+    - ``update_entity``: Update the _Face_ entity in the context broker with the predicted age and gender when processing a _Face_ entity.
 - ``subscriptions``:  List of subscriptions to create on the context broker. Each element can have the following fields:
     - ``entity_type``:  Entity type to subscribe to.
     - ``watched_attributes``:  List of attributes to subscribe to.
@@ -123,8 +123,8 @@ The API allows the Project to be executed as a service. It has automatic and int
 
         ```
         {
-        "entity_id": "string",
-        "post_to_broker": true
+          "entity_id": "string",
+          "post_to_broker": true
         }
         ```
 
