@@ -12,22 +12,22 @@ This project uses the [InstanceSegmentation](/docs/DataModels/InstanceSegmentati
 
 This project uses a configuration YAML with the following fields:
 
-- ``instance_segmentation``:  Specifies the name and parameters of the instance segmentation model. It must have the following fields:
-  - ``model_name``:  Name of the model.
-  - ``params``:  The parameters of the models' python class.
+- ``instance_segmentation``: Specifies the name and parameters of the instance segmentation model. It must have the following fields:
+  - ``model_name``: Name of the model.
+  - ``params``: The parameters of the models' python class.
 - ``context_broker``:
-    - ``host``:  IP address of the Context Broker
-    - ``port``:  Port of the Context Broker
-    - ``notification_uri``:  URI where the subscription notifications will be sent
+    - ``host``: IP address of the Context Broker.
+    - ``port``: Port of the Context Broker.
+    - ``notification_uri``: URI where the subscription notifications will be sent.
 - ``api``:
-    - ``host``:  Bind IP address of the API server
-    - ``port``:  Bind port of the API server
-    - ``allowed_origins``: List of origins that should be permitted to make cross-origin requests
-    - ``local_image_storage``: Flags if the images are stored locally and can be accessed by their path or must be retrieved from a URL
-- ``subscriptions``:  List of subscriptions to create on the context broker. Each element can have the following fields:
-    - ``entity_type``:  Entity type to subscribe to
-    - ``watched_attributes``:  List of attributes to subscribe to
-    - ``query``:  Query to filter the entities to subscribe to
+    - ``host``: Bind IP address of the API server.
+    - ``port``: Bind port of the API server.
+    - ``allowed_origins``: List of origins that should be permitted to make cross-origin requests.
+    - ``local_image_storage``: Flags if the images are stored locally and can be accessed by their path or must be retrieved from a URL.
+- ``subscriptions``: List of subscriptions to create on the context broker. Each element can have the following fields:
+    - ``entity_type``: Entity type to subscribe to.
+    - ``watched_attributes``: List of attributes to subscribe to.
+    - ``query``: Query to filter the entities to subscribe to.
 
 <details>
 <summary>Example:</summary>
@@ -69,7 +69,7 @@ The API allows the Project to be executed as a service. It has automatic and int
 
 - **``GET``** _/_
 
-    Returns the name and version of the API
+    Returns the name and version of the API.
 
     - **Response**
 
@@ -87,14 +87,14 @@ The API allows the Project to be executed as a service. It has automatic and int
 
 - **``POST``** _/predict_
 
-    Predict bounding boxes and masks of the objects in an image. It returns a list of data models for each detected object. The response type can be specified with the ``accept`` header (``application/json`` or ``application/ld+json``)
+    Predict bounding boxes and masks of the objects in an image. It returns a list of data models for each detected object. The response type can be specified with the ``accept`` header (``application/json`` or ``application/ld+json``).
 
     - **Request body**
 
-      A json with the following fields:
+      A JSON with the following fields:
 
-      - ``entity_id``:  The id of an image entity in the context broker to perform instance segmentation on
-      - ``post_to_broker``:  Flag if the generated data models should be posted to the context broker. Defaults to ``true``
+      - ``entity_id``: The id of an image entity in the context broker to perform instance segmentation on.
+      - ``post_to_broker``: Flag if the generated data models should be posted to the context broker. Defaults to ``true``.
     
       </br>
       <details>
@@ -113,15 +113,15 @@ The API allows the Project to be executed as a service. It has automatic and int
     
       A list with the generated data models (one for each person) with the following fields:
 
-      - ``id``:  The id of the entity on the context broker
-      - ``dateObserved``:  The date when the data model was generated
-      - ``type``:  The type of the data model (``InstanceSegmentation``)
-      - ``image``:  The id of the source image entity
-      - ``mask``:  The mask of the object in the image (RLE compressed binary mask with hexadecimal encoding)
-      - ``boundingBox``:  The bounding box of the object in the image with relative image coordinates
-      - ``confidence``:  The confidence of the detection
-      - ``label``:  The label of the detected object
-      - ``labelId``:  The label id of the detected object
+      - ``id``: The id of the entity on the context broker.
+      - ``dateObserved``: The date when the data model was generated.
+      - ``type``: The type of the data model (``InstanceSegmentation``).
+      - ``image``: The id of the source image entity.
+      - ``mask``: The mask of the object in the image (RLE compressed binary mask with hexadecimal encoding).
+      - ``boundingBox``: The bounding box of the object in the image with relative image coordinates.
+      - ``confidence``: The confidence of the detection.
+      - ``label``: The label of the detected object.
+      - ``labelId``: The label id of the detected object.
 
       </br>
       <details>
@@ -229,21 +229,21 @@ The API allows the Project to be executed as a service. It has automatic and int
 
 - **``POST``** _/ngsi-ld/v1/notify_
   
-  Route to notify the activation of a subscription from a context broker
+  Route to notify the activation of a subscription from a context broker.
 
   - **Query parameters**
     
-    ``subscriptionId``: The id of the subscription
+    ``subscriptionId``: The id of the subscription.
 
   - **Request body**
 
-      A json with the following fields:
+      A JSON with the following fields:
 
-      - ``id``:  The id of the notification
-      - ``type``:  ``Notification``
-      - ``subscriptionId``:  The id of the subscription
-      - ``notifiedAt``:  The date when the notification was sent
-      - ``data``:  A list with the entities notified
+      - ``id``: The id of the notification.
+      - ``type``: ``Notification``.
+      - ``subscriptionId``: The id of the subscription.
+      - ``notifiedAt``: The date when the notification was sent.
+      - ``data``: A list with the entities notified.
     
       </br>
       <details>
@@ -263,4 +263,4 @@ The API allows the Project to be executed as a service. It has automatic and int
 
   - **Response**
 
-    ``204`` _no content_: If the notification was processed successfully
+    ``204`` _no content_: If the notification was processed successfully.

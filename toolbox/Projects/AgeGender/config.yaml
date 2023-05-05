@@ -37,7 +37,7 @@ context_broker:
   host: 192.168.0.100
   port: 1026
   # URI where notifications will be sent
-  notification_uri: http://192.168.0.100:9002/ngsi-ld/v1/notify
+  notification_uri: http://192.168.0.100:8080/ngsi-ld/v1/notify
 
 api:
   host: 0.0.0.0
@@ -61,10 +61,7 @@ subscriptions:
   - entity_type: Image
     watched_attributes: ["purpose"]
     query: "purpose==%22AgeGender%22"
-  - entity_type: Face
-    watched_attributes: ["dateCreated"]
-    query: ""
 
 visualization:
-  image_width: 1500
+  image_height: 1000
   Face: {}
