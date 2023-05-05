@@ -130,23 +130,26 @@ The API allows the Project to be executed as a service. It has automatic and int
       ```
       [
         {
-          "id": "string",
-          "dateObserved": "string",
+          "id": "urn:ngsi-ld:InstanceSegmentation:wJm91OsuEe2QfbPVle6bQw",
+          "dateObserved": "2023-05-05T10:22:34.964605",
           "type": "InstanceSegmentation",
-          "image": "string",
+          "image": "urn:ngsi-ld:Image:0Brlst7Mb2GuqiUQfFzBU409Xu9Y-LbdNkSAQG9xONk",
           "mask": {
-            "size": [integer, integer],
-            "counts": "string"
+            "size": [
+              3024,
+              4032
+            ],
+            "counts": "605b5065353d6c6d323a403e49374b354b344c344e324e324e324e324f314f324e314f314f314f3130304f314f31303030304f3130303030303030304f31303030314f3030303030303030303030303030303030303030303030303030303030303030303030303030303030303030314f30303030303030303030303030314f314f324d354c334d354b354a61305e4f6130594f5c6c666835"
           },
           "boundingBox": {
-            "xmin": number,
-            "ymin": number,
-            "xmax": number,
-            "ymax": number
+            "xmin": 0.4862205263168093,
+            "ymin": 0.4151156390154803,
+            "xmax": 0.5035785190642826,
+            "ymax": 0.44116150386749753
           },
-          "label": "number",
-          "labelId": integer,
-          "confidence": number
+          "label": "vase",
+          "labelId": 75,
+          "confidence": 0.5476813316345215
         }
       ]
       ```
@@ -158,47 +161,66 @@ The API allows the Project to be executed as a service. It has automatic and int
       ```
       [
         {
-          "id": "string",
+          "id": "urn:ngsi-ld:InstanceSegmentation:AW8wlusvEe2pN7PVle6bQw",
           "type": "InstanceSegmentation",
-          "@context": [],
+          "@context": [
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+          ],
           "dateObserved": {
             "type": "Property",
             "value": {
               "@type": "DateTime",
-              "@value": "string"
+              "@value": "2023-05-05T10:24:23Z"
             }
           },
           "image": {
             "type": "Relationship",
-            "object": "string"
+            "object": "urn:ngsi-ld:Image:0Brlst7Mb2GuqiUQfFzBU409Xu9Y-LbdNkSAQG9xONk"
           },
           "mask": {
             "type": "Property",
             "value": {
-              "size": [integer, integer],
-              "counts": "string"
+              "size": [
+                3024,
+                4032
+              ],
+              "counts": "605b5065353d6c6d323a403e49374b354b344c344e324e324e324e324f314f324e314f314f314f3130304f314f31303030304f3130303030303030304f31303030314f3030303030303030303030303030303030303030303030303030303030303030303030303030303030303030314f30303030303030303030303030314f314f324d354c334d354b354a61305e4f6130594f5c6c666835"
             }
           },
           "boundingBox": {
             "type": "Property",
             "value": {
-              "xmin": number,
-              "ymin": number,
-              "xmax": number,
-              "ymax": number
+              "xmin": 0.4862205263168093,
+              "ymin": 0.4151156390154803,
+              "xmax": 0.5035785190642826,
+              "ymax": 0.44116150386749753
             }
           },
           "label": {
             "type": "Property",
-            "value": "string"
+            "value": "vase"
           },
           "labelId": {
             "type": "Property",
-            "value": integer
+            "value": 75
           },
           "confidence": {
             "type": "Property",
-            "value": number
+            "value": 0.5476813316345215
+          },
+          "dateModified": {
+            "type": "Property",
+            "value": {
+              "@type": "DateTime",
+              "@value": "2023-05-05T10:24:23Z"
+            }
+          },
+          "dateCreated": {
+            "type": "Property",
+            "value": {
+              "@type": "DateTime",
+              "@value": "2023-05-05T10:24:23Z"
+            }
           }
         }
       ]
@@ -207,7 +229,7 @@ The API allows the Project to be executed as a service. It has automatic and int
 
 - **``POST``** _/ngsi-ld/v1/notify_
   
-  Route to notify the activation of a subscription (usually used by a context broker)
+  Route to notify the activation of a subscription from a context broker
 
   - **Query parameters**
     
@@ -241,4 +263,4 @@ The API allows the Project to be executed as a service. It has automatic and int
 
   - **Response**
 
-    ``204`` if the notification was processed successfully
+    ``204`` _no content_: If the notification was processed successfully

@@ -31,6 +31,7 @@ class DataModelVisualizer:
 
     def set_config(self, config: dict):
         self.config = config.get("visualization", {})
+        self.config = {} if self.config is None else self.config
         self.img_w = self.config.get("image_width", None)
         self.img_h = self.config.get("image_height", None)
 

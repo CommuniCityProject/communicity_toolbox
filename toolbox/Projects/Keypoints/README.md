@@ -128,35 +128,103 @@ The API allows the Project to be executed as a service. It has automatic and int
       ```
       [
         {
-          "id": "string",
-          "dateObserved": "string",
+          "id": "urn:ngsi-ld:PersonKeyPoints:Ewr1pesuEe2xXt05bH~uyw",
+          "dateObserved": "2023-05-05T10:17:43.886068",
           "type": "PersonKeyPoints",
-          "image": "string",
+          "image": "urn:ngsi-ld:Image:XY0r-VgvLkk3G908InXw815d7gtVrB72xqm0K844g6E",
           "boundingBox": {
-            "xmin": number,
-            "ymin": number,
-            "xmax": number,
-            "ymax": number
+            "xmin": 0.3064143657684326,
+            "ymin": 0.04763534420826396,
+            "xmax": 0.7099463462829589,
+            "ymax": 0.9976930283271735
           },
-          "confidence": number,
+          "confidence": 0.9998873472213745,
           "keypoints": {
-            "nose": [number, number, number],
-            "left_eye": [number, number, number],
-            "right_eye": [number, number, number],
-            "left_ear": [number, number, number],
-            "right_ear": [number, number, number],
-            "left_shoulder": [number, number, number],
-            "right_shoulder": [number, number, number],
-            "left_elbow": [number, number, number],
-            "right_elbow": [number, number, number],
-            "left_wrist": [number, number, number],
-            "right_wrist": [number, number, number],
-            "left_hip": [number, number, number],
-            "right_hip": [number, number, number],
-            "left_knee": [number, number, number],
-            "right_knee": [number, number, number],
-            "left_ankle": [number, number, number],
-            "right_ankle": [number, number, number]
+            "nose": [
+              0.5161009430885315,
+              0.11442651599645615,
+              1.705211877822876
+            ],
+            "left_eye": [
+              0.530274510383606,
+              0.09819689393043518,
+              2.9264578819274902
+            ],
+            "right_eye": [
+              0.4960910677909851,
+              0.10319062322378159,
+              0.9791589975357056
+            ],
+            "left_ear": [
+              0.5519519448280334,
+              0.15187951922416687,
+              0.9948521256446838
+            ],
+            "right_ear": [
+              0.4735800325870514,
+              0.16561231017112732,
+              2.086688995361328
+            ],
+            "left_shoulder": [
+              0.5652918219566345,
+              0.331653892993927,
+              0.27620482444763184
+            ],
+            "right_shoulder": [
+              0.4635750651359558,
+              0.28421345353126526,
+              0.20316766202449799
+            ],
+            "left_elbow": [
+              0.5386120080947876,
+              0.5363969206809998,
+              0.4380761981010437
+            ],
+            "right_elbow": [
+              0.48024994134902954,
+              0.4564972221851349,
+              1.025445580482483
+            ],
+            "left_wrist": [
+              0.5878028869628906,
+              0.6799667477607727,
+              0.6801813244819641
+            ],
+            "right_wrist": [
+              0.6186513900756836,
+              0.49020493030548096,
+              1.0798372030258179
+            ],
+            "left_hip": [
+              0.4510689377784729,
+              0.686208963394165,
+              0.1246616467833519
+            ],
+            "right_hip": [
+              0.3693620264530182,
+              0.6537497043609619,
+              0.08254871517419815
+            ],
+            "left_knee": [
+              0.5861353874206543,
+              0.9146721959114075,
+              0.3097969591617584
+            ],
+            "right_knee": [
+              0.41271671652793884,
+              0.9446346163749695,
+              0.37432464957237244
+            ],
+            "left_ankle": [
+              0.41771912574768066,
+              0.9945719242095947,
+              0.06195808947086334
+            ],
+            "right_ankle": [
+              0.3418484926223755,
+              0.9945719242095947,
+              0.08313852548599243
+            ]
           }
         }
       ]
@@ -169,53 +237,137 @@ The API allows the Project to be executed as a service. It has automatic and int
       ```
       [
         {
-          "id": "string",
+          "id": "urn:ngsi-ld:PersonKeyPoints:MhqTWesuEe2UVt05bH~uyw",
           "type": "PersonKeyPoints",
-          "@context": [],
+          "@context": [
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+          ],
           "dateObserved": {
             "type": "Property",
             "value": {
               "@type": "DateTime",
-              "@value": "string"
+              "@value": "2023-05-05T10:18:35Z"
             }
           },
           "image": {
             "type": "Relationship",
-            "object": "string"
+            "object": "urn:ngsi-ld:Image:XY0r-VgvLkk3G908InXw815d7gtVrB72xqm0K844g6E"
           },
           "boundingBox": {
             "type": "Property",
             "value": {
-              "xmin": number
-              "ymin": number
-              "xmax": number
-              "ymax": number
+              "xmin": 0.3064143657684326,
+              "ymin": 0.04763534420826396,
+              "xmax": 0.7099463462829589,
+              "ymax": 0.9976930283271735
             }
           },
           "confidence": {
             "type": "Property",
-            "value": number
+            "value": 0.9998873472213745
           },
           "keypoints": {
             "type": "Property",
             "value": {
-              "nose": [number, number, number],
-              "left_eye": [number, number, number],
-              "right_eye": [number, number, number],
-              "left_ear": [number, number, number],
-              "right_ear": [number, number, number],
-              "left_shoulder": [number, number, number],
-              "right_shoulder": [number, number, number],
-              "left_elbow": [number, number, number],
-              "right_elbow": [number, number, number],
-              "left_wrist": [number, number, number],
-              "right_wrist": [number, number, number],
-              "left_hip": [number, number, number],
-              "right_hip": [number, number, number],
-              "left_knee": [number, number, number],
-              "right_knee": [number, number, number],
-              "left_ankle": [number, number, number],
-              "right_ankle": [number, number, number]
+              "nose": [
+                0.5161009430885315,
+                0.11442651599645615,
+                1.705211877822876
+              ],
+              "left_eye": [
+                0.530274510383606,
+                0.09819689393043518,
+                2.9264578819274902
+              ],
+              "right_eye": [
+                0.4960910677909851,
+                0.10319062322378159,
+                0.9791589975357056
+              ],
+              "left_ear": [
+                0.5519519448280334,
+                0.15187951922416687,
+                0.9948521256446838
+              ],
+              "right_ear": [
+                0.4735800325870514,
+                0.16561231017112732,
+                2.086688995361328
+              ],
+              "left_shoulder": [
+                0.5652918219566345,
+                0.331653892993927,
+                0.27620482444763184
+              ],
+              "right_shoulder": [
+                0.4635750651359558,
+                0.28421345353126526,
+                0.20316766202449799
+              ],
+              "left_elbow": [
+                0.5386120080947876,
+                0.5363969206809998,
+                0.4380761981010437
+              ],
+              "right_elbow": [
+                0.48024994134902954,
+                0.4564972221851349,
+                1.025445580482483
+              ],
+              "left_wrist": [
+                0.5878028869628906,
+                0.6799667477607727,
+                0.6801813244819641
+              ],
+              "right_wrist": [
+                0.6186513900756836,
+                0.49020493030548096,
+                1.0798372030258179
+              ],
+              "left_hip": [
+                0.4510689377784729,
+                0.686208963394165,
+                0.1246616467833519
+              ],
+              "right_hip": [
+                0.3693620264530182,
+                0.6537497043609619,
+                0.08254871517419815
+              ],
+              "left_knee": [
+                0.5861353874206543,
+                0.9146721959114075,
+                0.3097969591617584
+              ],
+              "right_knee": [
+                0.41271671652793884,
+                0.9446346163749695,
+                0.37432464957237244
+              ],
+              "left_ankle": [
+                0.41771912574768066,
+                0.9945719242095947,
+                0.06195808947086334
+              ],
+              "right_ankle": [
+                0.3418484926223755,
+                0.9945719242095947,
+                0.08313852548599243
+              ]
+            }
+          },
+          "dateModified": {
+            "type": "Property",
+            "value": {
+              "@type": "DateTime",
+              "@value": "2023-05-05T10:18:36Z"
+            }
+          },
+          "dateCreated": {
+            "type": "Property",
+            "value": {
+              "@type": "DateTime",
+              "@value": "2023-05-05T10:18:36Z"
             }
           }
         }
@@ -225,7 +377,7 @@ The API allows the Project to be executed as a service. It has automatic and int
 
 - **``POST``** _/ngsi-ld/v1/notify_
   
-  Route to notify the activation of a subscription (usually used by a context broker)
+  Route to notify the activation of a subscription from a context broker
 
   - **Query parameters**
     
@@ -259,4 +411,4 @@ The API allows the Project to be executed as a service. It has automatic and int
 
   - **Response**
 
-    ``204`` if the notification was processed successfully
+    ``204`` _no content_: If the notification was processed successfully
