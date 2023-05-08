@@ -33,6 +33,7 @@ class Image:
 
     Overloaded operators:
         __str__
+        __eq__
         __repr__
         __iter__
     """
@@ -221,6 +222,14 @@ class Image:
             height=value["height"],
             id=value["id"]
         )
+    
+    def __eq__(self, other: Image) -> bool:
+        if not isinstance(other, Image):
+            return False
+        if self._image is not None and other._image is not None:
+            if not np.array_equal(self._image, other._image):
+                return False
+        return self.serialize() == other.serialize()
 
     # Pydantic methods
     def __iter__(self):

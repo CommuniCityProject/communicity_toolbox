@@ -20,6 +20,7 @@ class Instance:
     Overloaded operators:
         __getattr__
         __getitem__
+        __eq__
         __iter__
         __str__
 
@@ -119,6 +120,16 @@ class Instance:
             name (str): Name of the attribute to remove.
         """
         del self._fields[name]
+
+    def __eq__(self, other: Instance) -> bool:
+        if not isinstance(other, Instance):
+            return False
+        eq = True
+        for f in self.fields:
+            if f not in other.fields:
+                return False
+            eq = eq and self._fields[f] == other._fields[f]
+        return eq
 
     # Enable dict conversion with ``dict(instance)``
     def __iter__(self):

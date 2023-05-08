@@ -141,16 +141,23 @@ def parse_entity(entity: typing.Union[Entity, dict],
         data_model_type (Type[BaseModel]): The data model class to which
             convert the entity. One from toolbox.DataModels.
 
+    Raises:
+        TypeError: If the entity type does not match the data model type.
+        ValueError: If the entity does not have a field that is required by
+            the data model.
+
     Returns:
         Type[BaseModel]: The parsed entity.
     """
+    if isinstance(entity, Entity):
+        entity = entity.to_dict()
     params = {}
     for name, field in data_model_type.__fields__.items():
         if name == "id":
             params["id"] = entity["id"]
         elif name == "type":
             if entity["type"] != data_model_type.get_type():
-                raise ValueError(f"Entity type {entity['type']} does not "
+                raise TypeError(f"Entity type {entity['type']} does not "
                                  f"match with data model type {data_model_type}"
                                  f" ({data_model_type.get_type()})")
         elif field.alias in entity:

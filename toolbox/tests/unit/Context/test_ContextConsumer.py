@@ -98,17 +98,17 @@ class TestContextConsumer(unittest.TestCase):
     def test_subscription_conflicts(self):
         cc = ContextConsumer(config)
         t = str(uuid.uuid4())
-        s_id = cc.subscribe(t, ["a1"], "a1==false")
+        s_id = cc.subscribe(t, ["a1"], "a1==true")
         self.assertEqual(len(cc.subscription_conflicts(
-            str(uuid.uuid4()), ["a1"], "a1==false")), 0)
+            str(uuid.uuid4()), ["a1"], "a1==true")), 0)
         self.assertEqual(len(cc.subscription_conflicts(
-            t, [uuid.uuid4()], "a1==false")), 0)
+            t, [uuid.uuid4()], "a1==true")), 0)
         self.assertEqual(len(cc.subscription_conflicts(
-            t, ["a1"], f"{uuid.uuid4()}==false")), 0)
+            t, ["a1"], f"{uuid.uuid4()}==true")), 0)
         self.assertEqual(len(cc.subscription_conflicts(
-            t, ["a1"], "a1==true")), 0)
+            t, ["a1"], "a1==false")), 0)
         self.assertGreater(
-            len(cc.subscription_conflicts(t, ["a1"], "a1==false")), 0)
+            len(cc.subscription_conflicts(t, ["a1"], "a1==true")), 0)
 
     def test_unsubscribe(self):
         cc = ContextConsumer(config)

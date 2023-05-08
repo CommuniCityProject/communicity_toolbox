@@ -8,4 +8,4 @@ FACE_DETECTION_API_PORT = 9007
 LARGE_FILE_BSIZE = 400e6
 
 IMG_FACES_PATH = "../../../data/samples/images/faces/celeb/ben_mad_min_jer.png"
-IMG_FACES_ID_PATH = "_IMG_PATH_FACES_ID"
+IMG_FACES_ID_PATH = "_IMG_FACES_ID"

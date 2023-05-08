@@ -341,6 +341,8 @@ class BoundingBox:
         return not self.is_empty()
 
     def __eq__(self, other: BoundingBox) -> bool:
+        if not isinstance(other, BoundingBox):
+            return False
         return self.xmin == other.xmin and \
             self.ymin == other.ymin and \
             self.xmax == other.xmax and \

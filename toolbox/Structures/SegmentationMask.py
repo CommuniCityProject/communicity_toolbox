@@ -28,6 +28,7 @@ class SegmentationMask:
 
     Overloaded operators:
         __str__
+        __eq__
         __iter__
     """
 
@@ -108,6 +109,11 @@ class SegmentationMask:
         """
         hex_rle["counts"] = bytes.fromhex(hex_rle["counts"])
         return SegmentationMask(rle=hex_rle)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, SegmentationMask):
+            return False
+        return np.array_equal(self.mask, other.mask)
 
     # Pydantic methods
     def __iter__(self):
