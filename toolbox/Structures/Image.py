@@ -12,11 +12,11 @@ from toolbox.utils.utils import is_url
 
 class Image:
     """Structure to store an image. Allow to load an image from a local file
-    or from an url.
+    or an URL.
 
     Attributes:
         path (Union[str, Path]): Path or URL to an image.
-        id (str): Id of an ngsi-ld image entity.
+        id (str): Id of a ngsi-ld image entity.
 
     Properties (read-only):
         image (np.ndarray): The image as a numpy array.

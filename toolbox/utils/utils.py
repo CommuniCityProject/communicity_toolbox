@@ -63,7 +63,7 @@ def is_url(url: str) -> bool:
     try:
         result = urlparse(url)
         return all([result.scheme, result.netloc])
-    except ValueError:
+    except:
         return False
 
 

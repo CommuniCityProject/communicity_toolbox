@@ -285,7 +285,7 @@ class TestBoundingBox(unittest.TestCase):
         self.assertNotEqual(BoundingBox(.1,.2,.3,.4), BoundingBox(.1,.2,.0,.4))
         self.assertNotEqual(BoundingBox(.1,.2,.3,.4), BoundingBox(.1,.2,.3,.0))
 
-    def test_serialize(self):
+    def test_serialize_deserialize(self):
         bb = BoundingBox(.1,.2,.3,.4)
         ser = bb.serialize()
         des = BoundingBox.deserialize(ser)
