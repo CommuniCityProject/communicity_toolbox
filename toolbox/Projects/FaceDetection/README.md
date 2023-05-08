@@ -19,6 +19,7 @@ This project uses a configuration YAML with the following fields:
     - ``host``: IP address of the Context Broker.
     - ``port``: Port of the Context Broker.
     - ``notification_uri``: URI where the subscription notifications will be sent.
+    - ``check_subscription_conflicts``: Flag if the subscription conflicts should be checked before creating them.
 - ``api``:
     - ``host``: Bind IP address of the API server.
     - ``port``: Bind port of the API server.
@@ -47,6 +48,7 @@ context_broker:
   host: 192.168.0.100
   port: 1026
   notification_uri: http://192.168.0.100:8080/ngsi-ld/v1/notify
+  check_subscription_conflicts: True
 
 api:
   host: 0.0.0.0
