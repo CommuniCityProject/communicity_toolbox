@@ -1,16 +1,13 @@
 from __future__ import annotations
 
-from typing import Any, List
+from typing import Any, List, Optional
 
-
+# TODO: key can not start with "_"
+# TODO: to dict recursive (for Instance)
 class Instance:
     """Structure used to store the output of a machine learning model.
     The stored attributes can be plain values (int, float, str, etc.),
-    Structures (BoundingBox, keypoints, etc.) or another instances.
-
-    Example:
-        instance = Instance().set("label", "dog").set("confidence", 0.8)
-        confidence = instance.confidence
+    Structures (BoundingBox, keypoints, etc.) or other instances.
 
     Methods:
         set(name, value) -> Instance
@@ -20,17 +17,49 @@ class Instance:
     Overloaded operators:
         __getattr__
         __getitem__
+        __setattr__
+        __eq__
         __iter__
         __str__
 
     Properties (read-only):
         fields (List[str]): List of names of the attributes set.
+
+    Example:
+        instance = Instance().set("label", "dog").set("confidence", 0.8)
+        confidence = instance.confidence
     """
 
-    def __init__(self):
-        """Initialize an empty Instance.
+    def __init__(self, fields: Optional[dict] = None):
+        """Initialize an Instance. If fields is not None, it will be used to
+        set the attributes. If a value is a dictionary, it will be stored as
+        an Instance.
+
+        Args:
+            fields (Optional[dict], optional): Optional values to set.
+                Defaults to None.
         """
         self._fields = {}
+        if fields is not None:
+            self.set_dict(fields)
+
+    def set_dict(self, fields: dict) -> Instance:
+        """Set multiple values at once. The keys of the dictionary will be used
+        as the names of the attributes. If a value is a dictionary, it will be
+        stored as an Instance.
+
+        Args:
+            fields (dict): Dictionary of values to set.
+
+        Returns:
+            Instance: self
+        """
+        for key, value in fields.items():
+            if isinstance(value, dict):
+                self.set(key, Instance(value))
+            else:
+                self.set(key, value)
+        return self
 
     def set(self, name: str, value: Any) -> Instance:
         """Store a value with the given name.
@@ -38,12 +67,15 @@ class Instance:
         Args:
             name (str): Name that will be used to access the value.
             value (Any): Any object.
+
+        Returns:
+            Instance: Self.
         """
         self._fields[name] = value
         return self
 
     def get(self, name: str, default: Any = None) -> Any:
-        """Get a an attribute by its name.
+        """Get an attribute by its name.
 
         Args:
             name (str): The name of the attribute.
@@ -57,6 +89,22 @@ class Instance:
         if name in self._fields:
             return self._fields[name]
         return default
+
+    def __setattr__(self, name: str, value: Any) -> Instance:
+        """Set an the value of an existing attribute.
+
+        Args:
+            name (str): Name of the attribute.
+            value (Any): Value to set.
+
+        Returns:
+            Instance: Self.
+        """
+        if name.startswith("_") or name not in self._fields:
+            super(Instance, self).__setattr__(name, value)
+        else:
+            self._fields[name] = value
+            return self
 
     def __getattr__(self, name: str) -> Any:
         """Get an attribute by its name.
@@ -82,13 +130,13 @@ class Instance:
             name (str): Name of the attribute.
 
         Raises:
-            AttributeError: If the instance has no attribute named ``name``.
+            KeyError: If the instance has no attribute named ``name``.
 
         Returns:
             Any: The stored value with the key ``name``.
         """
         if name not in self._fields:
-            raise AttributeError(
+            raise KeyError(
                 f"Instance has no field '{name}' ({list(self._fields.keys())})")
         return self._fields[name]
 
@@ -119,6 +167,16 @@ class Instance:
             name (str): Name of the attribute to remove.
         """
         del self._fields[name]
+
+    def __eq__(self, other: Instance) -> bool:
+        if not isinstance(other, Instance):
+            return False
+        for f in self.fields:
+            if f not in other.fields:
+                return False
+            if self._fields[f] != other._fields[f]:
+                return False
+        return True
 
     # Enable dict conversion with ``dict(instance)``
     def __iter__(self):

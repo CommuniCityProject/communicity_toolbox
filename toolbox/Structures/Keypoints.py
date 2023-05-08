@@ -5,6 +5,7 @@ from typing import Dict, List, Tuple, Type
 import numpy as np
 
 
+# TODO: Test keypoints == named_keypoints
 class BaseKeypoints:
     """Store data about keypoints.
 
@@ -30,6 +31,7 @@ class BaseKeypoints:
 
     Overloaded operators:
         __len__
+        __eq__
         __str__
         __iter__
     """
@@ -142,6 +144,13 @@ class BaseKeypoints:
         """
         return cls.from_named_keypoints(keypoints_dict)
 
+    def __eq__(self, other: BaseKeypoints) -> bool:
+        if not isinstance(other, BaseKeypoints):
+            return False
+        return np.array_equal(self.keypoints, other.keypoints) and \
+            self.confidence_threshold == other.confidence_threshold and \
+            self.labels == other.labels
+            
     # Pydantic methods
     def __iter__(self):
         d = self.serialize()
