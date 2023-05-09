@@ -12,10 +12,9 @@ Since a context broker is not intended for storing large files, this service ins
 
 When an image is uploaded a URL-safe, secure and random id is generated. This id is returned as a response and it can be used to retrieve back the image. An entity is created with some metadata about the image on the context broker, with the same id, following the _[Image](/docs/DataModels/Image/)_ data model. This data model includes a URL that can be used to retrieve the image, a path to the image file that can be used by applications running on the same machine and some metadata about the image, such as its size.
 
-The API also includes a route to visualize the Toolbox data models which draws its content to the source image. It also accepts a visualization parameters, such as colors, font size or image size. When a data model is visualized, a new image is created and its id is returned as a response which can then be used to retrieve the image. This id is a hash of the data models and the visualization parameters, so the same calls will return the same image/id.
+The API also includes a route to visualize the Toolbox data models which draws its content to the source image. It also accepts the visualization parameters, such as colors, font size or image size. When a data model is visualized, a new image is created and its id is returned as a response which can then be used to retrieve the image. This id is a hash of the data models and the visualization parameters, so the same calls will return the same image/id.
 
-This API also allow to limit the type and size of the upload images as well as the storage size.
-The size, type and integrity of the images is checked for each upload. It is also possible to limit the maximum number of images files, the total storage size and the time the images are stored. When this limit is exceeded, the oldest images are deleted.
+This API also allows limiting the type and size of the uploaded images as well as the storage size. The size, type and integrity of the images are checked for each upload. It is also possible to limit the maximum number of image files, the total storage size and the time the images are stored. When this limit is exceeded, the oldest images are deleted.
 
 ## Data models
 
@@ -43,8 +42,8 @@ This project uses a configuration YAML with the following fields:
     - ``max_dir_size``: Maximum size of the storage directory in bytes. If reached, the oldest files will be deleted. Set to null to disable.
     - ``max_file_time``: Maximum amount of seconds a file can exist. If a file was created more than ``max_file_time`` seconds ago, it will be deleted. Set to null to disable.
     - ``update_time``: When using ``max_file_time``, the creation time of files will be checked periodically every ``update_time`` seconds.
-    - ``allow_uploads``: If true, the API allows to upload images.
-    - ``allow_entity_visualization``: If true, the API allows to visualize the Toolbox data models.
+    - ``allow_uploads``: If true, the API allows uploading images.
+    - ``allow_entity_visualization``: If true, the API allows the visualization of the Toolbox data models.
     - ``max_entities_visualize``: Maximum allowed number of entities to visualize in one single image. Set to null to disable.
 
 <details>
