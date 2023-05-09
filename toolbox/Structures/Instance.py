@@ -2,12 +2,9 @@ from __future__ import annotations
 
 from typing import Any, List, Optional
 
-# TODO: key can not start with "_"
-# TODO: to dict recursive (for Instance)
+
 class Instance:
     """Structure used to store the output of a machine learning model.
-    The stored attributes can be plain values (int, float, str, etc.),
-    Structures (BoundingBox, keypoints, etc.) or other instances.
 
     Methods:
         set(name, value) -> Instance
@@ -32,8 +29,7 @@ class Instance:
 
     def __init__(self, fields: Optional[dict] = None):
         """Initialize an Instance. If fields is not None, it will be used to
-        set the attributes. If a value is a dictionary, it will be stored as
-        an Instance.
+        set the initial attributes.
 
         Args:
             fields (Optional[dict], optional): Optional values to set.
@@ -45,8 +41,7 @@ class Instance:
 
     def set_dict(self, fields: dict) -> Instance:
         """Set multiple values at once. The keys of the dictionary will be used
-        as the names of the attributes. If a value is a dictionary, it will be
-        stored as an Instance.
+        as the names of the attributes.
 
         Args:
             fields (dict): Dictionary of values to set.
@@ -55,10 +50,7 @@ class Instance:
             Instance: self
         """
         for key, value in fields.items():
-            if isinstance(value, dict):
-                self.set(key, Instance(value))
-            else:
-                self.set(key, value)
+            self.set(key, value)
         return self
 
     def set(self, name: str, value: Any) -> Instance:
@@ -100,9 +92,13 @@ class Instance:
         Returns:
             Instance: Self.
         """
-        if name.startswith("_") or name not in self._fields:
+        if name.startswith("_") or name in self.__dict__:
             super(Instance, self).__setattr__(name, value)
         else:
+            if name not in self._fields:
+                raise AttributeError(
+                    f"Instance has no field '{name}' "
+                    f"({list(self._fields.keys())})")
             self._fields[name] = value
             return self
 
@@ -118,6 +114,8 @@ class Instance:
         Returns:
             Any: The stored value with the key ``name``.
         """
+        if name.startswith("_") or name in self.__dict__:
+            return super(Instance, self).__getattribute__(name)
         if name not in self._fields:
             raise AttributeError(
                 f"Instance has no field '{name}' ({list(self._fields.keys())})")

@@ -5,21 +5,22 @@ from typing import Dict, List, Tuple, Type
 import numpy as np
 
 
-# TODO: Test keypoints == named_keypoints
 class BaseKeypoints:
-    """Store data about keypoints.
+    """Store keypoints data.
 
     Attributes:
         labels (List[str]): List with the name of the keypoints.
         keypoints (np.ndarray): Array of shape (K, 3), where K is the number of
             keypoints and the last dimension corresponds to (x, y, confidence),
             where x and y are the relative image coordinates.
-        named_keypoints (Dict[str, Tuple[float, float, float]]): A dict of
-            keypoints by its name.
         confidence_threshold (float): Minimum keypoints confidence.
 
     Properties (read-only):
-        visible_keypoints (Dict[str, Tuple[float, float, float]])
+        named_keypoints (Dict[str, Tuple[float, float, float]]): A dict of
+            keypoints by its name.
+        visible_keypoints (Dict[str, Tuple[float, float, float]]) A dict of
+            keypoints by its name only with the visible ones
+            (confidence >= confidence_threshold)
 
     Methods:
         serialize() -> dict
@@ -46,12 +47,11 @@ class BaseKeypoints:
                 number of keypoints and the last dimension corresponds to
                 (x, y, confidence), where x and y are the relative image
                 coordinates.
-            confidence_threshold (float, optional): Keypoint confidence
+            confidence_threshold (float, optional): Keypoints confidence
                 threshold to determine if a keypoint is visible or not.
                 Defaults to 0.05.
         """
         self.keypoints = keypoints
-        self.named_keypoints = self._parse_keypoints(keypoints)
         self.confidence_threshold = confidence_threshold
 
     @staticmethod
@@ -85,20 +85,14 @@ class BaseKeypoints:
         rel_kp[:, 1] /= image_height
         return cls(rel_kp, **kwargs)
 
-    def _parse_keypoints(self, keypoints: np.ndarray
-                         ) -> Dict[str, Tuple[float, float, float]]:
-        """Parse a keypoints array to a dictionary.
-
-        Args:
-            keypoints (np.ndarray): Array of shape (K, 3), where K is the
-                number of keypoints and the last dimension corresponds to
-                (x, y, confidence), where x and y are the relative image
-                coordinates.
-
-        Returns:
-            Dict[str, tuple]: Dict of keypoint by its name.
+    @property
+    def named_keypoints(self) -> Dict[str, Tuple[float, float, float]]:
+        """Return a dict with the keypoints by its name.
         """
-        return {str(i): list(map(float, kp)) for i, kp in enumerate(keypoints)}
+        return {
+            str(i): list(map(float, kp))
+            for i, kp in enumerate(self.keypoints)
+        }
 
     @property
     def visible_keypoints(self) -> Dict[str, Tuple[float, float, float]]:
@@ -148,9 +142,8 @@ class BaseKeypoints:
         if not isinstance(other, BaseKeypoints):
             return False
         return np.array_equal(self.keypoints, other.keypoints) and \
-            self.confidence_threshold == other.confidence_threshold and \
-            self.labels == other.labels
-            
+            self.confidence_threshold == other.confidence_threshold
+
     # Pydantic methods
     def __iter__(self):
         d = self.serialize()
@@ -177,7 +170,7 @@ class BaseKeypoints:
 
 
 class COCOKeypoints(BaseKeypoints):
-    """Store keypoints of a person with the coco format (17 keypoints).
+    """Store keypoints data of a person with the coco format (17 keypoints).
 
     Attributes:
         labels (List[str]): List with the name of the keypoints.
@@ -185,12 +178,14 @@ class COCOKeypoints(BaseKeypoints):
             keypoints (17) and the last dimension corresponds to
             (x, y, confidence), where x and y are the relative image
             coordinates.
-        named_keypoints (Dict[str, Tuple[float, float, float]]): A dict of
-            keypoints by its name.
         confidence_threshold (float): Minimum keypoints confidence.
 
     Properties (read-only):
-        visible_keypoints (Dict[str, Tuple[float, float, float]])
+        named_keypoints (Dict[str, Tuple[float, float, float]]): A dict of
+            keypoints by its name.
+        visible_keypoints (Dict[str, Tuple[float, float, float]]) A dict of
+            keypoints by its name only with the visible ones
+            (confidence >= confidence_threshold)
 
     Methods:
         serialize() -> dict
@@ -202,6 +197,7 @@ class COCOKeypoints(BaseKeypoints):
 
     Overloaded operators:
         __len__
+        __eq__
         __str__
         __iter__
     """
@@ -226,24 +222,16 @@ class COCOKeypoints(BaseKeypoints):
         "right_ankle"
     ]
 
-    def _parse_keypoints(self, keypoints: np.ndarray
-                         ) -> Dict[str, Tuple[float, float, float]]:
-        """Parse a keypoints array to a dictionary.
-
-        Args:
-            keypoints (np.ndarray): Array of shape (K, 3), where K is the
-                number of keypoints (17) and the last dimension corresponds to
-                (x, y, confidence), where x and y are the relative image
-                coordinates.
-
-        Returns:
-            Dict[str, tuple]: Dict of keypoint by its name.
+    @property
+    def named_keypoints(self) -> Dict[str, Tuple[float, float, float]]:
+        """Return a dict with the keypoints by its name.
         """
-        assert len(keypoints) == len(self.labels), \
-            (len(keypoints), len(self.labels))
+        assert len(self.keypoints) == len(self.labels), \
+            (len(self.keypoints), len(self.labels))
 
         return {
-            name: list(map(float, kp)) for kp, name in zip(keypoints, self.labels)
+            name: list(map(float, kp))
+            for kp, name in zip(self.keypoints, self.labels)
         }
 
     @staticmethod

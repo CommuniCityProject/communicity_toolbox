@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Optional
+from typing import Optional
 
 import cv2
 import numpy as np
@@ -79,7 +79,9 @@ class SegmentationMask:
         mask_h, mask_w = self.mask.shape[:2]
         if mask_h != height or mask_w != width:
             mask = cv2.resize(
-                self.mask.astype("uint8"), (width, height)).astype(bool)
+                self.mask.astype("uint8"),
+                (width, height)
+            ).astype(bool)
         else:
             mask = self.mask
         return SegmentationMask(mask=mask)

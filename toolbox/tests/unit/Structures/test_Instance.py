@@ -1,7 +1,7 @@
 import unittest
+from copy import deepcopy
 
 from toolbox.Structures import Instance
-
 
 
 class TestInstance(unittest.TestCase):
@@ -10,6 +10,7 @@ class TestInstance(unittest.TestCase):
         inst = Instance()
     
     def test_set_dict(self):
+        # Nested dicts
         values = {
             "key1": "value1",
             "key2": "value2",
@@ -26,14 +27,38 @@ class TestInstance(unittest.TestCase):
         inst = Instance().set_dict(values)
         self.assertEqual(inst.key1, "value1")
         self.assertEqual(inst.key2, "value2")
-        self.assertIsInstance(inst.key3, Instance)
-        self.assertIsInstance(inst.key6, Instance)
-        self.assertIsInstance(inst.key6.key7, Instance)
-        self.assertEqual(inst.key3.key4, "value4")
-        self.assertEqual(inst.key3.key5, "value5")
-        self.assertEqual(inst.key6.key7.key8, "value8")
+        self.assertIsInstance(inst.key3, dict)
+        self.assertIsInstance(inst.key6, dict)
+        self.assertIsInstance(inst.key6["key7"], dict)
+        self.assertEqual(inst.key3["key4"], "value4")
+        self.assertEqual(inst.key3["key5"], "value5")
+        self.assertEqual(inst.key6["key7"]["key8"], "value8")
 
         inst = Instance(values)
+        self.assertEqual(inst.key1, "value1")
+        self.assertEqual(inst.key2, "value2")
+        self.assertIsInstance(inst.key3, dict)
+        self.assertIsInstance(inst.key6, dict)
+        self.assertIsInstance(inst.key6["key7"], dict)
+        self.assertEqual(inst.key3["key4"], "value4")
+        self.assertEqual(inst.key3["key5"], "value5")
+        self.assertEqual(inst.key6["key7"]["key8"], "value8")
+        
+        # Nested Instances
+        values = {
+            "key1": "value1",
+            "key2": "value2",
+            "key3": Instance({
+                "key4": "value4",
+                "key5": "value5",
+            }),
+            "key6": Instance({
+                "key7": Instance({
+                    "key8": "value8"
+                })
+            })
+        }
+        inst = Instance().set_dict(values)
         self.assertEqual(inst.key1, "value1")
         self.assertEqual(inst.key2, "value2")
         self.assertIsInstance(inst.key3, Instance)
@@ -64,7 +89,6 @@ class TestInstance(unittest.TestCase):
         self.assertEqual(inst.key1, "value11")
         self.assertEqual(inst._fields["key1"], "value11")
         
-
     def test_set_get(self):
         inst = Instance()
 
@@ -144,6 +168,7 @@ class TestInstance(unittest.TestCase):
             Instance().set("I1", Instance().set("k1", "v1")),
             Instance().set("I1", Instance().set("k1", "v2")),
         )
+        # Nested dicts
         values = {
             "key1": "value1",
             "key2": "value2",
@@ -153,14 +178,32 @@ class TestInstance(unittest.TestCase):
             },
             "key6": {
                 "key7": {
-                    "key8": "value8",
-                    "key9": "value9"
+                    "key8": "value8"
                 }
             }
         }
         inst_a = Instance().set_dict(values)
-        inst_b = Instance().set_dict(values)
-        inst_b.key6.key7.key9 = "value90"
+        inst_b = Instance().set_dict(deepcopy(values))
+        inst_b.key6["key7"]["key9"] = "value90"
+        self.assertNotEqual(inst_a, inst_b)
+
+        # Nested Instances
+        values = {
+            "key1": "value1",
+            "key2": "value2",
+            "key3": Instance({
+                "key4": "value4",
+                "key5": "value5",
+            }),
+            "key6": Instance({
+                "key7": Instance({
+                    "key8": "value8"
+                })
+            })
+        }
+        inst_a = Instance().set_dict(values)
+        inst_b = Instance().set_dict(deepcopy(values))
+        inst_b.key6.key7.key8 = "value90"
         self.assertNotEqual(inst_a, inst_b)
 
 
