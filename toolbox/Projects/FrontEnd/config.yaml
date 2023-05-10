@@ -1,0 +1,7 @@
+projects:
+  - name: Image Storage
+    port: 9001
+    template: BaseTemplate
+  - name: Face Detection
+    port: 9002
+    template: SimplePredict
