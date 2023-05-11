@@ -1,0 +1,1 @@
+python39 -m streamlit run --server.headless true  --runner.magicEnabled false .\app.py

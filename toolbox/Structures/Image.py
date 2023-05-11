@@ -148,12 +148,16 @@ class Image:
         Raises:
             ValueError
         """
-        with urllib.request.urlopen(url) as req:
-            arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
-            self._image = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-            if self._image is None:
-                raise ValueError(f"Error reading image from {url}")
-            self._height, self._width = self._image.shape[:2]
+        try:
+            with urllib.request.urlopen(url) as req:
+                arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
+                self._image = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+                if self._image is None:
+                    raise ValueError(f"Error reading image from {url}")
+                self._height, self._width = self._image.shape[:2]
+        except urllib.error.HTTPError as e:
+            raise urllib.error.HTTPError(
+                f"Error reading image from {url}") from e
 
     @staticmethod
     def from_url(url: str) -> Image:
@@ -222,7 +226,7 @@ class Image:
             height=value["height"],
             id=value["id"]
         )
-    
+
     def __eq__(self, other: Image) -> bool:
         if not isinstance(other, Image):
             return False
