@@ -156,8 +156,7 @@ class Image:
                     raise ValueError(f"Error reading image from {url}")
                 self._height, self._width = self._image.shape[:2]
         except urllib.error.HTTPError as e:
-            raise urllib.error.HTTPError(
-                f"Error reading image from {url}") from e
+            raise ValueError(f"Error reading image from {url}") from e
 
     @staticmethod
     def from_url(url: str) -> Image:

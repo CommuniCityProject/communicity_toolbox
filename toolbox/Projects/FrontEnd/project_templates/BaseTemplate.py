@@ -2,8 +2,8 @@ from typing import Optional
 
 import streamlit as st
 
-from toolbox.utils.utils import get_logger, urljoin
 from toolbox.Projects.ImageStorage import ImageStorageCli
+from toolbox.utils.utils import get_logger, urljoin
 
 
 class BaseTemplate:
@@ -11,7 +11,7 @@ class BaseTemplate:
     def __init__(self, name: str, host: str, port: int, url_path: str,
                  image_storage_cli: Optional[ImageStorageCli] = None,
                  **kwargs):
-        self.logger = get_logger("toolbox.FrontEnd." + name)
+        self.logger = get_logger("toolbox.FrontEnd." + name.replace(" ", "_"))
         self.name = name
         self.host = host
         self.port = port

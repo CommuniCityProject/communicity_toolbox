@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 from typing import List, Tuple, Type
+import logging
 
 import streamlit as st
 from project_templates import BaseTemplate, project_templates
@@ -47,7 +48,7 @@ def init(config: dict, log_level: str = "INFO"
         Tuple[List[Type[BaseTemplate]], ImageStorageCli]: A tuple containing
             the project templates and the image storage client.
     """
-    logger.setLevel(log_level)
+    logging.getLogger("toolbox").setLevel(log_level)
     config = parse_config(config)
     
     logger.info(f"Using the image storage {config['image_storage']}")

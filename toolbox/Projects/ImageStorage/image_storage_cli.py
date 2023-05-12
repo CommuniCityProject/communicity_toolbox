@@ -3,7 +3,9 @@ from typing import List, Union
 import requests
 
 from toolbox.Structures import Image
-from toolbox.utils.utils import urljoin
+from toolbox.utils.utils import get_logger, urljoin
+
+logger = get_logger("toolbox.ImageStorageCli")
 
 
 class ImageStorageCli:
@@ -21,6 +23,7 @@ class ImageStorageCli:
         self.port = port
         self.url_path = url_path
         self.url = urljoin(f"http://{self.host}:{self.port}", self.url_path)
+        logger.info(f"Using the image storage {self.url}")
 
     def upload_bytes(
         self,
@@ -57,8 +60,11 @@ class ImageStorageCli:
             "purpose": purpose
         }
         headers = {"accept": "application/json"}
+        logger.info(f"Uploading image {name} ({len(bytes)}) to {self.url}")
         r = requests.post(self.url, headers=headers, data=data, files=files)
         if not r.ok:
+            logger.error(
+                f"Error uploading image. Got {r.status_code} ({r.text})")
             if raise_on_error:
                 r.raise_for_status()
             return None
@@ -84,11 +90,13 @@ class ImageStorageCli:
                 successful, else None.
         """
         url = urljoin(self.url, image_id)
+        logger.info(f"Downloading image {url}")
         try:
             img = Image.from_url(url)
             img.id = image_id
             return img
         except Exception as e:
+            logger.error(f"Error downloading image {image_id}. Got {e}")
             if raise_on_error:
                 raise e
             return None
@@ -120,8 +128,12 @@ class ImageStorageCli:
             "entity_ids": entity_ids,
             "params": visualization_params
         }
+        logger.info(
+            f"Visualizing {entity_ids} with {visualization_params} on {url}")
         r = requests.post(url, json=content)
         if not r.ok:
+            logger.error(
+                f"Error visualizing entities. Got {r.status_code} ({r.text})")
             if raise_on_error:
                 r.raise_for_status()
             return None
