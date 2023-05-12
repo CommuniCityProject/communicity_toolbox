@@ -130,7 +130,7 @@ The [swagger-ui](https://github.com/swagger-api/swagger-ui) documentation is ava
 
         A JSON with the following fields:
 
-        - ``entities_id``: A list of entity ids to visualize in one single image. All the entities must have the same source image, which will be used as background.
+        - ``entity_ids``: A list of entity ids to visualize in one single image. All the entities must have the same source image, which will be used as background.
         - ``params``: Optional object with the visualization parameters.
 
     - **Response**

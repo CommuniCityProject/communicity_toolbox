@@ -51,6 +51,6 @@ api:
   # Set to null to disable.
   max_entities_visualize: 100
 
-visualization:
-  image_width: 1000
+visualization: {}
+  # image_width: 1000
   

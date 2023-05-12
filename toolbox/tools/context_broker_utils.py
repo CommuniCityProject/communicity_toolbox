@@ -38,11 +38,11 @@ class ContextBrokerUtils:
                 # Delete entities
                 if not self._check_response(r):
                     break
-                entities_ids = [e["id"] for e in r.json()]
-                if not entities_ids:
+                entity_ids = [e["id"] for e in r.json()]
+                if not entity_ids:
                     break
-                total += len(entities_ids)
-                r = requests.post(self._url_batch_delete, json=entities_ids)
+                total += len(entity_ids)
+                r = requests.post(self._url_batch_delete, json=entity_ids)
                 if not self._check_response(r):
                     break
         print(f"Total entities deleted: {total}")
@@ -58,11 +58,11 @@ class ContextBrokerUtils:
             # Delete entities
             if not self._check_response(r):
                 break
-            entities_ids = [e["id"] for e in r.json()]
-            if not entities_ids:
+            entity_ids = [e["id"] for e in r.json()]
+            if not entity_ids:
                 break
-            total += len(entities_ids)
-            r = requests.post(self._url_batch_delete, json=entities_ids)
+            total += len(entity_ids)
+            r = requests.post(self._url_batch_delete, json=entity_ids)
             if not self._check_response(r):
                 break
         print(f"Total entities deleted: {total}")

@@ -187,7 +187,7 @@ class ImageStorage:
             )
             async def visualize(
                 background_tasks: BackgroundTasks,
-                entities_id: Union[List[str], str] = Body(
+                entity_ids: Union[List[str], str] = Body(
                     description="An entity id or a list of ids to visualize. "
                     "All entities must have the same source image."),
                 params: dict = Body({},
@@ -198,16 +198,16 @@ class ImageStorage:
                 # Check the storage dir limits at the end of execution
                 background_tasks.add_task(self._storage.check_dir_limits)
 
-                if isinstance(entities_id, str):
-                    entities_id = [entities_id]
+                if isinstance(entity_ids, str):
+                    entity_ids = [entity_ids]
                 else:
-                    entities_id.sort()
+                    entity_ids.sort()
 
                 if self._max_n_entities_vis is not None and \
-                        len(entities_id) > self._max_n_entities_vis:
+                        len(entity_ids) > self._max_n_entities_vis:
                     raise HTTPException(
                         status.HTTP_422_UNPROCESSABLE_ENTITY,
-                        f"Too many entities {len(entities_id)}. "
+                        f"Too many entities {len(entity_ids)}. "
                         f"Maximum is {self._max_n_entities_vis}"
                     )
 
@@ -215,7 +215,7 @@ class ImageStorage:
                 entities_str = ""
                 image_id = ""
                 dms = []
-                for e_id in entities_id:
+                for e_id in entity_ids:
                     try:
                         dm = self.context_consumer.parse_entity(e_id)
                     except ValueError as e:

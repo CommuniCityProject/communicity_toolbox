@@ -25,7 +25,7 @@ def get_project_templates(
     Returns:
         Type[BaseTemplate]: A project template object.
     """
-    print("creation")
+    logger.info(f"Creating project template ({project_params})")
     template_cls = project_templates[project_params["template"]]
     template = template_cls(
         **project_params,
@@ -37,9 +37,20 @@ def get_project_templates(
 @st.cache_resource
 def init(config: dict, log_level: str = "INFO"
          ) -> Tuple[List[Type[BaseTemplate]], ImageStorageCli]:
+    """Initialize the UI components.
+
+    Args:
+        config (dict): A configuration dict.
+        log_level (str, optional): The logging level. Defaults to "INFO".
+
+    Returns:
+        Tuple[List[Type[BaseTemplate]], ImageStorageCli]: A tuple containing
+            the project templates and the image storage client.
+    """
     logger.setLevel(log_level)
     config = parse_config(config)
-    # Create the image storage client
+    
+    logger.info(f"Using the image storage {config['image_storage']}")
     image_storage_cli = ImageStorageCli(
         host=config["image_storage"]["host"],
         port=config["image_storage"]["port"],
