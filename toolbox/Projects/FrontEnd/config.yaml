@@ -1,5 +1,5 @@
 common-host: &common-host
-  192.168.0.100
+  158.109.9.60
 
 image_storage: &image_storage
   host: *common-host
@@ -12,6 +12,16 @@ projects:
     <<: *image_storage
   - name: Face Detection
     port: 9007
+    host: *common-host
+    url_path: /
+    template: SimplePredict
+  - name: Age Gender
+    port: 9003
+    host: *common-host
+    url_path: /
+    template: SimplePredict
+  - name: Instance Segmentation
+    port: 9005
     host: *common-host
     url_path: /
     template: SimplePredict
