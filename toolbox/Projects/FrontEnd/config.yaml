@@ -1,5 +1,5 @@
 common-host: &common-host
-  158.109.9.60
+  192.168.0.100
 
 image_storage: &image_storage
   host: *common-host
@@ -7,11 +7,26 @@ image_storage: &image_storage
   url_path: /
 
 projects:
+  - name: Context Broker
+    port: 1026
+    host: *common-host
+    url_path: /
+    template: SimplePredict # TODO: Change to ContextBroker
   - name: Image Storage
-    template: SimplePredict
+    template: ImageStorageTemplate
     <<: *image_storage
   - name: Face Detection
     port: 9007
+    host: *common-host
+    url_path: /
+    template: SimplePredict
+  - name: Face Recognition
+    port: 9002
+    host: *common-host
+    url_path: /
+    template: SimplePredict # TODO: Change to FaceRecognition
+  - name: Face Emotions
+    port: 9004
     host: *common-host
     url_path: /
     template: SimplePredict
@@ -22,6 +37,11 @@ projects:
     template: SimplePredict
   - name: Instance Segmentation
     port: 9005
+    host: *common-host
+    url_path: /
+    template: SimplePredict
+  - name: Keypoints
+    port: 9006
     host: *common-host
     url_path: /
     template: SimplePredict
