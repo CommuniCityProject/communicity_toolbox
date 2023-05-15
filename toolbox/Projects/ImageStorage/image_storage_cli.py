@@ -60,7 +60,7 @@ class ImageStorageCli:
             "purpose": purpose
         }
         headers = {"accept": "application/json"}
-        logger.info(f"Uploading image {name} ({len(bytes)}) to {self.url}")
+        logger.info(f"Uploading image {name} to {self.url}")
         r = requests.post(self.url, headers=headers, data=data, files=files)
         if not r.ok:
             logger.error(

@@ -1,6 +1,4 @@
-from typing import List, Optional, Union, Dict
-
-from functools import partial
+from typing import List, Optional, Union
 
 import requests
 import streamlit as st
@@ -11,6 +9,10 @@ from . import BaseTemplate
 
 
 class SimplePredict(BaseTemplate):
+    """Streamlit template for Toolbox Projects which API implements a predict
+    method. It allows predicting an image by their ID or by uploading it and
+    shows the output JSON and image.
+    """
 
     def __init__(self, **kwargs):
         """Create the SimplePredict Project template.
@@ -29,7 +31,8 @@ class SimplePredict(BaseTemplate):
     def _call_api_predict(
         self,
         image_id: str,
-        post_to_broker: Optional[bool] = None
+        post_to_broker: Optional[bool] = None,
+        accept: str = "application/json"
     ) -> List[dict]:
         """Call the predict method of the API.
 
@@ -38,6 +41,8 @@ class SimplePredict(BaseTemplate):
             post_to_broker (Optional[bool], optional): Post the generated
                 entity to the context broker. None to use the API defaults.
                 Defaults to None.
+            accept (str, optional): Accept header. ``application/json`` or
+                ``application/ld+json``. Defaults to "application/json".
 
         Raises:
             HTTPError: If the request fails.
@@ -49,86 +54,97 @@ class SimplePredict(BaseTemplate):
         content = {"entity_id": image_id}
         if post_to_broker is not None:
             content["post_to_broker"] = post_to_broker
-        self.logger.info(f"Calling {route} with {content}")
-        response = requests.post(route, json=content)
+        headers = {"Accept": accept}
+        self.logger.info(
+            f"Calling {route} with {content} (headers: {headers}))")
+        response = requests.post(route, json=content, headers=headers)
         if not response.ok:
             response.raise_for_status()
         return response.json()
 
-    def _predict_image(self, image_id: str):
+    def _on_predict(self):
         """Call the API to predict the given image and visualize the results.
+        Store the results on the session state.
 
         Args:
             image_id (str): Input image id.
         """
         try:
-            entities = self._call_api_predict(image_id)
-            self.components["output_json"].value = entities
-            self.components["output_json"].type = "json"
+            entities = self._call_api_predict(
+                st.session_state.input_image.id,
+                accept=st.session_state.accept_header
+            )
+            st.session_state.output_json = entities
         except Exception as e:
             self.logger.exception(e, exc_info=True)
-            self.components["output_json"].value = f"Error: {str(e)}"
-            self.components["output_json"].type = "error"
+            st.session_state.error_message = f"Error: {e}"
+            return
+
+        if len(entities) == 0:
             return
 
         try:
-            image = self._visualize_entities(entities)
-            self.components["output_image"].value = image.image
-            self.components["output_image"].type = "image"
+            image = self._download_visualize_entities(entities)
+            st.session_state.output_image = image
         except Exception as e:
-            self.components["output_image"].value = f"Error: {str(e)}"
-            self.components["output_image"].type = "error"
+            self.logger.exception(e, exc_info=True)
+            st.session_state.error_message = f"Error: {e}"
 
-    def _get_image_from_id(self, image_id: str):
-        """Get an image from the image storage by its ID and store it on the
-        session state. Updates ``input_image``.
+    def _get_image_from_id(self, image_id: str) -> Image:
+        """Get an image from the image storage by its ID.
 
         Args:
             image_id (str): ID of the image on the image storage.
+
+        Returns:
+            Image: The downloaded image.
         """
         if st.session_state.input_image is not None and \
-            st.session_state.input_image.id == image_id:
-            return
+                st.session_state.input_image.id == image_id:
+            return st.session_state.input_image
         try:
             image = self.image_storage_cli.download(image_id)
             image.id = image_id
+            return image
         except:
-            image = None
             st.session_state.error_message = "Error: Image " + \
                 image_id.replace(":", "\:") + \
                 f" not found on {self.image_storage_cli.url}"
-        st.session_state.input_image = image
+            return None
 
-    def _upload_image(self, st_uploaded_file) -> str:
-        """Uploads an image previously uploaded to the Streamlit app to the
-        image storage and updates the UI.
-
-        Args:
-            st_uploaded_file (streamlit.uploaded_file_manager.UploadedFile): 
-                Image uploaded to the Streamlit app.
+    def upload_input_image(self) -> Union[str, None]:
+        """Uploads the input image to the image storage.
 
         Returns:
-            str: ID of the image on the image storage.
+            Union[str, None]: The ID of the uploaded image on the image storage
+                or None if the upload fails or the image is already uploaded
+                to the image storage.
         """
-        try:
-            image_id = self.image_storage_cli.upload_bytes(
-                image_bytes=st_uploaded_file.read(),
-                name=st_uploaded_file.name,
-                file_type=st_uploaded_file.type,
-                source="toolbox.FrontEnd."+self.name,
-            )
-        except Exception as e:
-            self._st_input_image.error(f"Error: {str(e)}")
-        else:
-            self._set_input_image(image_id)
-            return image_id
+        uploaded_file = st.session_state.uploaded_file
+        if st.session_state.uploaded_file_id != uploaded_file.id:
+            try:
+                image_id = self.image_storage_cli.upload_bytes(
+                    image_bytes=uploaded_file.read(),
+                    name=uploaded_file.name,
+                    file_type=uploaded_file.type,
+                    source="toolbox.FrontEnd."+self.name.replace(" ", "_")
+                )
+                st.session_state.uploaded_file_id = uploaded_file.id
+                return image_id
+            except Exception as e:
+                self.logger.exception(e, exc_info=True)
+                st.session_state.error_message = f"Error: {e}"
+        return None
 
-    def _visualize_entities(self, entities: List[dict]) -> Image:
+    def _download_visualize_entities(self, entities: List[dict]) -> Image:
         """Visualize a list of entities by its id. Call the image storage API
-        to generate the image, then download it and update the UI.
+        to generate the image, then download it.
 
         Args:
             entities (List[dict]): List of entity dicts to visualize.
+
+        Returns:
+            Image: Image generated by the image storage API.
         """
         entity_ids = [e["id"] for e in entities]
         vis_id = self.image_storage_cli.visualize(entity_ids)
@@ -137,14 +153,16 @@ class SimplePredict(BaseTemplate):
     def _init_session_state(self):
         """Initialize the session state variables.
         """
-        if "current_input_image_id" not in st.session_state:
-            st.session_state.current_input_image_id = None
         if "input_image" not in st.session_state:
             st.session_state.input_image = None
-        if "valid_input" not in st.session_state:
-            st.session_state.valid_input = False
         if "error_message" not in st.session_state:
             st.session_state.error_message = None
+        if "output_json" not in st.session_state:
+            st.session_state.output_json = None
+        if "output_image" not in st.session_state:
+            st.session_state.output_image = None
+        if "uploaded_file_id" not in st.session_state:
+            st.session_state.uploaded_file_id = None
 
     def _ui(self):
         """Set the UI elements.
@@ -159,8 +177,8 @@ class SimplePredict(BaseTemplate):
                 "Image ID",
                 key="input_image_id",
                 disabled=("uploaded_file" in st.session_state and
-                    st.session_state.uploaded_file is not None
-                )
+                          st.session_state.uploaded_file is not None
+                          )
             )
             st.write(
                 "<p style='color: gray; text-align: center;'>- or -</p>",
@@ -172,6 +190,11 @@ class SimplePredict(BaseTemplate):
                 key="uploaded_file",
             )
             st.write("</br>", unsafe_allow_html=True)
+            st.radio(
+                "Accept",
+                options=["application/json", "application/ld+json"],
+                key="accept_header",
+            )
             self._st_button_predict = st.empty()
             st.divider()
             self._st_input_image = st.empty()
@@ -179,25 +202,31 @@ class SimplePredict(BaseTemplate):
 
         with col_output:
             st.subheader("Output")
-            self._st_output_json = st.empty()
-            st.divider()
             self._st_output_image = st.empty()
+            st.divider()
+            self._st_output_json = st.empty()
 
     def _update(self):
         """Handle the UI logic.
         """
-        button_predict_enabled = False
-        image_id_to_send = None
-
+        # Get the input image ID from the text input or the uploaded file
         input_image_id = ""
         if st.session_state.uploaded_file is None:
             # Get the image from the id text input
             input_image_id = st.session_state.input_image_id
         else:
             # Get the image from the uploaded file
-            pass
+            input_image_id = self.upload_input_image()
 
-        self._get_image_from_id(input_image_id)
+        # Download the input image from the image storage
+        if input_image_id:
+            st.session_state.input_image = self._get_image_from_id(
+                input_image_id)
+
+        # Clear image if there is no input
+        if st.session_state.input_image is None:
+            st.session_state.output_image = None
+            st.session_state.output_json = None
 
         # Set the input_image an id caption widgets
         if st.session_state.input_image is not None:
@@ -215,65 +244,33 @@ class SimplePredict(BaseTemplate):
         # Set the predict button
         self._st_button_predict.button(
             "Predict",
-            on_click=self._predict_image,
+            on_click=self._on_predict,
             disabled=st.session_state.input_image is None
         )
 
+        # Show the output image if any
+        if st.session_state.output_image is not None:
+            self._st_output_image.image(
+                st.session_state.output_image.image,
+                channels="BGR"
+            )
+        else:
+            self._st_output_image.empty()
+
+        # Show the output JSON if any
+        if st.session_state.output_json is not None:
+            if len(st.session_state.output_json) == 0:
+                self._st_output_image.warning("No entities found")
+            self._st_output_json.json(st.session_state.output_json)
+        else:
+            self._st_output_json.empty()
+
+        # Show the error message if any
         if st.session_state.error_message is not None:
             self._st_error.error(st.session_state.error_message)
         else:
             self._st_error.empty()
-        
         st.session_state.error_message = None
-
-        # Set the input_image_id widget
-        # if self._uploaded_file is None:
-        #     image_id_input_enabled = True
-        # else:
-        #     image_id_input_enabled = False
-        # input_image_id = self._st_input_image_id.text_input(
-        #     "Image ID",
-        #     disabled=not image_id_input_enabled
-        # )
-
-        # self._set_input_image(input_image_id)
-
-        # Download the image by its ID if no image has been uploaded
-        # if self._uploaded_file is None:
-        #     if input_image_id and self._set_input_image(input_image_id):
-        #         button_predict_enabled = True
-        #         image_id_to_send = input_image_id
-
-        #     input_image_id = self._upload_image(self._uploaded_file)
-        # else:
-        #     button_predict_enabled = False
-
-        # Predict button
-        # self._st_button_predict.button(
-        #     "Predict",
-        #     disabled=not button_predict_enabled,
-        #     on_click=partial(self._predict_image, image_id_to_send)
-        # )
-
-        # Update the components
-        # [c.update() for c in self.components.values()]
-
-        # # Update output JSON
-        # if self._predicted_json is not None:
-        #     self._st_output_json.json(self._predicted_json)
-        # else:
-        #     self._st_output_json.empty()
-
-        # # Update output image
-        # if self._visualized_image is None:
-        #     self._st_output_image.empty()
-        # elif isinstance(self._visualized_image, Image):
-        #     self._st_output_image.image(
-        #         self._visualized_image.image,
-        #         channels="BGR"
-        #     )
-        # elif isinstance(self._visualized_image, str):
-        #     self._st_output_image.error(self._visualized_image)
 
     def __call__(self):
         self._init_session_state()
