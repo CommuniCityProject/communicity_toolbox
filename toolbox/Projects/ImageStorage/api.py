@@ -65,7 +65,8 @@ class ImageStorage:
         # Create the context consumer
         if self._allow_visualize:
             self.context_consumer = ContextConsumer(config)
-            self._visualizer = DataModelVisualizer(config)
+            self._visualizer = DataModelVisualizer(
+                config.get("visualization", {}))
 
         # Run the API
         self._api = self._server()

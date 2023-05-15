@@ -199,7 +199,7 @@ class DemoBase:
         config = parse_config(args.config)
         self._load_model(config, args.task)
 
-        self.visualizer = DataModelVisualizer(config)
+        self.visualizer = DataModelVisualizer(config.get("visualization", {}))
 
         if args.task != "local":
             self.context_producer = ContextProducer(config)

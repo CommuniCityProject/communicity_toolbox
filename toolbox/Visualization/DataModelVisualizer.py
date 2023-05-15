@@ -27,13 +27,7 @@ class DataModelVisualizer:
             config (dict): Configuration dict with the optional visualization
                 parameters.
         """
-        self.set_config(config)
-
-    def set_config(self, config: dict):
-        self.config = config.get("visualization", {})
-        self.config = {} if self.config is None else self.config
-        self.img_w = self.config.get("image_width", None)
-        self.img_h = self.config.get("image_height", None)
+        self.config = config
 
     def visualize_data_models(
         self,
@@ -64,13 +58,15 @@ class DataModelVisualizer:
         image = image.copy()
         orig_h, orig_w = image.shape[:2]
 
+        target_w = config.get("image_width", None)
+        target_h = config.get("image_height", None)
         fx = None
         fy = None
-        if (self.img_w is not None and self.img_w != orig_w) or \
-                (self.img_h is not None and self.img_h != orig_h):
+        if (target_w is not None and target_w != orig_w) or \
+                (target_h is not None and target_h != orig_h):
 
-            fx = self.img_w / orig_w if self.img_w is not None else None
-            fy = self.img_h / orig_h if self.img_h is not None else None
+            fx = target_w / orig_w if target_w is not None else None
+            fy = target_h / orig_h if target_h is not None else None
             fx = fx if fx is not None else fy
             fy = fy if fy is not None else fx
 
