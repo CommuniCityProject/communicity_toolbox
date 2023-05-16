@@ -5,9 +5,10 @@ import copy
 import itertools
 
 from toolbox.DataModels import BaseModel
-from toolbox.Context import entity_parser
+from toolbox.Context import entity_parser, Subscription
 from toolbox.DataModels.DataModelsCatalog import data_models_catalog
 from toolbox.utils.utils import get_logger
+
 
 logger = get_logger("toolbox.ContextConsumer")
 
@@ -160,17 +161,18 @@ class ContextConsumer:
             subscription_data["throttling"] = throttling
         return subscription_data
 
-    def subscribe(self, subscription: Optional[dict] = None,
+    def subscribe(self, subscription: Optional[Subscription] = None,
                   **kwargs) -> Union[str, None]:
         """Create a subscription in the context broker.
 
         Args:
-            subscription (Optional[dict]): The subscription data as a dict (see
-                :meth:`build_subscription`). If None, the subscription data
-                will be built from the kwargs. Defaults to None.
-            kwargs: The subscription data as keyword arguments (see
-                :meth:`build_subscription`). If subscription is not None, the
-                kwargs will be ignored. Defaults to None.
+            subscription (Optional[Subscription]): A Subscription object.
+                If None, a Subscription will be built from the kwargs.
+                Defaults to None.
+            kwargs: The subscription data as keyword arguments (see 
+                :class:`Subscription` for the list of valid arguments). If
+                subscription is not None, the kwargs will be ignored.
+                Defaults to None.
 
         Returns:
             str: The subscription id.

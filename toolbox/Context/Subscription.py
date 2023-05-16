@@ -1,5 +1,7 @@
+from __future__ import annotations
 from typing import List, Union, Optional
 from datetime import datetime
+
 
 class Subscription:
     """Class that represent a context broker subscription to one or more
@@ -20,9 +22,12 @@ class Subscription:
         notification_accept
         expires
         throttling
-    
+
     Properties:
         json (dict): The subscription as a JSON object.
+
+    Overloaded operators:
+        __eq__
     """
 
     def __init__(
@@ -89,7 +94,7 @@ class Subscription:
             throttling (Optional[int], optional): Minimal period of time in
                 seconds which shall elapse between two consecutive
                 notifications. Defaults to None.
-            
+
         Raises:
             ValueError: If the provided arguments are not valid.
         """
@@ -104,7 +109,7 @@ class Subscription:
         if entity_type is not None:
             if isinstance(entity_type, str):
                 entity_type = [entity_type]
-        
+
         if entity_id is not None:
             if entity_type is None:
                 raise ValueError(
@@ -117,7 +122,7 @@ class Subscription:
                     "entity_type and entity_id must have the same length "
                     f"{len(entity_type)}, {len(entity_id)}"
                 )
-        
+
         if entity_id_pattern is not None:
             if entity_type is None:
                 raise ValueError(
@@ -149,7 +154,7 @@ class Subscription:
         self.notification_accept = notification_accept
         self.expires = expires
         self.throttling = throttling
-    
+
     @property
     def json(self) -> dict:
         """Returns the subscription as a JSON object.
@@ -164,12 +169,12 @@ class Subscription:
                 }
             }
         }
-        
+
         # Add notification attributes
         if self.notification_attributes is not None:
             subscription["notification"]["attributes"] = \
                 self.notification_attributes
-        
+
         # Add entities
         if self.entity_type is not None:
             subscription["entities"] = []
@@ -178,30 +183,30 @@ class Subscription:
                 if self.entity_id is not None and self.entity_id[i] is not None:
                     ent["id"] = self.entity_id[i]
                 if self.entity_id_pattern is not None and \
-                    self.entity_id_pattern[i] is not None:
+                        self.entity_id_pattern[i] is not None:
                     ent["idPattern"] = self.entity_id_pattern[i]
                 subscription["entities"].append(ent)
-        
+
         # Add watched attributes
         if self.watched_attributes is not None:
             subscription["watchedAttributes"] = self.watched_attributes
-        
+
         # Add query
         if self.query is not None:
             subscription["q"] = self.query
-        
+
         # Add expiration
         if self.expires is not None:
             subscription["expires"] = self.expires
-        
+
         # Add throttling
         if self.throttling is not None:
             subscription["throttling"] = self.throttling
-        
+
         # Add description
         if self.description is not None:
             subscription["description"] = self.description
-        
+
         # Add name
         if self.name is not None:
             subscription["name"] = self.name
@@ -209,7 +214,55 @@ class Subscription:
         # Add subscription ID
         if self.subscription_id is not None:
             subscription["id"] = self.subscription_id
-        
+
         return subscription
 
+    def __eq__(self, other: Subscription) -> bool:
+        """Compares if two subscriptions are virtually equal.
+        """
+        if not isinstance(other, Subscription):
+            return False
 
+        # xor entity_type
+        if (self.entity_type is None) != (other.entity_type is None):
+            return False
+
+        # xor entity_id
+        if (self.entity_id is None) != (other.entity_id is None):
+            return False
+
+        # xor entity_id_pattern
+        if (self.entity_id_pattern is None) != (other.entity_id_pattern is None):
+            return False
+
+        # Check entities
+        if self.entity_type is not None:
+            if len(self.entity_type) != len(other.entity_type):
+                return False
+            for i in range(len(self.entity_type)):
+                if self.entity_type[i] not in other.entity_type:
+                    return False
+                if self.entity_id is not None and \
+                    self.entity_id[i] not in other.entity_id:
+                        return False
+                if self.entity_id_pattern is not None and \
+                    self.entity_id_pattern[i] not in other.entity_id_pattern:
+                        return False
+
+        if self.watched_attributes != other.watched_attributes:
+            return False
+        if self.query != other.query:
+            return False
+        if self.uri != other.uri:
+            return False
+        if self.notification_format != other.notification_format:
+            return False
+        if self.notification_accept != other.notification_accept:
+            return False
+        if self.notification_attributes != other.notification_attributes:
+            return False
+        if self.expires != other.expires:
+            return False
+        if self.throttling != other.throttling:
+            return False
+        return True
