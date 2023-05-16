@@ -1,5 +1,5 @@
 common-host: &common-host
-  192.168.0.100
+  127.0.0.1
 
 image_storage: &image_storage
   host: *common-host

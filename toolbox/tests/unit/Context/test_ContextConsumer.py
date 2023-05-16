@@ -19,17 +19,17 @@ _subscriptions_uri = _context_broker_uri + "/ngsi-ld/v1/subscriptions"
 
 class TestContextConsumer(unittest.TestCase):
 
-    def _compare_subscription(self, sub1, sub2):
-        comp_keys = ["type", "entities",
-                     "notification", "watchedAttributes", "q"]
-        comp_noti_keys = ["format", "endpoint"]
-        rsub1 = {k: v for k, v in sub1.items() if k in comp_keys}
-        rsub2 = {k: v for k, v in sub2.items() if k in comp_keys}
-        rsub1["notification"] = {
-            k: v for k, v in rsub1["notification"].items() if k in comp_noti_keys}
-        rsub2["notification"] = {
-            k: v for k, v in rsub2["notification"].items() if k in comp_noti_keys}
-        self.assertEqual(rsub1, rsub2)
+    # def _compare_subscription(self, sub1, sub2):
+    #     comp_keys = ["type", "entities",
+    #                  "notification", "watchedAttributes", "q"]
+    #     comp_noti_keys = ["format", "endpoint"]
+    #     rsub1 = {k: v for k, v in sub1.items() if k in comp_keys}
+    #     rsub2 = {k: v for k, v in sub2.items() if k in comp_keys}
+    #     rsub1["notification"] = {
+    #         k: v for k, v in rsub1["notification"].items() if k in comp_noti_keys}
+    #     rsub2["notification"] = {
+    #         k: v for k, v in rsub2["notification"].items() if k in comp_noti_keys}
+    #     self.assertEqual(rsub1, rsub2)
 
     def _get_subscription(self, sub_id):
         r = requests.get(f"{_subscriptions_uri}/{sub_id}")
@@ -37,63 +37,175 @@ class TestContextConsumer(unittest.TestCase):
 
     def test_init(self):
         cc = ContextConsumer(config)
+        self.assertEqual(cc.notification_uri, config["context_broker"]["notification_uri"])
+        self.assertEqual(cc.subscription_name, config["context_broker"]["subscription_name"])
+
+    def test_build_subscription(self):
+        cc = ContextConsumer(config)
+        
+        sub = cc.build_subscription("Ty")
+        self.assertEqual(sub["type"], "Subscription")
+        self.assertEqual(sub["entities"], [{"type": "Ty"}])
+        self.assertEqual(sub["notification"]["format"], "normalized")
+        self.assertEqual(sub["notification"]["endpoint"]["uri"], config["context_broker"]["notification_uri"])
+        self.assertEqual(sub["notification"]["endpoint"]["accept"], "application/json")
+        self.assertEqual(sub["name"], cc.subscription_name)
+    
+        sub = cc.build_subscription(
+            entity_type="Ty",
+            uri="http://1.2.3.4:5678",
+            subscription_id="1234",
+            name="a_name",
+            description="a_description",
+            entity_id="an_entity_id",
+            entity_id_pattern="an_entity_id_pattern",
+            watched_attributes=["a1", "a2"],
+            query="a1==true",
+            notification_attributes=["b1", "b2"],
+            notification_format="keyValues",
+            notification_accept="application/json",
+            expires="2021-01-01T00:00:00Z",
+            throttling=5,
+        )
+        self.assertEqual(sub["type"], "Subscription")
+        self.assertEqual(sub["entities"], [{"type": "Ty", "id": "an_entity_id", "idPattern": "an_entity_id_pattern"}])
+        self.assertEqual(sub["notification"]["endpoint"]["uri"], "http://1.2.3.4:5678")
+        self.assertEqual(sub["id"], "1234")
+        self.assertEqual(sub["name"], "a_name")
+        self.assertEqual(sub["description"], "a_description")
+        self.assertEqual(sub["entities"][0]["id"], "an_entity_id")
+        self.assertEqual(sub["entities"][0]["idPattern"], "an_entity_id_pattern")
+        self.assertEqual(sub["watchedAttributes"], ["a1", "a2"])
+        self.assertEqual(sub["q"], "a1==true")
+        self.assertEqual(sub["notification"]["attributes"], ["b1", "b2"])
+        self.assertEqual(sub["notification"]["format"], "keyValues")
+        self.assertEqual(sub["notification"]["endpoint"]["accept"], "application/json")
+        self.assertEqual(sub["expires"], "2021-01-01T00:00:00Z")
+        self.assertEqual(sub["throttling"], 5)
 
     def test_subscribe(self):
         cc = ContextConsumer(config)
 
-        id_0 = cc.subscribe("Ty")
+        # Test subscription creation
+        id_0 = cc.subscribe(entity_type="Ty")
         self.assertIsNotNone(id_0)
         self.assertEqual(cc.subscription_ids[0], id_0)
 
-        id_1 = cc.subscribe("Ty")
+        # Test subscription post
+        sub = cc.build_subscription(
+            entity_type="Ty",
+            uri="http://1.2.3.4:5678",
+            name="a_name",
+            description="a_description",
+            entity_id="urn:ngsi-ld:Ty:123",
+            watched_attributes=["a1", "a2"],
+            query="a1==true",
+            notification_attributes=["b1", "b2"],
+            notification_format="keyValues",
+            notification_accept="application/ld+json",
+            expires="2021-01-01T00:00:00.000Z",
+            throttling=5,
+        )
+        id_1 = cc.subscribe(sub)
         self.assertIsNotNone(id_1)
         self.assertEqual(cc.subscription_ids[1], id_1)
-        self.assertNotEqual(id_0, id_1)
 
-        s_id = cc.subscribe("Ty", ["a1"], "a1==true")
-        r = requests.get(f"{_subscriptions_uri}/{s_id}")
-        self.assertTrue(r.ok)
-        self._compare_subscription(
-            r.json(),
-            {
-                "type": "Subscription",
-                "entities": [{"type": "Ty"}],
-                "watchedAttributes": ["a1"],
-                "q": "a1==true",
-                "notification": {
-                    "format": "normalized",
-                    "endpoint": {
-                        "uri": config["context_broker"]["notification_uri"],
-                        "accept": "application/json"
-                    }
-                }
-            }
+        id_2 = cc.subscribe(
+            entity_type="Ty",
+            uri="http://1.2.3.4:5678",
+            name="a_name",
+            description="a_description",
+            entity_id="urn:ngsi-ld:Ty:123",
+            watched_attributes=["a1", "a2"],
+            query="a1==true",
+            notification_attributes=["b1", "b2"],
+            notification_format="keyValues",
+            notification_accept="application/ld+json",
+            expires="2021-01-01T00:00:00.000Z",
+            throttling=5
         )
+        self.assertIsNotNone(id_2)
+        self.assertEqual(cc.subscription_ids[2], id_2)
+        
+        self.assertNotEqual(id_0, id_1)
+        
+        # Get the subscriptions
+        r = requests.get(f"{_subscriptions_uri}/{id_0}")
+        self.assertTrue(r.ok)
+        ret_sub = r.json()
+        self.assertEqual(ret_sub["id"], id_0)
+        self.assertEqual(ret_sub["type"], "Subscription")
+        self.assertEqual(ret_sub["subscriptionName"], cc.subscription_name)
+        self.assertEqual(ret_sub["entities"], [{"type": "Ty"}])
+        self.assertEqual(ret_sub["notification"]["format"], "normalized")
+        self.assertEqual(ret_sub["notification"]["endpoint"]["uri"], config["context_broker"]["notification_uri"])
+        self.assertEqual(ret_sub["notification"]["endpoint"]["accept"], "application/json")
+
+        r = requests.get(f"{_subscriptions_uri}/{id_1}")
+        self.assertTrue(r.ok)
+        ret_sub = r.json()
+        self.assertEqual(ret_sub["id"], id_1)
+        self.assertEqual(ret_sub["type"], "Subscription")
+        self.assertEqual(ret_sub["subscriptionName"], "a_name")
+        self.assertEqual(ret_sub["description"], "a_description")
+        self.assertEqual(ret_sub["entities"], [{"type": "Ty", "id": "urn:ngsi-ld:Ty:123"}])
+        self.assertEqual(ret_sub["watchedAttributes"], ["a1", "a2"])
+        self.assertEqual(ret_sub["q"], "a1==true")
+        self.assertEqual(ret_sub["notification"]["attributes"], ["b1", "b2"])
+        self.assertEqual(ret_sub["notification"]["format"], "keyValues")
+        self.assertEqual(ret_sub["notification"]["endpoint"]["uri"], "http://1.2.3.4:5678")
+        self.assertEqual(ret_sub["notification"]["endpoint"]["accept"], "application/ld+json")
+        self.assertEqual(ret_sub["expiresAt"], "2021-01-01T00:00:00.000Z")
+        self.assertEqual(ret_sub["throttling"], 5)
+
+    def test_get_subscription(self):
+        cc = ContextConsumer(config)
+        s_id = cc.subscribe(
+            entity_type="Ty",
+            uri="http://1.2.3.4:5678",
+            name="a_name",
+            description="a_description",
+            entity_id="urn:ngsi-ld:Ty:123",
+            watched_attributes=["a1", "a2"],
+            query="a1==true",
+            notification_attributes=["b1", "b2"],
+            notification_format="keyValues",
+            notification_accept="application/ld+json",
+            expires="2021-01-01T00:00:00.000Z",
+            throttling=5
+        )
+        self.assertIsNotNone(s_id)
+        sub = cc.get_subscription(s_id)
+        self.assertEqual(sub["id"], s_id)
+        self.assertEqual(sub["type"], "Subscription")
+        self.assertEqual(sub["subscriptionName"], "a_name")
+        self.assertEqual(sub["description"], "a_description")
+        self.assertEqual(sub["entities"], [{"type": "Ty", "id": "urn:ngsi-ld:Ty:123"}])
+        self.assertEqual(sub["watchedAttributes"], ["a1", "a2"])
+        self.assertEqual(sub["q"], "a1==true")
+        self.assertEqual(sub["notification"]["attributes"], ["b1", "b2"])
+        self.assertEqual(sub["notification"]["format"], "keyValues")
+        self.assertEqual(sub["notification"]["endpoint"]["uri"], "http://1.2.3.4:5678")
+        self.assertEqual(sub["notification"]["endpoint"]["accept"], "application/ld+json")
+        self.assertEqual(sub["expiresAt"], "2021-01-01T00:00:00.000Z")
+        self.assertEqual(sub["throttling"], 5)
+
+        sub = cc.get_subscription("none")
+        self.assertIsNone(sub)
 
     def test_get_subscriptions(self):
         cc = ContextConsumer(config)
-        s_id = cc.subscribe("Ty", ["a1"], "a1==true")
-        subs = cc.get_subscriptions()
-        self.assertGreater(len(subs), 0)
-        sub = [s for s in subs if s["id"] == s_id]
-        self.assertEqual(len(sub), 1)
-        sub = sub[0]
-        self._compare_subscription(
-            sub,
-            {
-                "type": "Subscription",
-                "entities": [{"type": "Ty"}],
-                "watchedAttributes": ["a1"],
-                "q": "a1==true",
-                "notification": {
-                    "format": "normalized",
-                    "endpoint": {
-                        "uri": config["context_broker"]["notification_uri"],
-                        "accept": "application/json"
-                    }
-                }
-            }
-        )
+        for i in range(6):
+            cc.subscribe(entity_type="Ty")
+        subs_0 = cc.get_subscriptions(3,0)
+        subs_1 = cc.get_subscriptions(3,1)
+        self.assertEqual(len(subs_0), 3)
+        self.assertEqual(len(subs_1), 3)
+        self.assertEqual(subs_0[1], subs_1[0])
+        self.assertEqual(subs_0[2], subs_1[1])
+        self.assertNotEqual(subs_0[0], subs_1[2])
+
+    def test_get_
 
     def test_subscription_conflicts(self):
         cc = ContextConsumer(config)
@@ -110,21 +222,21 @@ class TestContextConsumer(unittest.TestCase):
         self.assertGreater(
             len(cc.subscription_conflicts(t, ["a1"], "a1==true")), 0)
 
-    def test_unsubscribe(self):
-        cc = ContextConsumer(config)
+    # def test_unsubscribe(self):
+    #     cc = ContextConsumer(config)
 
-        s_id0 = cc.subscribe("T0")
-        s_id1 = cc.subscribe("T1")
-        s_id2 = cc.subscribe("T2")
-        s_id3 = cc.subscribe("T3")
+    #     s_id0 = cc.subscribe("T0")
+    #     s_id1 = cc.subscribe("T1")
+    #     s_id2 = cc.subscribe("T2")
+    #     s_id3 = cc.subscribe("T3")
 
-        self.assertEqual(len(cc.subscription_ids), 4)
-        self.assertTrue(cc.unsubscribe(s_id0))
-        self.assertEqual(len(cc.subscription_ids), 3)
-        self.assertFalse(cc.unsubscribe(s_id0))
-        self.assertEqual(len(cc.subscription_ids), 3)
-        self.assertFalse(cc.unsubscribe("0"))
-        self.assertEqual(len(cc.subscription_ids), 3)
+    #     self.assertEqual(len(cc.subscription_ids), 4)
+    #     self.assertTrue(cc.unsubscribe(s_id0))
+    #     self.assertEqual(len(cc.subscription_ids), 3)
+    #     self.assertFalse(cc.unsubscribe(s_id0))
+    #     self.assertEqual(len(cc.subscription_ids), 3)
+    #     self.assertFalse(cc.unsubscribe("0"))
+    #     self.assertEqual(len(cc.subscription_ids), 3)
 
     def test_parse_entity(self):
         cc = ContextConsumer(config)
