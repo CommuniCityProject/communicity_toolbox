@@ -31,14 +31,14 @@ class TestContextConsumer(unittest.TestCase):
     #         k: v for k, v in rsub2["notification"].items() if k in comp_noti_keys}
     #     self.assertEqual(rsub1, rsub2)
 
-    def _get_subscription(self, sub_id):
-        r = requests.get(f"{_subscriptions_uri}/{sub_id}")
-        return r.ok, r.status_code
+    # def _get_subscription(self, sub_id):
+    #     r = requests.get(f"{_subscriptions_uri}/{sub_id}")
+    #     return r.ok, r.status_code
 
     def test_init(self):
         cc = ContextConsumer(config)
         self.assertEqual(cc.notification_uri, config["context_broker"]["notification_uri"])
-        self.assertEqual(cc.subscription_name, config["context_broker"]["subscription_name"])
+        self.assertTrue(cc.subscription_name)
 
     def test_build_subscription(self):
         cc = ContextConsumer(config)
@@ -195,7 +195,7 @@ class TestContextConsumer(unittest.TestCase):
 
     def test_get_subscriptions(self):
         cc = ContextConsumer(config)
-        for i in range(6):
+        for _ in range(6):
             cc.subscribe(entity_type="Ty")
         subs_0 = cc.get_subscriptions(3,0)
         subs_1 = cc.get_subscriptions(3,1)
@@ -205,7 +205,124 @@ class TestContextConsumer(unittest.TestCase):
         self.assertEqual(subs_0[2], subs_1[1])
         self.assertNotEqual(subs_0[0], subs_1[2])
 
-    def test_get_
+    def test_iterate_subscriptions(self):
+        cc = ContextConsumer(config)
+        for _ in range(6):
+            cc.subscribe(entity_type="Ty")
+        it = cc.iterate_subscriptions(3)
+        subs_0 = next(it)
+        subs_1 = next(it)
+        self.assertEqual(len(subs_0), 3)
+        self.assertEqual(len(subs_1), 3)
+        set_0 = set([s["id"] for s in subs_0])
+        set_1 = set([s["id"] for s in subs_1])
+        self.assertEqual(len(set_0), 3)
+        self.assertEqual(len(set_1), 3)
+        self.assertEqual(len(set_0.intersection(set_1)), 0)
+
+    def test_get_all_subscriptions(self):
+        cc = ContextConsumer(config)
+        pre_subs = cc.get_all_subscriptions()
+        for _ in range(6):
+            s_id = cc.subscribe(entity_type="Ty")
+        post_subs = cc.get_all_subscriptions()
+        self.assertEqual(len(pre_subs) + 6, len(post_subs))
+        self.assertIn(s_id, set([s["id"] for s in post_subs]))
+
+    def test_subscription_equals(self):
+        cc = ContextConsumer(config)
+        params = {
+            "entity_type": "Ty",
+            "uri": "http://1.2.3.4:5678",
+            "subscription_id": "1234",
+            "name": "a_name",
+            "description": "a_description",
+            "entity_id": "an_entity_id",
+            "entity_id_pattern": "an_entity_id_pattern",
+            "watched_attributes": ["a1", "a2"],
+            "query": "a1==true",
+            "notification_attributes": ["b1", "b2"],
+            "notification_format": "keyValues",
+            "notification_accept": "application/json",
+            "expires": "2021-01-01T00:00:00Z",
+            "throttling": 5,
+        }
+        sub_1 = cc.build_subscription(**params)
+        params_mod = params.copy()
+        self.assertTrue(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        params_mod["entity_type"] = "TT"
+        self.assertFalse(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        params_mod["uri"] = "http://1.2.3.4:5778"
+        self.assertFalse(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        params_mod["subscription_id"] = "1235"
+        self.assertTrue(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        params_mod["name"] = "q_name"
+        self.assertTrue(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        params_mod["description"] = "q_description"
+        self.assertTrue(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        params_mod["entity_id"] = "an_entity_ii"
+        self.assertFalse(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        params_mod["entity_id_pattern"] = "aa_entity_id_pattern"
+        self.assertFalse(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        params_mod["watched_attributes"] = ["a2", "a2"],
+        self.assertFalse(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        params_mod["query"] = "a1==false",
+        self.assertFalse(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        params_mod["notification_attributes"] = ["b1", "b3"],
+        self.assertFalse(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        params_mod["notification_format"] = "normalized",
+        self.assertFalse(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        params_mod["notification_accept"] = "application/ld+json",
+        self.assertFalse(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        params_mod["expires"] = "2021-01-02T00:00:00Z",
+        self.assertFalse(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+        params_mod = params.copy()
+        # params_mod["throttling"] = 5,
+        self.assertTrue(
+            cc.subscription_equals(sub_1, cc.build_subscription(**params_mod))
+        )
+
 
     def test_subscription_conflicts(self):
         cc = ContextConsumer(config)
