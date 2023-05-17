@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List, Union, Optional
 from datetime import datetime
+import json as Json
 
 
 class Subscription:
@@ -8,7 +9,7 @@ class Subscription:
     entities.
 
     Attributes:
-        uri
+        notification_uri
         subscription_id
         name
         description
@@ -26,13 +27,17 @@ class Subscription:
     Properties:
         json (dict): The subscription as a JSON object.
 
+    Static methods:
+        from_json(json) -> Subscription
+
     Overloaded operators:
         __eq__
+        __str__
     """
 
     def __init__(
         self,
-        uri: str,
+        notification_uri: str,
         subscription_id: Optional[str] = None,
         name: Optional[str] = None,
         description: Optional[str] = None,
@@ -53,7 +58,7 @@ class Subscription:
             entity_type (Optional[Union[str, List[str]]]): Entity type to
                 subscribe to. If None, `watched_attributes` must be provided.
                 A single entity type or a list of entity types.
-            uri (str): URI which conveys the endpoint which will
+            notification_uri (str): URI which conveys the endpoint which will
                 receive the notification.
             subscription_id (Optional[str], optional): Subscription ID. If
                 None, a new one will be generated. Defaults to None.
@@ -102,8 +107,7 @@ class Subscription:
         # Preconditions and casting
         if entity_type is None and watched_attributes is None:
             raise ValueError(
-                "entity_type or watched_attributes must be provided "
-                f"{entity_type}, {watched_attributes}"
+                "entity_type or watched_attributes must be provided"
             )
 
         if entity_type is not None:
@@ -113,7 +117,7 @@ class Subscription:
         if entity_id is not None:
             if entity_type is None:
                 raise ValueError(
-                    "entity_type must be provided if entity_id is provided"
+                    "entity_type can not be None if entity_id is provided"
                 )
             if isinstance(entity_id, str):
                 entity_id = [entity_id]
@@ -126,7 +130,7 @@ class Subscription:
         if entity_id_pattern is not None:
             if entity_type is None:
                 raise ValueError(
-                    "entity_type must be provided if entity_id_pattern is "
+                    "entity_type can not be None if entity_id_pattern is "
                     "provided"
                 )
             if isinstance(entity_id_pattern, str):
@@ -141,7 +145,7 @@ class Subscription:
             expires = expires.strftime("%Y-%m-%dT%H:%M:%SZ")
 
         self.entity_type = entity_type
-        self.uri = uri
+        self.notification_uri = notification_uri
         self.subscription_id = subscription_id
         self.name = name
         self.description = description
@@ -164,7 +168,7 @@ class Subscription:
             "notification": {
                 "format": self.notification_format,
                 "endpoint": {
-                    "uri": self.uri,
+                    "uri": self.notification_uri,
                     "accept": self.notification_accept
                 }
             }
@@ -217,6 +221,80 @@ class Subscription:
 
         return subscription
 
+    @staticmethod
+    def from_json(json: dict) -> Subscription:
+        """Builds a subscription from a JSON.
+
+        Args:
+            json (dict): Subscription JSON dict.
+
+        Returns:
+            Subscription: A Subscription object.
+        """
+        # Get ID
+        subscription_id = json.get("id", None)
+
+        # Check type
+        if json.get("type", None) != "Subscription":
+            raise ValueError("The provided JSON object is not a subscription")
+
+        # Get name
+        name = json.get("name", None)
+
+        # Get description
+        description = json.get("description", None)
+
+        # Get entities
+        entities = json.get("entities", None)
+        if entities is not None:
+            entity_type = []
+            entity_id = []
+            entity_id_pattern = []
+            for ent in entities:
+                entity_type.append(ent["type"])
+                entity_id.append(ent.get("id", None))
+                entity_id_pattern.append(ent.get("idPattern", None))
+        else:
+            entity_type = None
+            entity_id = None
+            entity_id_pattern = None
+            
+        # Get watched_attributes
+        watched_attributes = json.get("watchedAttributes", None)
+        
+        # Get query
+        query = json.get("q", None)
+
+        # Get notification
+        notification = json["notification"]
+        notification_attributes = notification.get("attributes", None)
+        notification_format = notification.get("format", None)
+        notification_accept = notification["endpoint"].get("accept", None)
+        notification_uri = notification["endpoint"]["uri"]
+
+        # Get expires
+        expires = json.get("expires", None)
+
+        # Get throttling
+        throttling = json.get("throttling", None)
+
+        return Subscription(
+            notification_uri=notification_uri,
+            subscription_id=subscription_id,
+            name=name,
+            description=description,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            entity_id_pattern=entity_id_pattern,
+            watched_attributes=watched_attributes,
+            query=query,
+            notification_attributes=notification_attributes,
+            notification_format=notification_format,
+            notification_accept=notification_accept,
+            expires=expires,
+            throttling=throttling
+        )
+
     def __eq__(self, other: Subscription) -> bool:
         """Compares if two subscriptions are virtually equal.
         """
@@ -253,7 +331,7 @@ class Subscription:
             return False
         if self.query != other.query:
             return False
-        if self.uri != other.uri:
+        if self.notification_uri != other.notification_uri:
             return False
         if self.notification_format != other.notification_format:
             return False
@@ -266,3 +344,9 @@ class Subscription:
         if self.throttling != other.throttling:
             return False
         return True
+
+    def __str__(self) -> str:
+        """Returns the subscription as a JSON string.
+        """
+        return Json.dumps(self.json, indent=4)
+    
