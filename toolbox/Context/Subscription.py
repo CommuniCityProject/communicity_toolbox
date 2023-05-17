@@ -124,7 +124,7 @@ class Subscription:
             if len(entity_id) != len(entity_type):
                 raise ValueError(
                     "entity_type and entity_id must have the same length "
-                    f"{len(entity_type)}, {len(entity_id)}"
+                    f"({len(entity_type)}, {len(entity_id)})"
                 )
 
         if entity_id_pattern is not None:
@@ -231,12 +231,12 @@ class Subscription:
         Returns:
             Subscription: A Subscription object.
         """
-        # Get ID
-        subscription_id = json.get("id", None)
-
         # Check type
         if json.get("type", None) != "Subscription":
             raise ValueError("The provided JSON object is not a subscription")
+        
+        # Get ID
+        subscription_id = json.get("id", None)
 
         # Get name
         name = json.get("subscriptionName", None)
@@ -245,15 +245,14 @@ class Subscription:
         description = json.get("description", None)
 
         # Get entities
-        entities = json.get("entities", None)
-        if entities is not None:
-            entity_type = []
-            entity_id = []
-            entity_id_pattern = []
-            for ent in entities:
-                entity_type.append(ent["type"])
-                entity_id.append(ent.get("id", None))
-                entity_id_pattern.append(ent.get("idPattern", None))
+        if "entities" in json:
+            entity_type = [ent["type"] for ent in json["entities"]]
+            entity_id = [ent.get("id", None) for ent in json["entities"]]
+            entity_id_pattern = [ent.get("idPattern", None) for ent in json["entities"]]
+            if set(entity_id) == {None}:
+                entity_id = None
+            if set(entity_id_pattern) == {None}:
+                entity_id_pattern = None
         else:
             entity_type = None
             entity_id = None
@@ -317,15 +316,16 @@ class Subscription:
         if self.entity_type is not None:
             if len(self.entity_type) != len(other.entity_type):
                 return False
-            for i in range(len(self.entity_type)):
-                if self.entity_type[i] not in other.entity_type:
-                    return False
-                if self.entity_id is not None and \
-                    self.entity_id[i] not in other.entity_id:
-                        return False
-                if self.entity_id_pattern is not None and \
-                    self.entity_id_pattern[i] not in other.entity_id_pattern:
-                        return False
+            if set(self.entity_type) != set(other.entity_type):
+                return False
+        
+        if self.entity_id is not None:
+            if set(self.entity_id) != set(other.entity_id):
+                return False
+        
+        if self.entity_id_pattern is not None:
+            if set(self.entity_id_pattern) != set(other.entity_id_pattern):
+                return False
 
         if self.watched_attributes != other.watched_attributes:
             return False

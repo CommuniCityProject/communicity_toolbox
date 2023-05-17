@@ -131,7 +131,7 @@ class ContextConsumer:
                 logger.warning(f"Found {len(conflicts)} conflicting "
                                f"subscription: {conflicts}. "
                                "Not creating the subscription.")
-                return conflicts[0]["id"]
+                return conflicts[0].subscription_id
 
         response = requests.post(
             url=self._subscriptions_uri,
@@ -290,7 +290,7 @@ class ContextConsumer:
         """
         r = True
         for sub_id in reversed(self._subscription_ids):
-            r = self._unsubscribe(sub_id) and r
+            r = self.unsubscribe(sub_id) and r
         return r
 
     def parse_entity(self, entity_id: str) -> Type[BaseModel]:

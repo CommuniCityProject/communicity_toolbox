@@ -20,7 +20,6 @@ _subscriptions_uri = urljoin(_context_broker_uri, "/ngsi-ld/v1/subscriptions")
 
 class TestContextConsumer(unittest.TestCase):
 
-# TODO: Check conflicts
     def test_init(self):
         cc = ContextConsumer(**config)
         self.assertEqual(cc.notification_uri, config["notification_uri"])
@@ -99,6 +98,14 @@ class TestContextConsumer(unittest.TestCase):
         ret_sub = r.json()
         self.assertEqual(ret_sub["subscriptionName"], cc.subscription_name)
         self.assertEqual(ret_sub["notification"]["endpoint"]["uri"], cc.notification_uri)
+
+        # Test check conflicts
+        config_2 = config.copy()
+        config_2["check_subscription_conflicts"] = True
+        cc = ContextConsumer(**config_2)
+        id_5 = cc.subscribe(entity_type="Ty")
+        id_6 = cc.subscribe(entity_type="Ty")
+        self.assertEqual(id_5, id_6)
 
     def test_get_subscription(self):
         cc = ContextConsumer(**config)
@@ -181,169 +188,240 @@ class TestContextConsumer(unittest.TestCase):
         self.assertEqual(len(pre_subs) + 6, len(post_subs))
         self.assertIn(s_id, set([s.subscription_id for s in post_subs]))
 
-    # def test_get_conflicting_subscriptions(self):
-    #     cc = ContextConsumer(**config)
-    #     t = str(uuid.uuid4())
+    def test_get_conflicting_subscriptions(self):
+        cc = ContextConsumer(**config)
+        t = str(uuid.uuid4())
+        id_0 = cc.subscribe(
+            entity_type=[t, t],
+            entity_id=["urn:ngsi-ld:Ty:123", "urn:ngsi-ld:Ty:456"],
+            query="a1==true"
+        )
+        conflicts = cc.get_conflicting_subscriptions(
+            Subscription(
+                name=cc.subscription_name,
+                notification_uri=cc.notification_uri,
+                entity_type=[t, t],
+                entity_id=["urn:ngsi-ld:Ty:123", "urn:ngsi-ld:Ty:456"],
+                query="a1==true"
+            )
+        )
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].subscription_id, id_0)
 
-    #     sub_0 = Subscription
+        id_1 = cc.subscribe(
+            entity_type=[t, t],
+            entity_id=["urn:ngsi-ld:Ty:123", "urn:ngsi-ld:Ty:456"],
+            query="a1==true"
+        )
+        conflicts = cc.get_conflicting_subscriptions(
+            Subscription(
+                name="a_name",
+                notification_uri=cc.notification_uri,
+                entity_type=[t, t],
+                entity_id=["urn:ngsi-ld:Ty:123", "urn:ngsi-ld:Ty:456"],
+                query="a1==true"
+            )
+        )
+        self.assertEqual(len(conflicts), 2)
 
-    #     s_id = cc.subscribe(entity_type=t)
+        conflicts = cc.get_conflicting_subscriptions(
+            Subscription(
+                notification_uri=cc.notification_uri,
+                entity_type=[t, "t"],
+                entity_id=["urn:ngsi-ld:Ty:123", "urn:ngsi-ld:Ty:456"],
+                query="a1==true"
+            )
+        )
+        self.assertEqual(len(conflicts), 0)
 
+    def test_unsubscribe(self):
+        cc = ContextConsumer(**config)
 
-    #     self.assertEqual(len(cc.subscription_conflicts(
-    #         str(uuid.uuid4()), ["a1"], "a1==true")), 0)
-    #     self.assertEqual(len(cc.subscription_conflicts(
-    #         t, [uuid.uuid4()], "a1==true")), 0)
-    #     self.assertEqual(len(cc.subscription_conflicts(
-    #         t, ["a1"], f"{uuid.uuid4()}==true")), 0)
-    #     self.assertEqual(len(cc.subscription_conflicts(
-    #         t, ["a1"], "a1==false")), 0)
-    #     self.assertGreater(
-    #         len(cc.subscription_conflicts(t, ["a1"], "a1==true")), 0)
+        total_subs_0 = len(cc.get_all_subscriptions())
 
-    # # def test_unsubscribe(self):
-    # #     cc = ContextConsumer(config)
+        # Make 4 subscriptions
+        s_id0 = cc.subscribe(entity_type="T0")
+        s_id1 = cc.subscribe(entity_type="T1")
+        s_id2 = cc.subscribe(entity_type="T2")
+        s_id3 = cc.subscribe(entity_type="T3")
 
-    # #     s_id0 = cc.subscribe("T0")
-    # #     s_id1 = cc.subscribe("T1")
-    # #     s_id2 = cc.subscribe("T2")
-    # #     s_id3 = cc.subscribe("T3")
+        self.assertIn(s_id0, cc.subscription_ids)
+        self.assertIn(s_id1, cc.subscription_ids)
+        self.assertIn(s_id2, cc.subscription_ids)
+        self.assertIn(s_id3, cc.subscription_ids)
 
-    # #     self.assertEqual(len(cc.subscription_ids), 4)
-    # #     self.assertTrue(cc.unsubscribe(s_id0))
-    # #     self.assertEqual(len(cc.subscription_ids), 3)
-    # #     self.assertFalse(cc.unsubscribe(s_id0))
-    # #     self.assertEqual(len(cc.subscription_ids), 3)
-    # #     self.assertFalse(cc.unsubscribe("0"))
-    # #     self.assertEqual(len(cc.subscription_ids), 3)
+        total_subs_1 = len(cc.get_all_subscriptions())
+        self.assertEqual(total_subs_0 + 4, total_subs_1)
+        self.assertEqual(len(cc.subscription_ids), 4)
+        
+        # Unsubscribe 0
+        self.assertTrue(cc.unsubscribe(s_id0))
+        self.assertEqual(len(cc.subscription_ids), 3)
+        self.assertNotIn(s_id0, cc.subscription_ids)
+        self.assertEqual(total_subs_1-1, len(cc.get_all_subscriptions()))
+        
+        # Unsubscribe 0 again
+        self.assertFalse(cc.unsubscribe(s_id0))
+        self.assertEqual(len(cc.subscription_ids), 3)
+        self.assertEqual(total_subs_1-1, len(cc.get_all_subscriptions()))
 
-    # def test_parse_entity(self):
-    #     cc = ContextConsumer(config)
-    #     e_id = "urn:ngsi-ld:Face:" + str(uuid.uuid4())
-    #     e_type = "Face"
-    #     context = ["https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
-    #     date_observed = "2000-01-01T00:00:00Z"
-    #     image = "urn:ngsi-ld:Image:123"
-    #     bounding_box = {"xmin": 0.0, "ymin": 0.1, "xmax": 0.2, "ymax": 0.3}
-    #     detection_confidence = 0.99
-    #     age = 30.5
-    #     gender = "FEMALE"
-    #     gender_confidence = 0.88
-    #     emotion = "HAPPINESS"
-    #     emotion_confidence = 0.77
-    #     features = [1.1, 2.2, 3.3]
-    #     features_algorithm = "algorithm"
-    #     recognition_domain = "domain"
-    #     recognized = False
-    #     recognized_distance = 2.2
-    #     recognized_person = "person"
-    #     r = requests.post(
-    #         _entities_uri,
-    #         headers={"Content-Type": "application/ld+json"},
-    #         data=json.dumps({
-    #             "id": e_id,
-    #             "type": e_type,
-    #             "@context": context,
-    #             "dateObserved": {"type": "Property", "value": {"@type": "DateTime", "@value": date_observed}},
-    #             "image": {"type": "Relationship", "object": image},
-    #             "boundingBox": {"type": "Property", "value": bounding_box},
-    #             "detectionConfidence": {"type": "Property", "value": detection_confidence},
-    #             "age": {"type": "Property", "value": age},
-    #             "gender": {"type": "Property", "value": gender},
-    #             "genderConfidence": {"type": "Property", "value": gender_confidence},
-    #             "emotion": {"type": "Property", "value": emotion},
-    #             "emotionConfidence": {"type": "Property", "value": emotion_confidence},
-    #             "features": {"type": "Property", "value": features},
-    #             "featuresAlgorithm": {"type": "Property", "value": features_algorithm},
-    #             "recognitionDomain": {"type": "Property", "value": recognition_domain},
-    #             "recognized": {"type": "Property", "value": recognized},
-    #             "recognizedDistance": {"type": "Property", "value": recognized_distance},
-    #             "recognizedPerson": {"type": "Property", "value": recognized_person}
-    #         })
-    #     )
-    #     ret_dm = cc.parse_entity(e_id)
-    #     self.assertEqual(e_id, ret_dm.id)
-    #     self.assertEqual(e_type, ret_dm.type)
-    #     self.assertEqual(datetime.datetime.fromisoformat(
-    #         date_observed[:-1]), ret_dm.dateObserved)
-    #     self.assertEqual(image, ret_dm.image)
-    #     self.assertEqual(BoundingBox(bounding_box["xmin"], bounding_box["ymin"], bounding_box["xmax"], bounding_box["ymax"]),
-    #                      ret_dm.bounding_box)
-    #     self.assertEqual(detection_confidence, ret_dm.detection_confidence)
-    #     self.assertEqual(age, ret_dm.age)
-    #     self.assertEqual(Gender[gender], ret_dm.gender)
-    #     self.assertEqual(gender_confidence, ret_dm.gender_confidence)
-    #     self.assertEqual(Emotion[emotion], ret_dm.emotion)
-    #     self.assertEqual(emotion_confidence, ret_dm.emotion_confidence)
-    #     self.assertEqual(features, ret_dm.features)
-    #     self.assertEqual(features_algorithm, ret_dm.features_algorithm)
-    #     self.assertEqual(recognition_domain, ret_dm.recognition_domain)
-    #     self.assertEqual(recognized, ret_dm.recognized)
-    #     self.assertEqual(recognized_distance, ret_dm.recognized_distance)
-    #     self.assertEqual(recognized_person, ret_dm.recognized_person)
-    #     with self.assertRaises(ValueError):
-    #         cc.parse_entity("0")
+        # Unsubscribe non-existent
+        self.assertFalse(cc.unsubscribe("0"))
+        self.assertEqual(len(cc.subscription_ids), 3)
+        self.assertEqual(total_subs_1-1, len(cc.get_all_subscriptions()))
 
-    # def test_parse_dict(self):
-    #     cc = ContextConsumer(config)
-    #     e_id = "urn:ngsi-ld:Face:" + str(uuid.uuid4())
-    #     e_type = "Face"
-    #     context = ["https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
-    #     date_observed = "2000-01-01T00:00:00Z"
-    #     image = "urn:ngsi-ld:Image:123"
-    #     bounding_box = {"xmin": 0.0, "ymin": 0.1, "xmax": 0.2, "ymax": 0.3}
-    #     detection_confidence = 0.99
-    #     age = 30.5
-    #     gender = "FEMALE"
-    #     gender_confidence = 0.88
-    #     emotion = "HAPPINESS"
-    #     emotion_confidence = 0.77
-    #     features = [1.1, 2.2, 3.3]
-    #     features_algorithm = "algorithm"
-    #     recognition_domain = "domain"
-    #     recognized = False
-    #     recognized_distance = 2.2
-    #     recognized_person = "person"
-    #     entity = {
-    #         "id": e_id,
-    #         "type": e_type,
-    #         "@context": context,
-    #         "dateObserved": {"type": "Property", "value": {"@type": "DateTime", "@value": date_observed}},
-    #         "image": {"type": "Relationship", "object": image},
-    #         "boundingBox": {"type": "Property", "value": bounding_box},
-    #         "detectionConfidence": {"type": "Property", "value": detection_confidence},
-    #         "age": {"type": "Property", "value": age},
-    #         "gender": {"type": "Property", "value": gender},
-    #         "genderConfidence": {"type": "Property", "value": gender_confidence},
-    #         "emotion": {"type": "Property", "value": emotion},
-    #         "emotionConfidence": {"type": "Property", "value": emotion_confidence},
-    #         "features": {"type": "Property", "value": features},
-    #         "featuresAlgorithm": {"type": "Property", "value": features_algorithm},
-    #         "recognitionDomain": {"type": "Property", "value": recognition_domain},
-    #         "recognized": {"type": "Property", "value": recognized},
-    #         "recognizedDistance": {"type": "Property", "value": recognized_distance},
-    #         "recognizedPerson": {"type": "Property", "value": recognized_person}
-    #     }
-    #     dm = cc.parse_dict(entity)
-    #     self.assertEqual(e_id, dm.id)
-    #     self.assertEqual(e_type, dm.type)
-    #     self.assertEqual(datetime.datetime.fromisoformat(
-    #         date_observed[:-1]), dm.dateObserved)
-    #     self.assertEqual(image, dm.image)
-    #     self.assertEqual(BoundingBox(bounding_box["xmin"], bounding_box["ymin"], bounding_box["xmax"], bounding_box["ymax"]),
-    #                      dm.bounding_box)
-    #     self.assertEqual(detection_confidence, dm.detection_confidence)
-    #     self.assertEqual(age, dm.age)
-    #     self.assertEqual(Gender[gender], dm.gender)
-    #     self.assertEqual(gender_confidence, dm.gender_confidence)
-    #     self.assertEqual(Emotion[emotion], dm.emotion)
-    #     self.assertEqual(emotion_confidence, dm.emotion_confidence)
-    #     self.assertEqual(features, dm.features)
-    #     self.assertEqual(features_algorithm, dm.features_algorithm)
-    #     self.assertEqual(recognition_domain, dm.recognition_domain)
-    #     self.assertEqual(recognized, dm.recognized)
-    #     self.assertEqual(recognized_distance, dm.recognized_distance)
-    #     self.assertEqual(recognized_person, dm.recognized_person)
+        # Unsubscribe 3
+        self.assertTrue(cc.unsubscribe(s_id3))
+        self.assertEqual(len(cc.subscription_ids), 2)
+        self.assertNotIn(s_id3, cc.subscription_ids)
+        self.assertEqual(total_subs_1-2, len(cc.get_all_subscriptions()))
+
+    def test_unsubscribe_all(self):
+        cc = ContextConsumer(**config)
+
+        total_subs_0 = len(cc.get_all_subscriptions())
+
+        # Make 4 subscriptions
+        s_id0 = cc.subscribe(entity_type="T0")
+        s_id1 = cc.subscribe(entity_type="T1")
+        s_id2 = cc.subscribe(entity_type="T2")
+        s_id3 = cc.subscribe(entity_type="T3")
+
+        total_subs_1 = len(cc.get_all_subscriptions())
+        self.assertEqual(total_subs_0 + 4, total_subs_1)
+        self.assertEqual(len(cc.subscription_ids), 4)
+
+        cc.unsubscribe_all()
+        self.assertEqual(len(cc.subscription_ids), 0)
+        self.assertEqual(total_subs_0, len(cc.get_all_subscriptions()))
+
+    def test_parse_entity(self):
+        cc = ContextConsumer(**config)
+        e_id = "urn:ngsi-ld:Face:" + str(uuid.uuid4())
+        e_type = "Face"
+        context = ["https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+        date_observed = "2000-01-01T00:00:00Z"
+        image = "urn:ngsi-ld:Image:123"
+        bounding_box = {"xmin": 0.0, "ymin": 0.1, "xmax": 0.2, "ymax": 0.3}
+        detection_confidence = 0.99
+        age = 30.5
+        gender = "FEMALE"
+        gender_confidence = 0.88
+        emotion = "HAPPINESS"
+        emotion_confidence = 0.77
+        features = [1.1, 2.2, 3.3]
+        features_algorithm = "algorithm"
+        recognition_domain = "domain"
+        recognized = False
+        recognized_distance = 2.2
+        recognized_person = "person"
+        r = requests.post(
+            _entities_uri,
+            headers={"Content-Type": "application/ld+json"},
+            data=json.dumps({
+                "id": e_id,
+                "type": e_type,
+                "@context": context,
+                "dateObserved": {"type": "Property", "value": {"@type": "DateTime", "@value": date_observed}},
+                "image": {"type": "Relationship", "object": image},
+                "boundingBox": {"type": "Property", "value": bounding_box},
+                "detectionConfidence": {"type": "Property", "value": detection_confidence},
+                "age": {"type": "Property", "value": age},
+                "gender": {"type": "Property", "value": gender},
+                "genderConfidence": {"type": "Property", "value": gender_confidence},
+                "emotion": {"type": "Property", "value": emotion},
+                "emotionConfidence": {"type": "Property", "value": emotion_confidence},
+                "features": {"type": "Property", "value": features},
+                "featuresAlgorithm": {"type": "Property", "value": features_algorithm},
+                "recognitionDomain": {"type": "Property", "value": recognition_domain},
+                "recognized": {"type": "Property", "value": recognized},
+                "recognizedDistance": {"type": "Property", "value": recognized_distance},
+                "recognizedPerson": {"type": "Property", "value": recognized_person}
+            })
+        )
+        ret_dm = cc.parse_entity(e_id)
+        self.assertEqual(e_id, ret_dm.id)
+        self.assertEqual(e_type, ret_dm.type)
+        self.assertEqual(datetime.datetime.fromisoformat(
+            date_observed[:-1]), ret_dm.dateObserved)
+        self.assertEqual(image, ret_dm.image)
+        self.assertEqual(BoundingBox(bounding_box["xmin"], bounding_box["ymin"], bounding_box["xmax"], bounding_box["ymax"]),
+                         ret_dm.bounding_box)
+        self.assertEqual(detection_confidence, ret_dm.detection_confidence)
+        self.assertEqual(age, ret_dm.age)
+        self.assertEqual(Gender[gender], ret_dm.gender)
+        self.assertEqual(gender_confidence, ret_dm.gender_confidence)
+        self.assertEqual(Emotion[emotion], ret_dm.emotion)
+        self.assertEqual(emotion_confidence, ret_dm.emotion_confidence)
+        self.assertEqual(features, ret_dm.features)
+        self.assertEqual(features_algorithm, ret_dm.features_algorithm)
+        self.assertEqual(recognition_domain, ret_dm.recognition_domain)
+        self.assertEqual(recognized, ret_dm.recognized)
+        self.assertEqual(recognized_distance, ret_dm.recognized_distance)
+        self.assertEqual(recognized_person, ret_dm.recognized_person)
+        with self.assertRaises(ValueError):
+            cc.parse_entity("0")
+
+    def test_parse_dict(self):
+        cc = ContextConsumer(**config)
+        e_id = "urn:ngsi-ld:Face:" + str(uuid.uuid4())
+        e_type = "Face"
+        context = ["https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+        date_observed = "2000-01-01T00:00:00Z"
+        image = "urn:ngsi-ld:Image:123"
+        bounding_box = {"xmin": 0.0, "ymin": 0.1, "xmax": 0.2, "ymax": 0.3}
+        detection_confidence = 0.99
+        age = 30.5
+        gender = "FEMALE"
+        gender_confidence = 0.88
+        emotion = "HAPPINESS"
+        emotion_confidence = 0.77
+        features = [1.1, 2.2, 3.3]
+        features_algorithm = "algorithm"
+        recognition_domain = "domain"
+        recognized = False
+        recognized_distance = 2.2
+        recognized_person = "person"
+        entity = {
+            "id": e_id,
+            "type": e_type,
+            "@context": context,
+            "dateObserved": {"type": "Property", "value": {"@type": "DateTime", "@value": date_observed}},
+            "image": {"type": "Relationship", "object": image},
+            "boundingBox": {"type": "Property", "value": bounding_box},
+            "detectionConfidence": {"type": "Property", "value": detection_confidence},
+            "age": {"type": "Property", "value": age},
+            "gender": {"type": "Property", "value": gender},
+            "genderConfidence": {"type": "Property", "value": gender_confidence},
+            "emotion": {"type": "Property", "value": emotion},
+            "emotionConfidence": {"type": "Property", "value": emotion_confidence},
+            "features": {"type": "Property", "value": features},
+            "featuresAlgorithm": {"type": "Property", "value": features_algorithm},
+            "recognitionDomain": {"type": "Property", "value": recognition_domain},
+            "recognized": {"type": "Property", "value": recognized},
+            "recognizedDistance": {"type": "Property", "value": recognized_distance},
+            "recognizedPerson": {"type": "Property", "value": recognized_person}
+        }
+        dm = cc.parse_dict(entity)
+        self.assertEqual(e_id, dm.id)
+        self.assertEqual(e_type, dm.type)
+        self.assertEqual(datetime.datetime.fromisoformat(
+            date_observed[:-1]), dm.dateObserved)
+        self.assertEqual(image, dm.image)
+        self.assertEqual(BoundingBox(bounding_box["xmin"], bounding_box["ymin"], bounding_box["xmax"], bounding_box["ymax"]),
+                         dm.bounding_box)
+        self.assertEqual(detection_confidence, dm.detection_confidence)
+        self.assertEqual(age, dm.age)
+        self.assertEqual(Gender[gender], dm.gender)
+        self.assertEqual(gender_confidence, dm.gender_confidence)
+        self.assertEqual(Emotion[emotion], dm.emotion)
+        self.assertEqual(emotion_confidence, dm.emotion_confidence)
+        self.assertEqual(features, dm.features)
+        self.assertEqual(features_algorithm, dm.features_algorithm)
+        self.assertEqual(recognition_domain, dm.recognition_domain)
+        self.assertEqual(recognized, dm.recognized)
+        self.assertEqual(recognized_distance, dm.recognized_distance)
+        self.assertEqual(recognized_person, dm.recognized_person)
 
 
 if __name__ == "__main__":

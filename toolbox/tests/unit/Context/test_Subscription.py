@@ -209,6 +209,67 @@ class TestSubscription(unittest.TestCase):
         self.assertEqual(sub.expires, "2020-01-01T00:00:00Z")
         self.assertEqual(sub.throttling, 5)
 
+        # Test parse entities
+        sub_json = {
+            "type": "Subscription",
+            "entities": [
+                {"type": "t1"},
+                {"type": "t2"},
+                {"type": "t3"}
+            ],
+            "notification": {
+                "format": "keyValues",
+                "endpoint": {
+                    "uri": "host",
+                    "accept": "application/ld+json"
+                }
+            }
+        }
+        sub = Subscription.from_json(sub_json)
+        self.assertEqual(sub.entity_type, ["t1", "t2", "t3"])
+        self.assertEqual(sub.entity_id, None)
+        self.assertEqual(sub.entity_id_pattern, None)
+        
+        sub_json["entities"] = [
+            {"type": "t1"},
+            {"type": "t2", "id": "id2"},
+            {"type": "t3", "id": "id3"}
+        ]
+        sub = Subscription.from_json(sub_json)
+        self.assertEqual(sub.entity_type, ["t1", "t2", "t3"])
+        self.assertEqual(sub.entity_id, [None, "id2", "id3"])
+        self.assertEqual(sub.entity_id_pattern, None)
+
+        sub_json["entities"] = [
+            {"type": "t1"},
+            {"type": "t2", "idPattern": "p2"},
+            {"type": "t3", "idPattern": "p3"}
+        ]
+        sub = Subscription.from_json(sub_json)
+        self.assertEqual(sub.entity_type, ["t1", "t2", "t3"])
+        self.assertEqual(sub.entity_id, None)
+        self.assertEqual(sub.entity_id_pattern, [None, "p2", "p3"])
+
+        sub_json["entities"] = [
+            {"type": "t1"},
+            {"type": "t2", "id": "id2", "idPattern": "p2"},
+            {"type": "t3", "id": "id3", "idPattern": "p3"}
+        ]
+        sub = Subscription.from_json(sub_json)
+        self.assertEqual(sub.entity_type, ["t1", "t2", "t3"])
+        self.assertEqual(sub.entity_id, [None, "id2", "id3"])
+        self.assertEqual(sub.entity_id_pattern, [None, "p2", "p3"])
+
+        sub_json["entities"] = [
+            {"type": "t1", "id": "id1", "idPattern": "p1"},
+            {"type": "t2", "id": "id2", "idPattern": "p2"},
+            {"type": "t3", "id": "id3", "idPattern": "p3"}
+        ]
+        sub = Subscription.from_json(sub_json)
+        self.assertEqual(sub.entity_type, ["t1", "t2", "t3"])
+        self.assertEqual(sub.entity_id, ["id1", "id2", "id3"])
+        self.assertEqual(sub.entity_id_pattern, ["p1", "p2", "p3"])
+
     def test_eq(self):
         sub_args = {
             "notification_uri": "host",
