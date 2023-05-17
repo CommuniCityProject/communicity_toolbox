@@ -6,6 +6,7 @@ import uuid
 
 import requests
 
+from toolbox import DataModels
 from toolbox.Context import ContextConsumer, Subscription
 from toolbox.Structures import BoundingBox, Emotion, Gender
 from toolbox.utils.config_utils import parse_config
@@ -295,8 +296,33 @@ class TestContextConsumer(unittest.TestCase):
         self.assertEqual(len(cc.subscription_ids), 0)
         self.assertEqual(total_subs_0, len(cc.get_all_subscriptions()))
 
-    def test_parse_entity(self):
+    def test_get_entity(self):
         cc = ContextConsumer(**config)
+
+        e_id = "urn:ngsi-ld:Test:" + str(uuid.uuid4())
+
+        # Post an entity to the broker
+        r = requests.post(
+            _entities_uri,
+            headers={"Content-Type": "application/ld+json"},
+            data=json.dumps({
+                "id": e_id,
+                "type": "Test",
+                "@context": ["https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"],
+                "test_prop": {"type": "Property", "value": "test_val"}
+            })
+        )
+
+        # Get the entity from the broker
+        e = cc.get_entity(e_id)
+        self.assertEqual(e["id"], e_id)
+        self.assertEqual(e["type"], "Test")
+        self.assertEqual(e["test_prop"]["value"], "test_val")
+
+    def test_get_data_model(self):
+        cc = ContextConsumer(**config)
+        
+        # Define data model data
         e_id = "urn:ngsi-ld:Face:" + str(uuid.uuid4())
         e_type = "Face"
         context = ["https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
@@ -315,6 +341,8 @@ class TestContextConsumer(unittest.TestCase):
         recognized = False
         recognized_distance = 2.2
         recognized_person = "person"
+
+        # Post it to the broker
         r = requests.post(
             _entities_uri,
             headers={"Content-Type": "application/ld+json"},
@@ -339,7 +367,10 @@ class TestContextConsumer(unittest.TestCase):
                 "recognizedPerson": {"type": "Property", "value": recognized_person}
             })
         )
-        ret_dm = cc.parse_entity(e_id)
+
+        # Retrieve the data model by its ID
+        ret_dm = cc.get_data_model(e_id)
+        self.assertIsInstance(ret_dm, DataModels.Face)
         self.assertEqual(e_id, ret_dm.id)
         self.assertEqual(e_type, ret_dm.type)
         self.assertEqual(datetime.datetime.fromisoformat(
@@ -360,10 +391,12 @@ class TestContextConsumer(unittest.TestCase):
         self.assertEqual(recognized_distance, ret_dm.recognized_distance)
         self.assertEqual(recognized_person, ret_dm.recognized_person)
         with self.assertRaises(ValueError):
-            cc.parse_entity("0")
+            cc.get_data_model("0")
 
-    def test_parse_dict(self):
+    def test_parse_data_model(self):
         cc = ContextConsumer(**config)
+
+        # Define data model data
         e_id = "urn:ngsi-ld:Face:" + str(uuid.uuid4())
         e_type = "Face"
         context = ["https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
@@ -382,6 +415,8 @@ class TestContextConsumer(unittest.TestCase):
         recognized = False
         recognized_distance = 2.2
         recognized_person = "person"
+
+        # Create an entity dict
         entity = {
             "id": e_id,
             "type": e_type,
@@ -402,7 +437,9 @@ class TestContextConsumer(unittest.TestCase):
             "recognizedDistance": {"type": "Property", "value": recognized_distance},
             "recognizedPerson": {"type": "Property", "value": recognized_person}
         }
-        dm = cc.parse_dict(entity)
+
+        # Parse the entity dict
+        dm = cc.parse_data_model(entity)
         self.assertEqual(e_id, dm.id)
         self.assertEqual(e_type, dm.type)
         self.assertEqual(datetime.datetime.fromisoformat(

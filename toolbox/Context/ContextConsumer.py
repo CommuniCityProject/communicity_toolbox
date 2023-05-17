@@ -1,15 +1,16 @@
-from typing import List, Type, Union, Optional, Iterator
-import uuid
-import requests
 import copy
 import itertools
+import uuid
+from typing import Iterator, List, Optional, Type, Union
 
-from toolbox.DataModels import BaseModel
+import requests
+
 from toolbox.Context import entity_parser
-from .Subscription import Subscription
+from toolbox.DataModels import BaseModel
 from toolbox.DataModels.DataModelsCatalog import data_models_catalog
 from toolbox.utils.utils import get_logger, urljoin
 
+from .Subscription import Subscription
 
 logger = get_logger("toolbox.ContextConsumer")
 
@@ -30,11 +31,9 @@ class ContextConsumer:
         get_conflicting_subscriptions(subscription) -> List[Subscription]
         unsubscribe(subscription_id) -> bool
         unsubscribe_all() -> bool
-        parse_entity(entity_id) -> Type[BaseModel]
-        parse_dict(entity) -> Type[BaseModel]
-
-    Static Methods:
-        subscription_equals(sub_a, sub_b) -> bool
+        get_entity(entity_id) -> dict
+        get_data_model(entity_id) -> Type[BaseModel]
+        parse_data_model(entity) -> Type[BaseModel]
 
     Properties (read-only):
         subscription_ids (List[str]): List of ids of the created subscriptions.
@@ -196,7 +195,8 @@ class ContextConsumer:
         Returns:
             List[Subscription]: List of Subscription objects.
         """
-        url = urljoin(self._subscriptions_uri, f"?limit={limit}&offset={offset}")
+        url = urljoin(self._subscriptions_uri,
+                      f"?limit={limit}&offset={offset}")
         logger.debug(f"Getting subscriptions from {url}")
         response = requests.get(url)
         if response.ok:
@@ -271,7 +271,7 @@ class ContextConsumer:
         if subscription_id in self._subscription_ids:
             self._subscription_ids.remove(subscription_id)
         response = requests.delete(
-            url=f"{self._subscriptions_uri}/{subscription_id}"
+            url=urljoin(self._subscriptions_uri, subscription_id)
         )
         if response.ok:
             logger.info(f"Subscription deleted: {subscription_id}")
@@ -293,33 +293,48 @@ class ContextConsumer:
             r = self.unsubscribe(sub_id) and r
         return r
 
-    def parse_entity(self, entity_id: str) -> Type[BaseModel]:
-        """Retrieve an entity from the context broker by its id and convert
-        it to toolbox data model.
+    def get_entity(self, entity_id: str) -> dict:
+        """Retrieve an entity from the context broker by its ID and convert
+        it to a toolbox data model.
 
         Args:
-            entity_id (str): The id of an entity.
+            entity_id (str): The ID of an entity.
 
         Raises:
-            KeyError: If the entity type is not recognized.
             ValueError: If the entity can not be retrieved.
 
         Returns:
             Type[BaseModel]: A data model object.
         """
-        response = requests.get(f"{self._entities_uri}/{entity_id}")
-
+        response = requests.get(urljoin(self._entities_uri, entity_id))
         if response.ok:
-            entity = response.json()
-            return self.parse_dict(entity)
+            return response.json()
+        raise ValueError(f"Error getting entity {entity_id} from "
+                         f"{response.url}: {response.status_code} "
+                         f"{response.text}")
 
-        raise ValueError(f"Could not retrieve entity '{entity_id}'")
+    def get_data_model(self, entity_id: str) -> Type[BaseModel]:
+        """Retrieve an entity from the context broker by its ID and convert
+        it to a toolbox data model.
 
-    def parse_dict(self, entity: dict) -> Type[BaseModel]:
+        Args:
+            entity_id (str): The ID of an entity.
+
+        Raises:
+            ValueError: If the entity can not be retrieved.
+            KeyError: If the entity type is not recognized.
+
+        Returns:
+            Type[BaseModel]: A data model object.
+        """
+        entity = self.get_entity(entity_id)
+        return self.parse_data_model(entity)
+
+    def parse_data_model(self, entity: dict) -> Type[BaseModel]:
         """Parse an entity from a dict and return a toolbox data model.
 
         Args:
-            entity (dict): An entity.
+            entity (dict): A ngsi-ld entity as a dict.
 
         Raises:
             KeyError: If the entity type is not recognized.
@@ -336,4 +351,6 @@ class ContextConsumer:
 
     @property
     def subscription_ids(self) -> List[str]:
+        """Get the list of subscription IDs created within the ContextConsumer.
+        """
         return copy.copy(self._subscription_ids)
