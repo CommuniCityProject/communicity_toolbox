@@ -170,7 +170,7 @@ class TestSubscription(unittest.TestCase):
         sub_json = {
             "id": "sub_id",
             "type": "Subscription",
-            "name": "a_name",
+            "subscriptionName": "a_name",
             "description": "a_description",
             "entities": [
                 {"type": "t1"},

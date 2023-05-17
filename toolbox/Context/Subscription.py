@@ -239,7 +239,7 @@ class Subscription:
             raise ValueError("The provided JSON object is not a subscription")
 
         # Get name
-        name = json.get("name", None)
+        name = json.get("subscriptionName", None)
 
         # Get description
         description = json.get("description", None)

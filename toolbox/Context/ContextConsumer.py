@@ -5,9 +5,10 @@ import copy
 import itertools
 
 from toolbox.DataModels import BaseModel
-from toolbox.Context import entity_parser, Subscription
+from toolbox.Context import entity_parser
+from .Subscription import Subscription
 from toolbox.DataModels.DataModelsCatalog import data_models_catalog
-from toolbox.utils.utils import get_logger
+from toolbox.utils.utils import get_logger, urljoin
 
 
 logger = get_logger("toolbox.ContextConsumer")
@@ -21,13 +22,12 @@ class ContextConsumer:
         subscription_name (str): The name used in subscriptions.
 
     Methods:
-        build_subscription(entity_type, uri) -> dict
-        subscribe(subscription) -> Union[str, None]
-        get_subscription(subscription_id) -> Union[dict, None]
-        get_subscriptions(limit, offset) -> List[dict]
-        iterate_subscriptions(limit) -> Iterator[dict]
-        get_all_subscriptions() -> List[dict]
-        get_conflicting_subscriptions(subscription) -> List[dict]
+        subscribe(subscription, **kwargs) -> Union[str, None]
+        get_subscription(subscription_id) -> Union[Subscription, None]
+        get_subscriptions_page(limit, offset) -> List[Subscription]
+        iterate_subscriptions(limit) -> Iterator[Subscription]
+        get_all_subscriptions() -> List[Subscription]
+        get_conflicting_subscriptions(subscription) -> List[Subscription]
         unsubscribe(subscription_id) -> bool
         unsubscribe_all() -> bool
         parse_entity(entity_id) -> Type[BaseModel]
@@ -40,130 +40,74 @@ class ContextConsumer:
         subscription_ids (List[str]): List of ids of the created subscriptions.
     """
 
-    def __init__(self, config: dict):
+    def __init__(
+        self,
+        host: str,
+        port: int,
+        base_path: str = "",
+        notification_uri: str = None,
+        check_subscription_conflicts: bool = False
+    ):
         """Initialize the ContextConsumer.
 
         Args:
-            config (dict): Configuration dictionary.
+            host (str): Host address of the context broker.
+            port (int): Port of the context broker.
+            base_path (str, optional): URL path to the context broker.
+                Defaults to "".
+            notification_uri (str, optional): The uri used for the
+                subscriptions notifications. Defaults to None.
+            check_subscription_conflicts (bool, optional): If True, the
+                subscription will be checked for conflicts before being
+                created. Defaults to False.
         """
-        self._broker_host = config["context_broker"]["host"]
-        self._broker_port = config["context_broker"]["port"]
-        self._broker_url = f"http://{self._broker_host}:{self._broker_port}"
-        self._subscriptions_uri = f"{self._broker_url}/ngsi-ld/v1/subscriptions"
-        self._entities_uri = f"{self._broker_url}/ngsi-ld/v1/entities"
-        self.notification_uri = config["context_broker"].get(
-            "notification_uri", None)
-        self._check_subscription_conflicts = config["context_broker"].get(
-            "check_subscription_conflicts", False)
-        self.subscription_name = str(uuid.uuid4())
+        self._broker_host = host
+        self._broker_port = port
+        self._base_path = base_path
+        self.notification_uri = notification_uri
+        self._check_subscription_conflicts = check_subscription_conflicts
+
         self._subscription_ids: List[str] = []
+        self.subscription_name = str(uuid.uuid4())
+
+        self._broker_url = urljoin(
+            f"http://{self._broker_host}:{self._broker_port}",
+            base_path
+        )
+        self._subscriptions_uri = urljoin(
+            self._broker_url,
+            "/ngsi-ld/v1/subscriptions"
+        )
+        self._entities_uri = urljoin(
+            self._broker_url,
+            "/ngsi-ld/v1/entities"
+        )
+
         logger.info(f"Using context broker at {self._broker_url}")
 
-    def build_subscription(
-        self,
-        entity_type: str,
-        uri: Optional[str] = None,
-        subscription_id: Optional[str] = None,
-        name: Optional[str] = None,
-        description: Optional[str] = None,
-        entity_id: Optional[str] = None,
-        entity_id_pattern: Optional[str] = None,
-        watched_attributes: Optional[List[str]] = None,
-        query: Optional[str] = None,
-        notification_attributes: Optional[List[str]] = None,
-        notification_format: str = "normalized",
-        notification_accept: str = "application/json",
-        expires: Optional[str] = None,
-        throttling: Optional[int] = None,
-    ) -> dict:
-        """Create a dict with the subscription data that can be posted to the
-        context broker.
-
-        Args:
-            entity_type (str): Entity type to subscribe to.
-            uri (Optional[str]): URI which conveys the endpoint which will
-                receive the notification. If None, the `notification_uri`
-                attribute of the ContextConsumer will be used. Defaults to
-                None.
-            subscription_id (Optional[str], optional): Subscription ID. If
-                None, a new one will be generated. Defaults to None.
-            name (Optional[str], optional): A (short) name given to this
-                Subscription. If None, the `subscription_name` attribute of the
-                ContextConsumer will be used. Defaults to None.
-            description (Optional[str], optional): Subscription description.
-                Defaults to None.
-            entity_id (Optional[str], optional): ID of the entity to subscribe
-                to. Defaults to None.
-            entity_id_pattern (Optional[str], optional): A regular expression
-                which denotes a pattern that shall be matched by the provided
-                or subscribed Entities. Defaults to None.
-            watched_attributes (Optional[List[str]], optional): Watched
-                Attributes (Properties or Relationships). If None it means any
-                Attribute. Defaults to None.
-            query (Optional[str], optional): Query that shall be met by
-                subscribed entities in order to trigger the notification.
-                Defaults to None.
-            notification_attributes (Optional[List[str]], optional): Entity
-                Attribute Names (Properties or Relationships) to be included in
-                the notification payload body. If None it will mean all
-                Attributes. Defaults to None.
-            notification_format (str, optional): Conveys the representation
-                format of the entities delivered at notification time. By
-                default,it will be in normalized format. Defaults to
-                "normalized".
-            notification_accept (str, optional): MIME type of the notification
-                payload body (``application/json`` or ``application/ld+json``).
-                Defaults to "application/json".
-            expires (Optional[str], optional): Expiration date for the
-                subscription. ISO 8601 String. Defaults to None.
-            throttling (Optional[int], optional): Minimal period of time in
-                seconds which shall elapse between two consecutive
-                notifications. Defaults to None.
+    def _build_subscription(self, **kwargs) -> Subscription:
+        """Create a Subscription object from the given kwargs.
+        If "notification_uri" is not provided, the `notification_uri` attribute
+        will be used. If "name" is not provided, the `subscription_name`
+        attribute will be used.
 
         Returns:
-            dict: The subscription data as a dict.
+            Subscription: The Subscription object.
         """
-        if uri is None:
-            uri = self.notification_uri
+        if "notification_uri" not in kwargs:
+            kwargs["notification_uri"] = self.notification_uri
+        if "name" not in kwargs:
+            kwargs["name"] = self.subscription_name
+        subscription = Subscription(**kwargs)
+        return subscription
 
-        if name is None:
-            name = self.subscription_name
-            
-        subscription_data = {
-            "type": "Subscription",
-            "name": name,
-            "entities": [{"type": entity_type}],
-            "notification": {
-                "format": notification_format,
-                "endpoint": {
-                    "uri": uri,
-                    "accept": notification_accept
-                }
-            }
-        }
-        if subscription_id is not None:
-            subscription_data["id"] = subscription_id
-        if description is not None:
-            subscription_data["description"] = description
-        if entity_id is not None:
-            subscription_data["entities"][0]["id"] = entity_id
-        if entity_id_pattern is not None:
-            subscription_data["entities"][0]["idPattern"] = entity_id_pattern
-        if watched_attributes is not None:
-            subscription_data["watchedAttributes"] = watched_attributes
-        if query is not None:
-            subscription_data["q"] = query
-        if notification_attributes is not None:
-            subscription_data["notification"]["attributes"] = notification_attributes
-        if expires is not None:
-            subscription_data["expires"] = expires
-        if throttling is not None:
-            subscription_data["throttling"] = throttling
-        return subscription_data
-
-    def subscribe(self, subscription: Optional[Subscription] = None,
-                  **kwargs) -> Union[str, None]:
-        """Create a subscription in the context broker.
+    def subscribe(
+        self,
+        subscription: Optional[Subscription] = None,
+        **kwargs
+    ) -> Union[str, None]:
+        """Create a subscription in the context broker from a Subscription
+        object or from the given kwargs.
 
         Args:
             subscription (Optional[Subscription]): A Subscription object.
@@ -175,22 +119,23 @@ class ContextConsumer:
                 Defaults to None.
 
         Returns:
-            str: The subscription id.
+            str: The subscription id or None if the subscription could not be
+                created.
         """
         if subscription is None:
-            subscription = self.build_subscription(**kwargs)
+            subscription = self._build_subscription(**kwargs)
 
         if self._check_subscription_conflicts:
             conflicts = self.get_conflicting_subscriptions(subscription)
             if conflicts:
                 logger.warning(f"Found {len(conflicts)} conflicting "
-                               f"subscription: {conflicts}."
+                               f"subscription: {conflicts}. "
                                "Not creating the subscription.")
                 return conflicts[0]["id"]
 
         response = requests.post(
             url=self._subscriptions_uri,
-            json=subscription,
+            json=subscription.json,
             headers={
                 "Accept": "application/ld+json",
                 "Content-Type": "application/json",
@@ -214,28 +159,34 @@ class ContextConsumer:
                      f"{response.url}: {response.status_code} {response.text}")
         return None
 
-    def get_subscription(self, subscription_id: str) -> Union[dict, None]:
+    def get_subscription(
+        self,
+        subscription_id: str
+    ) -> Union[Subscription, None]:
         """Get a subscription from the context broker by its id.
 
         Args:
             subscription_id (str): Subscription id.
 
         Returns:
-            Union[dict, None]: The subscription data as a dict or None if the
-                subscription does not exist.
+            Union[Subscription, None]: The Subscription object or None if the
+                subscription could not be found.
         """
-        url = f"{self._subscriptions_uri}/{subscription_id}"
+        url = urljoin(self._subscriptions_uri, subscription_id)
         logger.debug(f"Getting subscription from {url}")
         response = requests.get(url)
         if response.ok:
-            return response.json()
+            return Subscription.from_json(response.json())
         logger.error(f"Error getting subscription from {url}: "
                      f"{response.status_code} {response.text}")
         return None
 
-    def get_subscriptions(self, limit: int = 100, offset: int = 0
-                          ) -> List[dict]:
-        """Get the current subscriptions in the context broker.
+    def get_subscriptions_page(
+        self,
+        limit: int = 100,
+        offset: int = 0
+    ) -> List[Subscription]:
+        """Get a list of subscriptions in the context broker.
 
         Args:
             limit (int, optional): Maximum number of subscriptions to return.
@@ -243,18 +194,21 @@ class ContextConsumer:
             offset (int, optional): Pagination offset. Defaults to 0.
 
         Returns:
-            List[dict]: List of JSONs with the subscriptions.
+            List[Subscription]: List of Subscription objects.
         """
-        url = f"{self._subscriptions_uri}/?limit={limit}&offset={offset}"
+        url = urljoin(self._subscriptions_uri, f"?limit={limit}&offset={offset}")
         logger.debug(f"Getting subscriptions from {url}")
         response = requests.get(url)
         if response.ok:
-            return response.json()
+            return [Subscription.from_json(s) for s in response.json()]
         logger.error(f"Error getting subscriptions from {url}: "
                      f"{response.status_code} {response.text}")
         return []
 
-    def iterate_subscriptions(self, limit: int = 100) -> Iterator[List[dict]]:
+    def iterate_subscriptions(
+        self,
+        limit: int = 100
+    ) -> Iterator[List[Subscription]]:
         """Iterate over the current subscriptions in the context broker.
 
         Args:
@@ -262,87 +216,47 @@ class ContextConsumer:
                 in each iteration. Defaults to 100.
 
         Yields:
-            Iterator[List[dict]]: Iterator over the subscriptions.
+            Iterator[List[Subscription]]: Iterator over the subscriptions.
         """
         offset = 0
         while True:
             try:
-                subs = self.get_subscriptions(limit, offset)
+                subs = self.get_subscriptions_page(limit, offset)
                 if not subs:
                     break
                 yield subs
                 offset += limit
-            except:
+            except Exception as e:
+                logger.exception(
+                    f"Error iterating over subscriptions: {e}",
+                    exc_info=True
+                )
                 break
 
-    def get_all_subscriptions(self) -> List[dict]:
+    def get_all_subscriptions(self) -> List[Subscription]:
         """Get all the current subscriptions in the context broker.
 
         Returns:
-            List[dict]: List of the subscriptions in the context broker.
+            List[Subscription]: List of the subscriptions in the context broker.
         """
         return list(
             itertools.chain.from_iterable(self.iterate_subscriptions(1000))
         )
 
-    @staticmethod
-    def subscription_equals(sub_a: dict, sub_b: dict) -> bool:
-        """Check if two subscriptions are virtually the same.
-
-        Args:
-            sub_a (dict): Subscription data as a dict (see
-                :meth:`build_subscription`).
-            sub_b (dict): Subscription data as a dict (see
-                :meth:`build_subscription`).
-
-        Returns:
-            bool: True if the subscriptions are virtually the same, False
-                otherwise.
-        """
-        if len(sub_a["entities"]) > len(sub_b["entities"]):
-            max_e = sub_a["entities"]
-            min_e = sub_b["entities"]
-        else:
-            max_e = sub_b["entities"]
-            min_e = sub_a["entities"]
-        for e in max_e:
-            if e not in min_e:
-                return False
-        if sub_a.get("watchedAttributes") != sub_b.get("watchedAttributes"):
-            return False
-        if sub_a.get("q") != sub_b.get("q"):
-            return False
-        if sub_a["notification"]["format"] != sub_b["notification"]["format"]:
-            return False
-        if sub_a["notification"]["endpoint"] != \
-                sub_b["notification"]["endpoint"]:
-            return False
-        if sub_a["notification"].get("attributes") != \
-                sub_b["notification"].get("attributes"):
-            return False
-        if sub_a.get("expires") != sub_b.get("expires"):
-            return False
-        if sub_a.get("throttling") != sub_b.get("throttling"):
-            return False
-        return True
-
-    def get_conflicting_subscriptions(self, subscription: dict) -> List[dict]:
+    def get_conflicting_subscriptions(
+        self,
+        subscription: Subscription
+    ) -> List[Subscription]:
         """Get a list of subscriptions in the context broker that are virtually
         the same as the given subscription.
 
         Args:
-            subscription (dict): The subscription data as a dict (see
-                :meth:`build_subscription`).
+            subscription (dict): A subscription object.
 
         Returns:
-            List[dict]: A list with the conflicting subscriptions.
+            List[Subscription]: A list with the conflicting subscriptions.
         """
-        broker_subs = self.get_all_subscriptions()
-        conflicts = []
-        for broker_sub in broker_subs:
-            if self.subscription_equals(subscription, broker_sub):
-                conflicts.append(broker_sub)
-        return conflicts
+        return [s for s in self.get_all_subscriptions() if s == subscription]
 
     def unsubscribe(self, subscription_id: str) -> bool:
         """Delete a subscription from the context broker.
