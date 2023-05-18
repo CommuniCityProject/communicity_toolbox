@@ -11,7 +11,7 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 
 from toolbox import DataModels, Structures
-from toolbox.Context import ContextConsumer, ContextProducer
+from toolbox.Context import ContextCli
 from toolbox.DataModels import BaseModel, Notification
 from toolbox.utils.config_utils import parse_config
 from toolbox.utils.utils import get_logger
@@ -33,8 +33,7 @@ class ApiBase:
             to make cross-origin requests.
         local_image_storage (bool): If the images are stored locally and can
             be accessed by their path.
-        context_consumer (ContextConsumer): The ContextConsumer.
-        context_producer (ContextProducer): The ContextProducer.
+        context_cli (ContextCli): The ContextCli.
         config (dict): The config of the API.
         base_dm (Optional[Type[BaseModel]]): Data model class that will be send.
 
@@ -62,8 +61,7 @@ class ApiBase:
         self.port: int
         self.allowed_origins: List[str]
         self.local_image_storage: bool
-        self.context_consumer: ContextConsumer
-        self.context_producer: ContextProducer
+        self.context_cli: ContextCli
         self.config: dict
         self.base_dm = base_dm
 
@@ -93,7 +91,7 @@ class ApiBase:
         """Create the subscriptions from the config.
         """
         for sub in self.config.get("subscriptions", []):
-            self.context_consumer.subscribe(
+            self.context_cli.subscribe(
                 entity_type=sub["entity_type"],
                 watched_attributes=sub.get("watched_attributes", []),
                 query=sub.get("query", "")
@@ -110,15 +108,14 @@ class ApiBase:
         self.host = self.config["api"]["host"]
         self.allowed_origins = self.config["api"]["allowed_origins"]
         self.local_image_storage = self.config["api"]["local_image_storage"]
-        self.context_consumer = ContextConsumer(self.config)
+        self.context_cli = ContextCli(**self.config["context_broker"])
         logging.getLogger("toolbox").setLevel(args.log_level)
         self._set_subscriptions()
-        self.context_producer = ContextProducer(self.config)
 
     def _end(self):
         """Method called at the end of the execution
         """
-        self.context_consumer.unsubscribe()
+        self.context_cli.unsubscribe_all()
 
     def _process_notified_models(self, data_models: List[Type[BaseModel]],
                                  subscription_id: str):
@@ -129,7 +126,7 @@ class ApiBase:
             subscription_id (str): The id of the subscription that triggered
                 the notification.
         """
-        if subscription_id not in self.context_consumer.subscription_ids:
+        if subscription_id not in self.context_cli.subscription_ids:
             logger.warning(f"Received a notification from a foreign "
                            f"subscription: {subscription_id}")
         for dm in data_models:
@@ -178,7 +175,7 @@ class ApiBase:
             Union[Structures.Image, None]: An Image object.
         """
         try:
-            image_dm = self.context_consumer.parse_entity(image_id)
+            image_dm = self.context_cli.get_data_model(image_id)
         except ValueError as e:
             logger.error(e, exc_info=True)
             raise HTTPException(
@@ -235,7 +232,7 @@ class ApiBase:
             """Notify the activation of a subscription.
             """
             data_models = [
-                self.context_consumer.parse_dict(entity)
+                self.context_cli.parse_data_model(entity)
                 for entity in notification.data
             ]
             self._process_notified_models(data_models, subscriptionId)
@@ -315,7 +312,7 @@ class ApiBase:
         ) -> Union[List[self.base_dm], Any]:
             accept = request.headers.get("accept", "application/json")
             try:
-                data_model = self.context_consumer.parse_entity(entity_id)
+                data_model = self.context_cli.parse_data_model(entity_id)
             except (KeyError, ValueError) as e:
                 logger.error(e, exc_info=True)
                 raise HTTPException(
