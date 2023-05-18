@@ -1,7 +1,8 @@
 from __future__ import annotations
-from typing import List, Union, Optional
-from datetime import datetime
+
 import json as Json
+from datetime import datetime
+from typing import List, Optional, Union
 
 
 class Subscription:
@@ -248,7 +249,10 @@ class Subscription:
         if "entities" in json:
             entity_type = [ent["type"] for ent in json["entities"]]
             entity_id = [ent.get("id", None) for ent in json["entities"]]
-            entity_id_pattern = [ent.get("idPattern", None) for ent in json["entities"]]
+            entity_id_pattern = [
+                ent.get("idPattern", None)
+                for ent in json["entities"]
+            ]
             if set(entity_id) == {None}:
                 entity_id = None
             if set(entity_id_pattern) == {None}:

@@ -57,7 +57,7 @@ class ContextCli:
         notification_uri: str = None,
         check_subscription_conflicts: bool = False
     ):
-        """Initialize the ContextConsumer.
+        """Initialize the ContextCli.
 
         Args:
             host (str): Host address of the context broker.
@@ -197,7 +197,6 @@ class ContextCli:
         if response.ok:
             return Subscription.from_json(response.json())
         elif response.status_code == 404:
-            logger.debug(f"{url} got 404")
             return None
         logger.error(f"Error getting subscription from {url}: "
                      f"{response.status_code} {response.text}")
@@ -222,13 +221,13 @@ class ContextCli:
         Returns:
             List[Subscription]: List of Subscription objects.
         """
-        url = urljoin(self._subscriptions_uri,
-                      f"?limit={limit}&offset={offset}")
-        logger.debug(f"Getting subscriptions from {url}")
-        response = requests.get(url)
+        params = {"limit": limit, "offset": offset}
+        logger.debug(f"Getting subscriptions from {self._subscriptions_uri} "
+                     f"with params {params}")
+        response = requests.get(self._subscriptions_uri, params=params)
         if response.ok:
             return [Subscription.from_json(s) for s in response.json()]
-        logger.error(f"Error getting subscriptions from {url}: "
+        logger.error(f"Error getting subscriptions from f"{response.url}: "
                      f"{response.status_code} {response.text}")
         response.raise_for_status()
 
@@ -312,17 +311,16 @@ class ContextCli:
         if response.ok:
             logger.info(f"Subscription deleted {subscription_id}")
             return True
-
+        if response.status_code == 404:
+            return False
         logger.error(
             f"Error deleting subscription {subscription_id} from "
             f"{response.url}: {response.status_code} {response.text}"
         )
-        if response.status_code == 404:
-            return False
         response.raise_for_status()
 
     def unsubscribe_all(self) -> bool:
-        """Delete all the subscriptions created within the ContextConsumer.
+        """Delete all the subscriptions created within the ContextCli.
 
         Raises:
             requests.exceptions.HTTPError: If the subscriptions could not be
@@ -336,50 +334,214 @@ class ContextCli:
             r = self.unsubscribe(sub_id) and r
         return r
 
-    def get_entity(self, entity_id: str) -> Union[dict, None]:
-        """Retrieve an entity from the context broker by its ID and returned as
-        a JSON dictionary if found.
+    def get_entity(
+        self,
+        entity_id: str,
+        as_dict: bool = False
+    ) -> Union[Type[BaseModel], dict, None]:
+        """Retrieve an entity from the context broker by its ID.
 
         Args:
             entity_id (str): The ID of an entity.
+            as_dict (bool, optional): If True, the entity will be returned as
+                a dictionary. Otherwise, it will be converted to a toolbox
+                data model. Defaults to False.
 
         Raises:
-            requests.exceptions.HTTPError: If there was an error getting the entity.
+            requests.exceptions.HTTPError: If there was an error getting the
+                entity.
+            KeyError: If the entity type is not recognized and as_dict is
+                False.
 
         Returns:
-            Union[dict, None]: A dictionary with the entity data or None if
-                the entity was not found.
+            Union[Type[BaseModel], dict, None]: A data model object, a
+                dictionary or None if the entity does not exist.
         """
         logger.debug(f"Getting entity {entity_id}")
         response = requests.get(urljoin(self._entities_uri, entity_id))
         if response.ok:
-            return response.json()
-
-        logger.error(f"Error getting entity {entity_id} from {response.url}: "
-                     f"{response.status_code} {response.text}")
+            entity_dict = response.json()
+            if as_dict:
+                return entity_dict
+            return self.parse_data_model(entity_dict)
         if response.status_code == 404:
             return None
+        logger.error(f"Error getting entity {entity_id} from {response.url}: "
+                     f"{response.status_code} {response.text}")
         response.raise_for_status()
 
-    def get_data_model(self, entity_id: str) -> Union[Type[BaseModel], None]:
-        """Retrieve an entity from the context broker by its ID and convert
-        it to a toolbox data model.
+    def get_entities_page(
+        self,
+        entity_id: Optional[List[str]] = None,
+        entity_type: Optional[str] = None,
+        id_pattern: Optional[str] = None,
+        attrs: Optional[List[str]] = None,
+        query: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+        as_dict: bool = False
+    ) -> List[Union[Type[BaseModel], dict]]:
+        """Get a list of entities from the context broker.
 
         Args:
-            entity_id (str): The ID of an entity.
+            entity_id (Optional[List[str]], optional): A list of entity IDs.
+                Defaults to None.
+            entity_type (Optional[str], optional): An entity type. If not
+                provided, attrs must be provided. Defaults to None. 
+            id_pattern (Optional[str], optional): A pattern to match entity
+                IDs. Defaults to None.
+            attrs (Optional[List[str]], optional): A list of attributes to
+                return. If not provided, entity_type must be provided.
+                Defaults to None.
+            query (Optional[str], optional): A query to filter entities.
+                Defaults to None.
+            limit (int, optional): Maximum number of entities to return.
+                Maximum value is 1000. Defaults to 100.
+            offset (int, optional): Pagination offset. Defaults to 0.
+            as_dict (bool, optional): If True, the entities will be returned as
+                dictionaries. Otherwise, they will be converted to a toolbox
+                data model. Defaults to False.
 
         Raises:
-            requests.exceptions.HTTPError: If the entity can not be retrieved.
-            KeyError: If the entity type is not recognized.
+            requests.exceptions.HTTPError: If there was an error getting the
+                entities.
+            KeyError: If the entity type is not recognized and as_dict is
+                False.
 
         Returns:
-            Union[Type[BaseModel], None]: A data model object or None if the
-                entity was not found.
+            List[Union[Type[BaseModel], dict]]: A list of data model objects or
+                dictionaries.
         """
-        entity = self.get_entity(entity_id)
-        if entity is None:
-            return None
-        return self.parse_data_model(entity)
+        params = {"limit": limit, "offset": offset}
+        if entity_id:
+            params["id"] = ",".join(entity_id)
+        if entity_type:
+            params["type"] = entity_type
+        if id_pattern:
+            params["idPattern"] = id_pattern
+        if attrs:
+            params["attrs"] = ",".join(attrs)
+        if query:
+            params["q"] = query
+        logger.debug(f"Getting entities from {self._entities_uri} with "
+                     f"params {params}")
+        response = requests.get(self._entities_uri, params=params)
+        if response.ok:
+            entity_dicts = response.json()
+            if as_dict:
+                return entity_dicts
+            return [self.parse_data_model(e) for e in entity_dicts]
+        logger.error(f"Error getting entities from {response.url}: "
+                     f"{response.status_code} {response.text}")
+        response.raise_for_status()
+
+    def iterate_entities(
+        self,
+        entity_id: Optional[List[str]] = None,
+        entity_type: Optional[str] = None,
+        id_pattern: Optional[str] = None,
+        attrs: Optional[List[str]] = None,
+        query: Optional[str] = None,
+        limit: int = 100,
+        as_dict: bool = False
+    ) -> Iterator[List[Union[Type[BaseModel], dict]]]:
+        """Iterate through a list of entities from the context broker.
+
+        Args:
+            entity_id (Optional[List[str]], optional): A list of entity IDs.
+                Defaults to None.
+            entity_type (Optional[str], optional): An entity type. If not
+                provided, attrs must be provided. Defaults to None. 
+            id_pattern (Optional[str], optional): A pattern to match entity
+                IDs. Defaults to None.
+            attrs (Optional[List[str]], optional): A list of attributes to
+                return. If not provided, entity_type must be provided.
+                Defaults to None.
+            query (Optional[str], optional): A query to filter entities.
+                Defaults to None.
+            limit (int, optional): Maximum number of entities to return in each
+                iteration. Maximum value is 1000. Defaults to 100.
+            as_dict (bool, optional): If True, the entities will be returned as
+                dictionaries. Otherwise, they will be converted to a toolbox
+                data model. Defaults to False.
+
+        Raises:
+            requests.exceptions.HTTPError: If there was an error getting the
+                entities.
+            KeyError: If the entity type is not recognized and as_dict is
+                False.
+
+        Returns:
+            Iterator[List[Union[Type[BaseModel], dict]]]: An iterator of data
+                model objects or dictionaries.
+        """
+        offset = 0
+        while True:
+            entities = self.get_entities_page(
+                entity_id=entity_id,
+                entity_type=entity_type,
+                id_pattern=id_pattern,
+                attrs=attrs,
+                query=query,
+                limit=limit,
+                offset=offset,
+                as_dict=as_dict
+            )
+            if not entities:
+                break
+            yield entities
+            offset += limit
+    
+    def get_all_entities(
+        self,
+        entity_id: Optional[List[str]] = None,
+        entity_type: Optional[str] = None,
+        id_pattern: Optional[str] = None,
+        attrs: Optional[List[str]] = None,
+        query: Optional[str] = None,
+        as_dict: bool = False
+    ) -> List[Union[Type[BaseModel], dict]]:
+        """Get all entities from the context broker.
+
+        Args:
+            entity_id (Optional[List[str]], optional): A list of entity IDs.
+                Defaults to None.
+            entity_type (Optional[str], optional): An entity type. If not
+                provided, attrs must be provided. Defaults to None. 
+            id_pattern (Optional[str], optional): A pattern to match entity
+                IDs. Defaults to None.
+            attrs (Optional[List[str]], optional): A list of attributes to
+                return. If not provided, entity_type must be provided.
+                Defaults to None.
+            query (Optional[str], optional): A query to filter entities.
+                Defaults to None.
+            as_dict (bool, optional): If True, the entities will be returned as
+                dictionaries. Otherwise, they will be converted to a toolbox
+                data model. Defaults to False.
+
+        Raises:
+            requests.exceptions.HTTPError: If there was an error getting the
+                entities.
+            KeyError: If the entity type is not recognized and as_dict is
+                False.
+
+        Returns:
+            List[Union[Type[BaseModel], dict]]: A list of data model objects or
+                dictionaries.
+        """
+        return list(
+            itertools.chain.from_iterable(
+                self.iterate_entities(
+                    entity_id=entity_id,
+                    entity_type=entity_type,
+                    id_pattern=id_pattern,
+                    attrs=attrs,
+                    query=query,
+                    as_dict=as_dict,
+                    limit=1000
+                )
+            )
+        )
 
     def parse_data_model(self, entity: dict) -> Type[BaseModel]:
         """Parse an entity from a dict to a toolbox data model object.
@@ -402,11 +564,11 @@ class ContextCli:
 
     @property
     def subscription_ids(self) -> List[str]:
-        """Get the list of subscription IDs created within the ContextConsumer.
+        """Get the list of subscription IDs created within the ContextCli.
         """
         return copy.copy(self._subscription_ids)
 
-    def post_entity(self, entity: dict):
+    def post_json(self, entity: dict):
         """Post a JSON entity to the context broker.
 
         Args:
@@ -420,7 +582,6 @@ class ContextCli:
         logger.debug(f"Posting entity to the context broker: \n{entity}")
         response = requests.post(
             self._entities_uri,
-            # headers={"Content-Type": content_type},
             json=entity
         )
         if not response.ok:
@@ -447,6 +608,62 @@ class ContextCli:
         with NgsiLdClient(self._broker_host, self._broker_port) as cli:
             cli.create(entity)
             return json.loads(entity.to_json())
+    
+    def update_data_model(
+        self,
+        data_model: Type[DataModels.BaseModel],
+        create: bool = False
+    ) -> dict:
+        """Update an existing entity in the context broker.
+
+        Args:
+            data_model (Type[DataModels.BaseModel]): The data model to update.
+            create (bool): If the entity should be created if it does not
+                exists. Defaults to False.
+
+        Raises:
+            ValueError: If the ID of the data model is None.
+            ngsildclient.api.exceptions.NgsiResourceNotFoundError: If the data
+                model does not exist on the context broker and  `create` is
+                False.
+
+        Returns:
+            dict: The uploaded json.
+        """
+        logger.debug(f"Updating data model: \n{data_model.pretty()}")
+        with NgsiLdClient(self._broker_host, self._broker_port) as cli:
+            if create:
+                if data_model.id is None or not cli.exists(data_model.id):
+                    logger.debug(
+                        "Data model does not exist on the context broker")
+                    self.post_data_model(data_model)
+                    return
+            if data_model.id is None:
+                raise ValueError("Can not update entity with ID None")
+            orig_entity = self._broker.get(data_model.id)
+            new_entity = create_entity(data_model)
+            if "dateCreated" in orig_entity.to_dict():
+                created = orig_entity["dateCreated"]["value"]["@value"]
+                new_entity.tprop("dateCreated", created)
+            new_entity.tprop("dateModified", datetime.now())
+            self._broker.update(new_entity)
+            return new_entity.to_json()
+
+    @staticmethod
+    def data_model_to_dict(data_model: Type[DataModels.BaseModel]) -> dict:
+        """Convert a toolbox data model object to a dictionary.
+
+        Args:
+            data_model (Type[DataModels.BaseModel]): The data model object to
+                convert.
+
+        Returns:
+            dict: The converted dictionary.
+        """
+        entity = create_entity(data_model)
+        entity.tprop("dateModified", datetime.now())
+        entity.tprop("dateCreated", datetime.now())
+        return json.loads(entity.to_json())
 
     def delete_entity(self, entity_id: str) -> bool:
         """Delete an entity from the context broker.
@@ -465,9 +682,9 @@ class ContextCli:
         if response.ok:
             logger.info(f"Entity deleted {entity_id}")
             return True
+        if response.status_code == 404:
+            return False
         logger.error(f"Error deleting entity {entity_id} from "
                         f"{response.url}: {response.status_code} "
                         f"{response.text}")
-        if response.status_code == 404:
-            return False
         response.raise_for_status()

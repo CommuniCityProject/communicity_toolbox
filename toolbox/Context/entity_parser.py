@@ -158,8 +158,8 @@ def parse_entity(entity: typing.Union[Entity, dict],
         elif name == "type":
             if entity["type"] != data_model_type.get_type():
                 raise TypeError(f"Entity type {entity['type']} does not "
-                                 f"match with data model type {data_model_type}"
-                                 f" ({data_model_type.get_type()})")
+                                f"match with data model type {data_model_type}"
+                                f" ({data_model_type.get_type()})")
         elif field.alias in entity:
             if "value" in entity[field.alias]:
                 k = "value"
