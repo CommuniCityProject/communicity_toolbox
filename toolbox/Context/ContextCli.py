@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Iterator, List, Optional, Type, Union
 
 import requests
-from ngsildclient import Client
+from ngsildclient import Client as NgsiLdClient
 
 from toolbox import DataModels
 from toolbox.Context import entity_parser
@@ -23,7 +23,7 @@ logging.getLogger("ngsildclient").setLevel(logging.WARNING)
 
 
 class ContextCli:
-    """
+    """A client for managing common operations on a context broker.
 
     Attributes:
         notification_uri (str): The uri used for notifications.
@@ -41,6 +41,9 @@ class ContextCli:
         get_entity(entity_id) -> dict
         get_data_model(entity_id) -> Type[BaseModel]
         parse_data_model(entity) -> Type[BaseModel]
+        post_entity(entity)
+        post_data_model(data_model) -> dict
+        delete_entity(entity_id) -> bool
 
     Properties (read-only):
         subscription_ids (List[str]): List of ids of the created subscriptions.
@@ -75,7 +78,6 @@ class ContextCli:
 
         self._subscription_ids: List[str] = []
         self.subscription_name = str(uuid.uuid4())
-        self._ngsild_client = Client(host, port)
 
         self._broker_url = urljoin(
             f"http://{self._broker_host}:{self._broker_port}",
@@ -129,7 +131,7 @@ class ContextCli:
             requests.exceptions.HTTPError: If the subscription could not be
                 created.
             Exception: If there was an error creating the subscription.
-                
+
         Returns:
             str: The subscription id.
         """
@@ -140,7 +142,8 @@ class ContextCli:
             conflicts = self.get_conflicting_subscriptions(subscription)
             if conflicts:
                 logger.warning(f"Found {len(conflicts)} conflicting "
-                               f"subscription: {conflicts}. "
+                               "subscription: "
+                               f"{[c.subscription_id for c in conflicts]}. "
                                "Not creating the subscription.")
                 return conflicts[0].subscription_id
 
@@ -179,7 +182,7 @@ class ContextCli:
 
         Args:
             subscription_id (str): Subscription id.
-        
+
         Raises:
             requests.exceptions.HTTPError: If there was an error getting the
                 subscription.
@@ -215,7 +218,7 @@ class ContextCli:
         Raises:
             requests.exceptions.HTTPError: If the subscriptions could not be
                 retrieved successfully.
-            
+
         Returns:
             List[Subscription]: List of Subscription objects.
         """
@@ -309,7 +312,7 @@ class ContextCli:
         if response.ok:
             logger.info(f"Subscription deleted {subscription_id}")
             return True
-        
+
         logger.error(
             f"Error deleting subscription {subscription_id} from "
             f"{response.url}: {response.status_code} {response.text}"
@@ -324,7 +327,7 @@ class ContextCli:
         Raises:
             requests.exceptions.HTTPError: If the subscriptions could not be
                 retrieved successfully.
-        
+
         Returns:
             bool: True if all the subscriptions were deleted successfully.
         """
@@ -334,14 +337,14 @@ class ContextCli:
         return r
 
     def get_entity(self, entity_id: str) -> Union[dict, None]:
-        """Retrieve an entity from the context broker by its ID and convert
-        it to a toolbox data model.
+        """Retrieve an entity from the context broker by its ID and returned as
+        a JSON dictionary if found.
 
         Args:
             entity_id (str): The ID of an entity.
 
         Raises:
-            HTTPError: If there was an error getting the entity.
+            requests.exceptions.HTTPError: If there was an error getting the entity.
 
         Returns:
             Union[dict, None]: A dictionary with the entity data or None if
@@ -353,7 +356,7 @@ class ContextCli:
             return response.json()
 
         logger.error(f"Error getting entity {entity_id} from {response.url}: "
-                        f"{response.status_code} {response.text}")
+                     f"{response.status_code} {response.text}")
         if response.status_code == 404:
             return None
         response.raise_for_status()
@@ -366,7 +369,7 @@ class ContextCli:
             entity_id (str): The ID of an entity.
 
         Raises:
-            HTTPError: If the entity can not be retrieved.
+            requests.exceptions.HTTPError: If the entity can not be retrieved.
             KeyError: If the entity type is not recognized.
 
         Returns:
@@ -379,7 +382,7 @@ class ContextCli:
         return self.parse_data_model(entity)
 
     def parse_data_model(self, entity: dict) -> Type[BaseModel]:
-        """Parse an entity from a dict and return a toolbox data model.
+        """Parse an entity from a dict to a toolbox data model object.
 
         Args:
             entity (dict): A ngsi-ld entity as a dict.
@@ -388,7 +391,7 @@ class ContextCli:
             KeyError: If the entity type is not recognized.
 
         Returns:
-            Type[BaseModel]: A data model.
+            Type[BaseModel]: A data model object.
         """
         entity_type = entity["type"]
         if entity_type not in data_models_catalog:
@@ -403,32 +406,21 @@ class ContextCli:
         """
         return copy.copy(self._subscription_ids)
 
-    # TODO
-    def post_entity(
-        self,
-        entity: dict,
-        ngsi_ld: bool = True
-    ):
-        """Post an entity to the context broker.
+    def post_entity(self, entity: dict):
+        """Post a JSON entity to the context broker.
 
         Args:
             entity (dict): The entity to upload to the context broker as a
-                JSON dict.
-            ngsi_ld (bool, optional): If True, the entity is in NGSI-LD format.
-                Defaults to True.
+                JSON dictionary.
 
         Raises:
-            HTTPError: If there was an error posting the entity.
-
-        Returns:
-            bool: True if success.
+            requests.exceptions.HTTPError: If there was an error posting the
+                entity.
         """
         logger.debug(f"Posting entity to the context broker: \n{entity}")
-        content_type = "application/ld+json" if ngsi_ld \
-            else "application/json"
         response = requests.post(
             self._entities_uri,
-            headers={"Content-Type": content_type},
+            # headers={"Content-Type": content_type},
             json=entity
         )
         if not response.ok:
@@ -437,20 +429,45 @@ class ContextCli:
             response.raise_for_status()
 
     def post_data_model(self, data_model: Type[DataModels.BaseModel]) -> dict:
-        """Post an entity to the context broker. If the data model id is
-        None, a new one will be assigned.
+        """Post a toolbox data model object to the context broker. If the data
+        model ID is None, a new one will be assigned.
 
         Args:
             data_model (Type[DataModels.BaseModel]): The data model object to
                 upload to the context broker.
 
         Returns:
-            dict: The uploaded json.
+            dict: The uploaded JSON.
         """
         logger.debug(f"Posting data model to the context broker: "
                      f"\n{data_model.pretty()}")
         entity = create_entity(data_model)
         entity.tprop("dateModified", datetime.now())
         entity.tprop("dateCreated", datetime.now())
-        self._broker.create(entity)
-        return json.loads(entity.to_json())
+        with NgsiLdClient(self._broker_host, self._broker_port) as cli:
+            cli.create(entity)
+            return json.loads(entity.to_json())
+
+    def delete_entity(self, entity_id: str) -> bool:
+        """Delete an entity from the context broker.
+
+        Args:
+            entity_id (str): The ID of the entity to delete.
+
+        Raises:
+            requests.exceptions.HTTPError: If there was an error deleting
+                the entity.
+
+        Returns:
+            bool: True if success.
+        """
+        response = requests.delete(urljoin(self._entities_uri, entity_id))
+        if response.ok:
+            logger.info(f"Entity deleted {entity_id}")
+            return True
+        logger.error(f"Error deleting entity {entity_id} from "
+                        f"{response.url}: {response.status_code} "
+                        f"{response.text}")
+        if response.status_code == 404:
+            return False
+        response.raise_for_status()
