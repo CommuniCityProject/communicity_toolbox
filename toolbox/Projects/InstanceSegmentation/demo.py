@@ -24,7 +24,7 @@ class Demo(DemoBase):
     def _consume_data_model(self, data_model: Type[DataModels.BaseModel]
         ) -> List[DataModels.InstanceSegmentation]:
         if isinstance(data_model, DataModels.Image):
-            image = Image(data_model.url)
+            image = Image(data_model.url, id=data_model.id)
             return self.model.predict(image)
         else:
             raise ValueError(f"Can not process entity type {type(data_model)}")

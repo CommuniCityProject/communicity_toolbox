@@ -18,7 +18,7 @@ from starlette.middleware.cors import CORSMiddleware
 from Storage import Storage
 
 from toolbox import DataModels, Structures
-from toolbox.Context import ContextConsumer
+from toolbox.Context import ContextCli
 from toolbox.utils.config_utils import parse_config
 from toolbox.utils.utils import float_or_none, get_logger, hash_str, urljoin
 from toolbox.Visualization import DataModelVisualizer
@@ -64,7 +64,7 @@ class ImageStorage:
 
         # Create the context consumer
         if self._allow_visualize:
-            self.context_consumer = ContextConsumer(config)
+            self.context_cli = ContextCli(**config["context_broker"])
             self._visualizer = DataModelVisualizer(
                 config.get("visualization", {}))
 
@@ -218,13 +218,13 @@ class ImageStorage:
                 dms = []
                 for e_id in entity_ids:
                     try:
-                        dm = self.context_consumer.parse_entity(e_id)
-                    except ValueError as e:
-                        logger.error(e, exc_info=True)
-                        raise HTTPException(
-                            status.HTTP_404_NOT_FOUND,
-                            f"Entity not found ({e_id})",
-                        )
+                        dm = self.context_cli.get_entity(e_id)
+                        if dm is None:
+                            logger.error(f"Entity not found: {e_id}")
+                            raise HTTPException(
+                                status.HTTP_404_NOT_FOUND,
+                                f"Entity not found: {e_id}",
+                            )
                     except KeyError as e:
                         logger.error(e, exc_info=True)
                         raise HTTPException(
@@ -253,13 +253,13 @@ class ImageStorage:
 
                 # Get the image
                 try:
-                    image_dm = self.context_consumer.parse_entity(image_id)
-                except ValueError as e:
-                    logger.error(e, exc_info=True)
-                    raise HTTPException(
-                        status.HTTP_404_NOT_FOUND,
-                        f"Image not found '{image_id}'"
-                    )
+                    image_dm = self.context_cli.get_entity(image_id)
+                    if image_dm is None:
+                        logger.error(f"Image not found: {image_id}")
+                        raise HTTPException(
+                            status.HTTP_404_NOT_FOUND,
+                            f"Image not found: {image_id}",
+                        )
                 except KeyError as e:
                     logger.error(e, exc_info=True)
                     raise HTTPException(
@@ -278,7 +278,7 @@ class ImageStorage:
                     logger.error(e, exc_info=True)
                     raise HTTPException(
                         status.HTTP_404_NOT_FOUND,
-                        f"Image not found ({image_id})"
+                        f"Image not found: {image_id}"
                     )
 
                 # Visualize the data models

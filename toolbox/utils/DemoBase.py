@@ -7,7 +7,7 @@ from typing import List, Optional, Type, Union
 import cv2
 import numpy as np
 
-from toolbox.Context import ContextConsumer, ContextProducer
+from toolbox.Context import ContextCli, entity_parser
 from toolbox.DataModels import BaseModel
 from toolbox.Structures import Image
 from toolbox.utils.config_utils import parse_config
@@ -202,8 +202,7 @@ class DemoBase:
         self.visualizer = DataModelVisualizer(config.get("visualization", {}))
 
         if args.task != "local":
-            self.context_producer = ContextProducer(config)
-            self.context_consumer = ContextConsumer(config)
+            self.context_cli = ContextCli(**config["context_broker"])
 
         if args.task == "local":
             self._run_local(args.image, args.output)
@@ -213,7 +212,6 @@ class DemoBase:
             self._run_consumer(
                 args.id, config, args.subscribe, args.post_to_broker)
         elif args.task == "visualize":
-            self.context_consumer = ContextConsumer(config)
             self._run_visualize(args.id, args.output, args.image)
 
     def _load_model(self, config: dict, task: str):
@@ -287,7 +285,7 @@ class DemoBase:
             image_paths = [image_path]
         for path in image_paths:
             for dm in self._process_image(Image(path)):
-                entity = self.context_producer.post_entity(dm)
+                entity = self.context_cli.post_data_model(dm)
                 print(json.dumps(entity, indent=4))
 
     def _consume_data_model(self, data_model: Type[BaseModel]
@@ -313,31 +311,34 @@ class DemoBase:
                 process every new entity. Defaults to False.
         """
         if e_id is not None:
-            data_model = self.context_consumer.parse_entity(e_id)
+            data_model = self.context_cli.get_entity(e_id)
+            assert data_model is not None
             dms = self._consume_data_model(data_model)
             self._print_data_models(dms)
             if post_to_broker:
-                [self.context_producer.update_entity(dm, create=True)
+                [self.context_cli.update_data_model(dm, create=True)
                     for dm in dms]
 
         if subscribe:
             def on_notify(path: str, c_type: str, data: str):
                 entity_dict = json.loads(data)
                 for data in entity_dict["data"]:
-                    data_model = self.context_consumer.parse_dict(data)
+                    data_model = entity_parser.json_to_data_model(data)
                     dms = self._consume_data_model(data_model)
                     self._print_data_models(dms)
                     if post_to_broker:
-                        [self.context_producer.update_entity(dm, create=True)
+                        [self.context_cli.update_data_model(dm, create=True)
                             for dm in dms]
                 return ""
             for sub in config.get("subscriptions", []):
-                self.context_consumer.subscribe(
+                self.context_cli.subscribe(
                     entity_type=sub["entity_type"],
                     watched_attributes=sub.get("watched_attributes", []),
                     query=sub.get("query", "")
                 )
             try:
+                print(f"Notifications endpoint: "
+                      f"{self.context_cli.notification_uri}")
                 create_http_server(
                     port=config["api"]["port"],
                     get_callback=None,
@@ -346,9 +347,9 @@ class DemoBase:
             except KeyboardInterrupt:
                 pass
             except Exception as e:
-                self.context_consumer.unsubscribe()
+                self.context_cli.unsubscribe_all()
                 raise e
-            self.context_consumer.unsubscribe()
+            self.context_cli.unsubscribe_all()
 
     def _run_visualize(self, e_id: str, output: Path,
                        image_path: Optional[Path] = None):
@@ -358,19 +359,20 @@ class DemoBase:
             e_id (str): The id of an entity.
             output (Path): The output image file path.
         """
-        data_model = self.context_consumer.parse_entity(e_id)
+        data_model = self.context_cli.get_entity(e_id)
+        assert data_model is not None
         self._print_data_models(data_model)
 
         image = None
         if image_path is not None:
             image = cv2.imread(str(image_path))
         elif data_model.image:
-            img_dm = self.context_consumer.parse_entity(data_model.image)
-            if img_dm.url:
-                try:
-                    image = Image(img_dm.url)
-                except Exception as e:
-                    print(e)
+            img_dm = self.context_cli.get_entity(data_model.image)
+            try:
+                if img_dm.url:
+                    image = Image(img_dm.url).image
+            except Exception as e:
+                print(f"Error getting the image: {data_model.image} {e}")
         if image is None:
             image = np.zeros((2000, 2000, 3), dtype="uint8")
 

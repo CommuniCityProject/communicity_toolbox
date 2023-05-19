@@ -11,7 +11,7 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 
 from toolbox import DataModels, Structures
-from toolbox.Context import ContextCli
+from toolbox.Context import ContextCli, entity_parser
 from toolbox.DataModels import BaseModel, Notification
 from toolbox.utils.config_utils import parse_config
 from toolbox.utils.utils import get_logger
@@ -175,13 +175,13 @@ class ApiBase:
             Union[Structures.Image, None]: An Image object.
         """
         try:
-            image_dm = self.context_cli.get_data_model(image_id)
-        except ValueError as e:
-            logger.error(e, exc_info=True)
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND,
-                f"Image not found '{image_id}'"
-            )
+            image_dm = self.context_cli.get_entity(image_id)
+            if image_dm is None:
+                logger.error(f"Image not found: {image_id}")
+                raise HTTPException(
+                    status.HTTP_404_NOT_FOUND,
+                    f"Image not found: {image_id}"
+                )
         except KeyError as e:
             logger.error(e, exc_info=True)
             raise HTTPException(
@@ -232,7 +232,7 @@ class ApiBase:
             """Notify the activation of a subscription.
             """
             data_models = [
-                self.context_cli.parse_data_model(entity)
+                entity_parser.json_to_data_model(entity)
                 for entity in notification.data
             ]
             self._process_notified_models(data_models, subscriptionId)
@@ -263,7 +263,7 @@ class ApiBase:
                     "model": self.base_dm()
                 },
                 "application/ld+json": {
-                    "example": self.context_producer.to_json(self.base_dm())
+                    "example": entity_parser.data_model_to_json(self.base_dm())
                 }
             }
         }
@@ -275,9 +275,10 @@ class ApiBase:
     ) -> Any:
         if accept == "application/ld+json":
             if isinstance(data_models, (list, tuple)):
-                ret = [self.context_producer.to_json(dm) for dm in data_models]
+                ret = [entity_parser.data_model_to_json(dm)
+                       for dm in data_models]
             else:
-                ret = self.context_producer.to_json(data_models)
+                ret = entity_parser.data_model_to_json(data_models)
             return JSONResponse(ret, media_type="application/ld+json")
         # Default JSON
         return data_models
@@ -307,13 +308,19 @@ class ApiBase:
         def predict(
             request: Request,
             entity_id: str = Body(description="Id of an entity"),
-            post_to_broker: bool = Body(True, description="Post the "
-                                        "predicted entity to the context broker"),
+            post_to_broker: bool = Body(True, description="Post the predicted "
+                                        "entity to the context broker"),
         ) -> Union[List[self.base_dm], Any]:
             accept = request.headers.get("accept", "application/json")
             try:
-                data_model = self.context_cli.parse_data_model(entity_id)
-            except (KeyError, ValueError) as e:
+                data_model = self.context_cli.get_entity(entity_id)
+                if data_model is None:
+                    logger.error(f"Entity not found: {entity_id}")
+                    raise HTTPException(
+                        status.HTTP_404_NOT_FOUND,
+                        f"Entity not found: {entity_id}"
+                    )
+            except KeyError as e:
                 logger.error(e, exc_info=True)
                 raise HTTPException(
                     status.HTTP_422_UNPROCESSABLE_ENTITY,

@@ -4,7 +4,7 @@ from collections import OrderedDict
 import time
 
 from toolbox.DataModels import BaseModel
-from toolbox.Context import ContextProducer
+from toolbox.Context import ContextCli
 from toolbox.utils.utils import float_or_none, get_logger
 
 logger = get_logger("ImageStorage")
@@ -55,7 +55,7 @@ class Storage:
         self._max_file_time = float_or_none(config["api"]["max_file_time"])
         self._delete_from_broker = config["api"]["delete_from_broker"]
 
-        self._context_producer = ContextProducer(config)
+        self._context_cli = ContextCli(**config["context_broker"])
         self._path.mkdir(exist_ok=True, parents=True)
         self._stored_files: Dict[str, File] = OrderedDict()
         self._total_size: int = 0
@@ -139,7 +139,7 @@ class Storage:
         self._stored_files[key] = File(path)
         self._total_size += self._stored_files[key].bytes
         if data_model is not None:
-            self._context_producer.post_entity(data_model)
+            self._context_cli.post_data_model(data_model)
     
     def delete_file(self, key: str):
         """Delete a file permanently.
@@ -152,7 +152,7 @@ class Storage:
         file.path.unlink(True)
         self._total_size -= file.bytes
         if self._delete_from_broker:
-            self._context_producer.delete_entity(key)
+            self._context_cli.delete_entity(key)
     
     def delete_all(self):
         """Delete all the inserted file.

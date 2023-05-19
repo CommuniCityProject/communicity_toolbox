@@ -57,7 +57,7 @@ class FaceRecognitionApi(ApiBase):
             for dm in dms:
                 self._model.recognize(dm)
                 if post_to_broker:
-                    self.context_producer.post_entity(dm)
+                    self.context_cli.post_data_model(dm)
             return dms
         elif isinstance(data_model, DataModels.Face):
             if data_model.recognized:
@@ -68,9 +68,9 @@ class FaceRecognitionApi(ApiBase):
             if post_to_broker:
                 if self._post_new_entity:
                     dm.id = None
-                    self.context_producer.post_entity(dm)
+                    self.context_cli.post_data_model(dm)
                 else:
-                    self.context_producer.update_entity(dm)
+                    self.context_cli.update_data_model(dm)
             return [dm]
         else:
             raise HTTPException(
@@ -99,7 +99,7 @@ class FaceRecognitionApi(ApiBase):
             image = self._get_image_from_dm(data_model)
             dms = self._model.predict(image)
             if post_to_broker:
-                [self.context_producer.post_entity(dm) for dm in dms]
+                [self.context_cli.post_data_model(dm) for dm in dms]
             return dms
         elif isinstance(data_model, DataModels.Face):
             if data_model.features is not None:
@@ -109,9 +109,9 @@ class FaceRecognitionApi(ApiBase):
             if post_to_broker:
                 if self._post_new_entity:
                     dm.id = None
-                    self.context_producer.post_entity(dm)
+                    self.context_cli.post_data_model(dm)
                 else:
-                    self.context_producer.update_entity(dm)
+                    self.context_cli.update_data_model(dm)
             return [dm]
         else:
             raise HTTPException(
@@ -148,13 +148,13 @@ class FaceRecognitionApi(ApiBase):
             """
             accept = request.headers.get("accept", "application/json")
             try:
-                data_model = self.context_consumer.parse_entity(entity_id)
-            except ValueError as e:
-                logger.error(e, exc_info=True)
-                raise HTTPException(
-                    status.HTTP_404_NOT_FOUND,
-                    "Entity not found"
-                )
+                data_model = self.context_cli.get_entity(entity_id)
+                if data_model is None:
+                    logger.error(f"Entity not found: {entity_id}")
+                    raise HTTPException(
+                        status.HTTP_404_NOT_FOUND,
+                        "Entity not found"
+                    )
             except KeyError as e:
                 logger.error(e, exc_info=True)
                 raise HTTPException(
@@ -194,10 +194,10 @@ class FaceRecognitionApi(ApiBase):
             rec_dm = self._model.recognize(data_model)
             if post_to_broker:
                 if self._update_entity:
-                    self.context_producer.update_entity(rec_dm)
+                    self.context_cli.update_data_model(rec_dm)
                 if self._post_new_entity:
                     rec_dm.id = None
-                    self.context_producer.post_entity(rec_dm)
+                    self.context_cli.post_data_model(rec_dm)
             return rec_dm
         else:
             raise HTTPException(
@@ -235,13 +235,13 @@ class FaceRecognitionApi(ApiBase):
             """
             accept = request.headers.get("accept", "application/json")
             try:
-                data_model = self.context_consumer.parse_entity(entity_id)
-            except ValueError as e:
-                logger.error(e, exc_info=True)
-                raise HTTPException(
-                    status.HTTP_404_NOT_FOUND,
-                    "Entity not found"
-                )
+                data_model = self.context_cli.get_entity(entity_id)
+                if data_model is None:
+                    logger.error(f"Entity not found: {entity_id}")
+                    raise HTTPException(
+                        status.HTTP_404_NOT_FOUND,
+                        "Entity not found"
+                    )
             except KeyError as e:
                 logger.error(e, exc_info=True)
                 raise HTTPException(

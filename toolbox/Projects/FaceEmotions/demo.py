@@ -24,12 +24,12 @@ class Demo(DemoBase):
         ) -> List[DataModels.Face]:
         if isinstance(data_model, DataModels.Face):
             assert data_model.image, data_model.image
-            img_dm = self.context_consumer.parse_entity(data_model.image)
+            img_dm = self.context_cli.get_entity(data_model.image)
             image = Image(img_dm.url)
             new_dm = self.model.update_face(image, data_model)
             return [new_dm]
         elif isinstance(data_model, DataModels.Image):
-            image = Image(data_model.url)
+            image = Image(data_model.url, id=data_model.id)
             return self.model.predict(image)
         else:
             raise ValueError(f"Can not process entity type {type(data_model)}")

@@ -197,11 +197,11 @@ class Subscription:
             subscription["watchedAttributes"] = self.watched_attributes
 
         # Add query
-        if self.query is not None:
+        if self.query:
             subscription["q"] = self.query
 
         # Add expiration
-        if self.expires is not None:
+        if self.expires:
             subscription["expires"] = self.expires
 
         # Add throttling

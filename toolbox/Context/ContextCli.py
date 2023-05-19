@@ -34,12 +34,23 @@ class ContextCli:
         get_conflicting_subscriptions(subscription) -> List[Subscription]
         unsubscribe(subscription_id) -> bool
         unsubscribe_all() -> bool
-        get_entity(entity_id) -> dict
+        get_entity(entity_id, as_dict) -> Union[Type[BaseModel], dict, None]
+        get_entities_page(entity_type, attrs, entity_id, id_pattern, query,
+                          limit, offset, as_dict
+                          ) -> List[Union[Type[BaseModel], dict]]
+        iterate_entities(entity_id, entity_type, id_pattern, attrs, query,
+                         limit, as_dict
+                         ) -> Iterator[List[Union[Type[BaseModel], dict]]]
+        get_all_entities(entity_id, entity_type, id_pattern, attrs, query,
+                         as_dict) -> List[Union[Type[BaseModel], dict]]
         get_data_model(entity_id) -> Type[BaseModel]
         parse_data_model(entity) -> Type[BaseModel]
-        post_entity(entity)
+        post_entity_json(entity)
+        update_entity_json(entity, create) -> dict
         post_data_model(data_model) -> dict
+        update_data_model(data_model, create) -> dict
         delete_entity(entity_id) -> bool
+        get_types() -> List[str]
 
     Properties (read-only):
         subscription_ids (List[str]): List of ids of the created subscriptions.
@@ -94,6 +105,10 @@ class ContextCli:
         self._entities_upsert_uri = urljoin(
             self._broker_url,
             "/ngsi-ld/v1/entityOperations/upsert"
+        )
+        self._entity_types_uri = urljoin(
+            self._broker_url,
+            "/ngsi-ld/v1/types"
         )
 
         logger.info(f"Using context broker at {self._broker_url}")
@@ -461,8 +476,8 @@ class ContextCli:
 
     def iterate_entities(
         self,
-        entity_id: Optional[List[str]] = None,
         entity_type: Optional[str] = None,
+        entity_id: Optional[List[str]] = None,
         id_pattern: Optional[str] = None,
         attrs: Optional[List[str]] = None,
         query: Optional[str] = None,
@@ -472,10 +487,10 @@ class ContextCli:
         """Iterate through a list of entities from the context broker.
 
         Args:
-            entity_id (Optional[List[str]], optional): A list of entity IDs.
-                Defaults to None.
             entity_type (Optional[str], optional): An entity type. If not
                 provided, attrs must be provided. Defaults to None. 
+            entity_id (Optional[List[str]], optional): A list of entity IDs.
+                Defaults to None.
             id_pattern (Optional[str], optional): A pattern to match entity
                 IDs. Defaults to None.
             attrs (Optional[List[str]], optional): A list of attributes to
@@ -518,8 +533,8 @@ class ContextCli:
     
     def get_all_entities(
         self,
-        entity_id: Optional[List[str]] = None,
         entity_type: Optional[str] = None,
+        entity_id: Optional[List[str]] = None,
         id_pattern: Optional[str] = None,
         attrs: Optional[List[str]] = None,
         query: Optional[str] = None,
@@ -528,10 +543,10 @@ class ContextCli:
         """Get all entities from the context broker.
 
         Args:
-            entity_id (Optional[List[str]], optional): A list of entity IDs.
-                Defaults to None.
             entity_type (Optional[str], optional): An entity type. If not
                 provided, attrs must be provided. Defaults to None. 
+            entity_id (Optional[List[str]], optional): A list of entity IDs.
+                Defaults to None.
             id_pattern (Optional[str], optional): A pattern to match entity
                 IDs. Defaults to None.
             attrs (Optional[List[str]], optional): A list of attributes to
@@ -573,7 +588,11 @@ class ContextCli:
         """
         return copy.copy(self._subscription_ids)
 
-    def post_json(self, entity: dict):
+    @property
+    def broker_url(self) -> str:
+        return self._broker_url
+
+    def post_entity_json(self, entity: dict):
         """Post a JSON entity to the context broker.
 
         Args:
@@ -598,7 +617,7 @@ class ContextCli:
                          f"{response.status_code} {response.text}")
             response.raise_for_status()
 
-    def update_json(self, entity: dict, create: bool = True) -> dict:
+    def update_entity_json(self, entity: dict, create: bool = True) -> dict:
         """Update a JSON entity in the context broker.
 
         Args:
@@ -633,7 +652,7 @@ class ContextCli:
         else:
             if not create:
                 raise ValueError(f"Entity {entity['id']} does not exist.")
-            self.post_json(entity)
+            self.post_entity_json(entity)
         return entity
 
     def post_data_model(self, data_model: Type[DataModels.BaseModel]) -> dict:
@@ -654,7 +673,7 @@ class ContextCli:
         logger.debug(f"Posting data model to the context broker: "
                      f"\n{data_model.pretty()}")
         entity = data_model_to_json(data_model)
-        self.post_json(entity)
+        self.post_entity_json(entity)
         return entity
     
     def update_data_model(
@@ -678,7 +697,7 @@ class ContextCli:
             dict: The updated JSON.
         """
         entity = data_model_to_json(data_model)
-        return self.update_json(entity, create=create)
+        return self.update_entity_json(entity, create=create)
 
     def delete_entity(self, entity_id: str) -> bool:
         """Delete an entity from the context broker.
@@ -702,4 +721,18 @@ class ContextCli:
         logger.error(f"Error deleting entity {entity_id} from "
                         f"{response.url}: {response.status_code} "
                         f"{response.text}")
+        response.raise_for_status()
+
+    def get_types(self) -> List[str]:
+        """Get a list of the current entity types in the context broker.
+
+        Returns:
+            List[str]: A list of entity types.
+        """
+        logger.debug("Getting entity types")
+        response = requests.get(self._entity_types_uri)
+        if response.ok:
+            return response.json()["typeList"]
+        logger.error(f"Error getting entity types from {response.url}: "
+                        f"{response.status_code} {response.text}")
         response.raise_for_status()

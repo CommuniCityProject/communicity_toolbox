@@ -35,7 +35,7 @@ class Demo(DemoBase):
                     raise ValueError(
                         "Can not process Face entity without features"
                     )
-                img_dm = self.context_consumer.parse_entity(data_model.image)
+                img_dm = self.context_cli.get_entity(data_model.image)
                 image = Image(img_dm.url)
                 data_model = self.model.update_face(image, data_model)
             # Recognize
@@ -43,7 +43,7 @@ class Demo(DemoBase):
                 data_model = self.model.recognize(data_model)
             return [data_model]
         elif isinstance(data_model, DataModels.Image):
-            image = Image(data_model.url)
+            image = Image(data_model.url, id=data_model.id)
             faces = self.model.predict(image)
             if self.model.do_extraction:
                 faces = [self.model.recognize(face) for face in faces]

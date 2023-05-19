@@ -4,7 +4,7 @@ import datetime
 
 from toolbox.Structures import BoundingBox
 from toolbox import DataModels
-from toolbox.Context import ContextProducer
+from toolbox.Context import ContextCli
 
 import config
 
@@ -152,10 +152,10 @@ class test_API_FaceRecognition(unittest.TestCase):
         """Test get /predict with a face entity
         """
         # Create a context producer
-        cp = ContextProducer({"context_broker": {
-            "host": config.HOST,
-            "port": config.CONTEXT_BROKER_PORT,
-        }})
+        cc = ContextCli(
+            host=config.HOST,
+            port=config.CONTEXT_BROKER_PORT,
+        )
         
         # Get image id
         with open(config.IMG_FACES_ID_PATH, "r") as f:
@@ -168,7 +168,7 @@ class test_API_FaceRecognition(unittest.TestCase):
             "image": img_id
         }
         face_dm = DataModels.Face(**face_params)
-        cp.post_entity(face_dm)
+        cc.post_data_model(face_dm)
         self.assertIsNotNone(face_dm.id)
 
         # Predict Face

@@ -18,13 +18,13 @@ context_broker:
   host: 192.168.0.100
   port: 1026
   # URI where notifications will be sent
-  notification_uri: http://192.168.0.100:8080/ngsi-ld/v1/notify
+  notification_uri: http://192.168.0.100:9090/ngsi-ld/v1/notify
   # Check for conflicting subscriptions before creating a new one
   check_subscription_conflicts: True
 
 api:
   host: 0.0.0.0
-  port: 8080
+  port: 9090
 
   # Wether the api should extract features of faces
   load_dataset: True

@@ -593,7 +593,7 @@ class TestContextCli(unittest.TestCase):
             self.assertEqual(detection_confidence, ret_dm.detection_confidence)
         self.assertEqual(len(ids), 0)
 
-    def test_post_json(self):
+    def test_post_entity_json(self):
         cc = ContextCli(**config)
         # Create an entity
         e = {
@@ -603,7 +603,7 @@ class TestContextCli(unittest.TestCase):
             "test": {"type": "Property", "value": "test_value"}
         }
         # Post the entity
-        cc.post_json(e)
+        cc.post_entity_json(e)
         # Get and check the entity from the context broker
         r = requests.get(urljoin(_entities_uri, e["id"]), headers={"Accept": "application/ld+json"})
         self.assertEqual(r.status_code, 200)
@@ -619,13 +619,13 @@ class TestContextCli(unittest.TestCase):
             "boundingBox": {"type": "Property", "value": {"xmin": 0.0, "ymin": 0.1, "xmax": 0.2, "ymax": 0.3}},
             "detectionConfidence": {"type": "Property", "value": 0.99},
         }
-        cc.post_json(e)
+        cc.post_entity_json(e)
         # Get and check the entity from the context broker
         r = requests.get(urljoin(_entities_uri, e["id"]), headers={"Accept": "application/ld+json"})
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.json(), e)
 
-    def test_update_json(self):
+    def test_update_entity_json(self):
         cc = ContextCli(**config)
         # Create an entity
         e = {
@@ -638,7 +638,7 @@ class TestContextCli(unittest.TestCase):
         r = requests.post(_entities_uri, json=e, headers={"Content-Type": "application/ld+json"})
         # Update the entity
         e["test"]["value"] = "test_value2"
-        r = cc.update_json(e)
+        r = cc.update_entity_json(e)
         self.assertEqual(r, e)
         # Get and check the entity from the context broker
         r = requests.get(urljoin(_entities_uri, e["id"]), headers={"Accept": "application/ld+json"})
@@ -653,7 +653,7 @@ class TestContextCli(unittest.TestCase):
             "test": {"type": "Property", "value": "test_value"}
         }
         # Update the entity
-        cc.update_json(e)
+        cc.update_entity_json(e)
         # Get and check the entity from the context broker
         r = requests.get(urljoin(_entities_uri, e["id"]), headers={"Accept": "application/ld+json"})
         self.assertEqual(r.json(), e)
@@ -671,7 +671,7 @@ class TestContextCli(unittest.TestCase):
         r = requests.post(_entities_uri, json=e, headers={"Content-Type": "application/ld+json"})
         # Update the entity
         e["detectionConfidence"]["value"] = 0.98
-        cc.update_json(e)
+        cc.update_entity_json(e)
         # Get and check the entity from the context broker
         r = requests.get(urljoin(_entities_uri, e["id"]), headers={"Accept": "application/ld+json"})
         self.assertEqual(r.status_code, 200)
@@ -779,6 +779,31 @@ class TestContextCli(unittest.TestCase):
         # Check that the entity has been deleted
         response = requests.get(urljoin(_entities_uri, e["id"]))
         self.assertEqual(response.status_code, 404)
+
+    def test_get_types(self):
+        cc = ContextCli(**config)
+        # Create two types
+        t1 = "TestType" + str(uuid.uuid4())
+        t2 = "TestType" + str(uuid.uuid4())
+        # Create one entity for each type
+        e1 = {
+            "id": "urn:ngsi-ld:Test:" + str(uuid.uuid4()),
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "type": t1,
+            "test": {"type": "Property", "value": "test_value"}
+        }
+        e2 = {
+            "id": "urn:ngsi-ld:Test:" + str(uuid.uuid4()),
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "type": t2,
+            "test": {"type": "Property", "value": "test_value"}
+        }
+        r = requests.post(_entities_uri, json=e1, headers={"Content-Type": "application/ld+json"})
+        r = requests.post(_entities_uri, json=e2, headers={"Content-Type": "application/ld+json"})
+        # Get the types
+        types = cc.get_types()
+        self.assertIn(t1, types)
+        self.assertIn(t2, types)
 
 
 if __name__ == "__main__":

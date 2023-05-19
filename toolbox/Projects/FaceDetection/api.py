@@ -47,7 +47,7 @@ class FaceDetectionApi(ApiBase):
             image = self._get_image_from_dm(data_model)
             dms = self._model.predict(image)
             if post_to_broker:
-                [self.context_producer.post_entity(dm) for dm in dms]
+                [self.context_cli.post_data_model(dm) for dm in dms]
             return dms
         else:
             raise HTTPException(
