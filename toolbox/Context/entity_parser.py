@@ -1,19 +1,25 @@
-import typing
+import json
 import uuid
 from datetime import datetime
 from enum import Enum
+from typing import Type, Union
 
 import numpy as np
 from ngsildclient import Entity
 from ngsildclient.utils.uuid import uuidshortener
 
 from toolbox.DataModels import BaseModel
+from toolbox.DataModels.DataModelsCatalog import data_models_catalog
 from toolbox.Structures import BoundingBox, Image, Keypoints, SegmentationMask
 
 
-def create_random_id(entity_type: str = "", prefix: str = "urn:ngsi-ld:",
-                     uuid4: bool = False, shortener: bool = True) -> str:
-    """Create a random URN id with the entity type and a UUID.
+def create_random_id(
+    entity_type: str = "",
+    prefix: str = "urn:ngsi-ld:",
+    uuid4: bool = False,
+    shortener: bool = True
+) -> str:
+    """Create a random URN ID with the entity type and a UUID.
 
     Args:
         entity_type (str, optional): The type of the entity. Defaults to "".
@@ -56,24 +62,24 @@ def set_entity_field(entity: Entity, field: any, name: str):
         entity.prop(name, field)
 
 
-def create_entity(data_model: typing.Type[BaseModel]) -> Entity:
-    """Create an NGSI-LD Entity object from a data model.
-    If the data model id is None, a new id will be created and set.
+def data_model_to_json(data_model: Type[BaseModel]) -> dict:
+    """Parse a toolbox data model to an NGSI-LD entity JSON.
+    If the data model id is None, a new one will be set.
 
     Args:
-        data_model (Type[BaseModel]): The model from which build the entity.
+        data_model (Type[BaseModel]): The toolbox data model object to parse.
 
     Returns:
-        Entity: The created NGSI-LD entity object.
+        dict: The parsed data model as a NGSI-LD entity JSON.
     """
     if not data_model.id:
-        data_model.id = create_random_id(
-            entity_type=data_model.type
-        )
+        data_model.id = create_random_id(entity_type=data_model.type)
     entity = Entity(data_model.type, data_model.id)
 
     # Set the context
     entity.ctx += data_model.context
+    # Set dateCreated attribute
+    entity.tprop("dateCreated", datetime.now())
     # Set dateObserved attribute
     entity.tprop("dateObserved", data_model.dateObserved)
     # Set relationship attributes
@@ -91,7 +97,7 @@ def create_entity(data_model: typing.Type[BaseModel]) -> Entity:
     for name, value in data_model_dict.items():
         if value is not None:
             set_entity_field(entity, value, name)
-    return entity
+    return json.loads(entity.to_json())
 
 
 def get_entity_field(field: any, field_type: any) -> any:
@@ -118,7 +124,7 @@ def get_entity_field(field: any, field_type: any) -> any:
         return field_type.deserialize(field)
     # Typing
     elif hasattr(field_type, "__origin__"):
-        if field_type.__origin__ is typing.Union:
+        if field_type.__origin__ is Union:
             return get_entity_field(field, field_type.__args__[0])
     # Enums
     elif hasattr(field_type, "__base__") and field_type.__base__ is Enum:
@@ -131,15 +137,14 @@ def get_entity_field(field: any, field_type: any) -> any:
         )
 
 
-def parse_entity(entity: typing.Union[Entity, dict],
-                 data_model_type: typing.Type[BaseModel]
-                 ) -> typing.Type[BaseModel]:
-    """Parses a NGSI-LD entity and convert it to a toolbox data model.
+def parse_entity(entity: dict, data_model_type: Type[BaseModel]
+                 ) -> Type[BaseModel]:
+    """Parses a NGSI-LD JSON entity and convert it to a toolbox data model.
 
     Args:
-        entity (Entity): The entity to be parsed.
+        entity (dict): The entity dictionary to be parsed.
         data_model_type (Type[BaseModel]): The data model class to which
-            convert the entity. One from toolbox.DataModels.
+            convert the entity. One from :mod:`toolbox.DataModels`.
 
     Raises:
         TypeError: If the entity type does not match the data model type.
@@ -149,8 +154,6 @@ def parse_entity(entity: typing.Union[Entity, dict],
     Returns:
         Type[BaseModel]: The parsed entity.
     """
-    if isinstance(entity, Entity):
-        entity = entity.to_dict()
     params = {}
     for name, field in data_model_type.__fields__.items():
         if name == "id":
@@ -178,3 +181,23 @@ def parse_entity(entity: typing.Union[Entity, dict],
         else:
             params[field.alias] = None
     return data_model_type(**params)
+
+
+def json_to_data_model(entity: dict) -> Type[BaseModel]:
+    """Parse an entity from a dict to a toolbox data model object.
+
+    Args:
+        entity (dict): A ngsi-ld entity as a dict.
+
+    Raises:
+        KeyError: If the entity type is not recognized.
+
+    Returns:
+        Type[BaseModel]: A data model object.
+    """
+    entity_type = entity["type"]
+    if entity_type not in data_models_catalog:
+        raise KeyError(f"Entity type {entity_type} not registered" +
+                       f" in data models catalog {data_models_catalog}")
+    data_model_cls = data_models_catalog[entity_type]
+    return parse_entity(entity, data_model_cls)

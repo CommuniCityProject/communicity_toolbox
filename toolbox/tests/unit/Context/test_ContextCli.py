@@ -321,15 +321,12 @@ class TestContextCli(unittest.TestCase):
         )
 
         # Get the entity from the broker
-        e = cc.get_entity(e_id)
+        e = cc.get_entity(e_id, as_dict=True)
         self.assertEqual(e["id"], e_id)
         self.assertEqual(e["type"], "Test")
         self.assertEqual(e["test_prop"]["value"], "test_val")
 
-    def test_get_data_model(self):
-        cc = ContextCli(**config)
-
-        # Define data model data
+        # Post a toolbox data model entity to the broker
         e_id = "urn:ngsi-ld:Face:" + str(uuid.uuid4())
         e_type = "Face"
         context = ["https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
@@ -376,7 +373,7 @@ class TestContextCli(unittest.TestCase):
         )
 
         # Retrieve the data model by its ID
-        ret_dm = cc.get_data_model(e_id)
+        ret_dm = cc.get_entity(e_id)
         self.assertIsInstance(ret_dm, DataModels.Face)
         self.assertEqual(e_id, ret_dm.id)
         self.assertEqual(e_type, ret_dm.type)
@@ -397,13 +394,78 @@ class TestContextCli(unittest.TestCase):
         self.assertEqual(recognized, ret_dm.recognized)
         self.assertEqual(recognized_distance, ret_dm.recognized_distance)
         self.assertEqual(recognized_person, ret_dm.recognized_person)
-        with self.assertRaises(requests.exceptions.HTTPError):
-            cc.get_data_model("0")
+        ret_dm = cc.get_entity(e_id, as_dict=True)
+        self.assertEqual(ret_dm["@context"], context[0])
+        
+        # Get non-existing entities
+        self.assertIsNone(cc.get_entity("urn:ngsi-ld:Face:non-existing"))
+        self.assertIsNone(cc.get_entity("non-existing"))
+        self.assertIsNone(cc.get_entity(""))
 
-    def test_parse_data_model(self):
+    def test_get_entities_page(self):
         cc = ContextCli(**config)
+        # Create dummy entities
+        test_type = str(uuid.uuid4())
+        ids = ["urn:ngsi-ld:Test:" + str(uuid.uuid4()) for _ in range(11)]
+        prop1 = ("test_prop_1" + test_type)
+        entity = {
+            "type": test_type,
+            prop1: {"type": "Property", "value": "test_val_1"},
+            "test_prop_2": {"type": "Property", "value": "test_val_2"}
+        }
+        for e_id in ids:
+            entity["id"] = e_id
+            r = requests.post(_entities_uri, json=entity)
+            self.assertEqual(r.status_code, 201, msg=r.text)
+        
+        # Get by type
+        entities = cc.get_entities_page(entity_type=test_type, limit=11, offset=0, as_dict=True)
+        self.assertEqual(len(entities), 11)
+        for e_id, e in zip(ids, entities):
+            self.assertEqual(e_id, e["id"])
+        
+        entities_0 = cc.get_entities_page(entity_type=test_type, limit=5, offset=0, as_dict=True)
+        entities_1 = cc.get_entities_page(entity_type=test_type, limit=5, offset=5, as_dict=True)
+        entities_2 = cc.get_entities_page(entity_type=test_type, limit=5, offset=10, as_dict=True)
+        self.assertEqual(len(entities_0), 5)
+        self.assertEqual(len(entities_1), 5)
+        self.assertEqual(len(entities_2), 1)
+        for e_id, e in zip(ids[:5], entities_0):
+            self.assertEqual(e_id, e["id"])
+        for e_id, e in zip(ids[5:10], entities_1):
+            self.assertEqual(e_id, e["id"])
+        for e_id, e in zip(ids[10:], entities_2):
+            self.assertEqual(e_id, e["id"])
 
-        # Define data model data
+        # Get by attrs
+        entities = cc.get_entities_page(attrs=[prop1], limit=11, offset=0, as_dict=True)
+        self.assertEqual(len(entities), 11)
+        for e_id, e in zip(ids, entities):
+            self.assertEqual(e_id, e["id"])
+
+        # Get by entity_id
+        entities = cc.get_entities_page(entity_id=ids, limit=11, offset=0, as_dict=True)
+        self.assertEqual(len(entities), 11)
+        for e_id, e in zip(ids, entities):
+            self.assertEqual(e_id, e["id"])
+        
+        # Get by id_pattern
+        entities = cc.get_entities_page(id_pattern=ids[-1][:-1]+"*", limit=11, offset=0, as_dict=True)
+        self.assertEqual(len(entities), 1)
+        self.assertEqual(ids[-1], entities[0]["id"])
+
+        # Get by query
+        entities = cc.get_entities_page(
+            query=f'{prop1}=="test_val_1"', limit=11, offset=0, as_dict=True)
+        self.assertEqual(len(entities), 11)
+        for e_id, e in zip(ids, entities):
+            self.assertEqual(e_id, e["id"])
+        
+        # Get none
+        entities = cc.get_entities_page(entity_type="non-existing", limit=11, offset=0, as_dict=True)
+        self.assertEqual(len(entities), 0)
+        
+        # Get data model
         e_id = "urn:ngsi-ld:Face:" + str(uuid.uuid4())
         e_type = "Face"
         context = ["https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
@@ -411,74 +473,207 @@ class TestContextCli(unittest.TestCase):
         image = "urn:ngsi-ld:Image:123"
         bounding_box = {"xmin": 0.0, "ymin": 0.1, "xmax": 0.2, "ymax": 0.3}
         detection_confidence = 0.99
-        age = 30.5
-        gender = "FEMALE"
-        gender_confidence = 0.88
-        emotion = "HAPPINESS"
-        emotion_confidence = 0.77
-        features = [1.1, 2.2, 3.3]
-        features_algorithm = "algorithm"
-        recognition_domain = "domain"
-        recognized = False
-        recognized_distance = 2.2
-        recognized_person = "person"
 
-        # Create an entity dict
-        entity = {
-            "id": e_id,
-            "type": e_type,
-            "@context": context,
-            "dateObserved": {"type": "Property", "value": {"@type": "DateTime", "@value": date_observed}},
-            "image": {"type": "Relationship", "object": image},
-            "boundingBox": {"type": "Property", "value": bounding_box},
-            "detectionConfidence": {"type": "Property", "value": detection_confidence},
-            "age": {"type": "Property", "value": age},
-            "gender": {"type": "Property", "value": gender},
-            "genderConfidence": {"type": "Property", "value": gender_confidence},
-            "emotion": {"type": "Property", "value": emotion},
-            "emotionConfidence": {"type": "Property", "value": emotion_confidence},
-            "features": {"type": "Property", "value": features},
-            "featuresAlgorithm": {"type": "Property", "value": features_algorithm},
-            "recognitionDomain": {"type": "Property", "value": recognition_domain},
-            "recognized": {"type": "Property", "value": recognized},
-            "recognizedDistance": {"type": "Property", "value": recognized_distance},
-            "recognizedPerson": {"type": "Property", "value": recognized_person}
-        }
+        # Post it to the broker
+        r = requests.post(
+            _entities_uri,
+            headers={"Content-Type": "application/ld+json"},
+            data=json.dumps({
+                "id": e_id,
+                "type": e_type,
+                "@context": context,
+                "dateObserved": {"type": "Property", "value": {"@type": "DateTime", "@value": date_observed}},
+                "image": {"type": "Relationship", "object": image},
+                "boundingBox": {"type": "Property", "value": bounding_box},
+                "detectionConfidence": {"type": "Property", "value": detection_confidence},
+            })
+        )
 
-        # Parse the entity dict
-        dm = cc.parse_data_model(entity)
-        self.assertEqual(e_id, dm.id)
-        self.assertEqual(e_type, dm.type)
-        self.assertEqual(datetime.datetime.fromisoformat(
-            date_observed[:-1]), dm.dateObserved)
-        self.assertEqual(image, dm.image)
+        # Retrieve the data model by its ID
+        entities = cc.get_entities_page(entity_id=e_id, limit=11, offset=0)
+        self.assertEqual(len(entities), 1)
+        ret_dm = entities[0]
+        self.assertIsInstance(ret_dm, DataModels.Face)
+        self.assertEqual(e_id, ret_dm.id)
+        self.assertEqual(e_type, ret_dm.type)
+        self.assertEqual(image, ret_dm.image)
         self.assertEqual(BoundingBox(bounding_box["xmin"], bounding_box["ymin"], bounding_box["xmax"], bounding_box["ymax"]),
-                         dm.bounding_box)
-        self.assertEqual(detection_confidence, dm.detection_confidence)
-        self.assertEqual(age, dm.age)
-        self.assertEqual(Gender[gender], dm.gender)
-        self.assertEqual(gender_confidence, dm.gender_confidence)
-        self.assertEqual(Emotion[emotion], dm.emotion)
-        self.assertEqual(emotion_confidence, dm.emotion_confidence)
-        self.assertEqual(features, dm.features)
-        self.assertEqual(features_algorithm, dm.features_algorithm)
-        self.assertEqual(recognition_domain, dm.recognition_domain)
-        self.assertEqual(recognized, dm.recognized)
-        self.assertEqual(recognized_distance, dm.recognized_distance)
-        self.assertEqual(recognized_person, dm.recognized_person)
+                         ret_dm.bounding_box)
+        self.assertEqual(detection_confidence, ret_dm.detection_confidence)
+    
+        entities = cc.get_entities_page(entity_id=e_id, limit=11, offset=0, as_dict=True)
+        self.assertEqual(entities[0]["@context"], context[0])
 
-    def test_post_entity(self):
+    def test_iterate_entities(self):
+        cc = ContextCli(**config)
+        # Create dummy entities
+        test_type = str(uuid.uuid4())
+        ids = ["urn:ngsi-ld:Test:" + str(uuid.uuid4()) for _ in range(11)]
+        entity = {
+            "type": test_type,
+            "test_prop": {"type": "Property", "value": "test_val"}
+        }
+        for e_id in ids:
+            entity["id"] = e_id
+            r = requests.post(_entities_uri, json=entity)
+            self.assertEqual(r.status_code, 201, msg=r.text)
+        
+        # Iterate over entities
+        it = cc.iterate_entities(entity_type=test_type, limit=5, as_dict=True)
+        ent_0 = next(it)
+        ent_1 = next(it)
+        ent_2 = next(it)
+        with self.assertRaises(StopIteration):
+            ent_3 = next(it)
+        self.assertEqual(len(ent_0), 5)
+        self.assertEqual(len(ent_1), 5)
+        self.assertEqual(len(ent_2), 1)
+        for e_id, e in zip(ids[:5], ent_0):
+            self.assertEqual(e_id, e["id"])
+        for e_id, e in zip(ids[5:10], ent_1):
+            self.assertEqual(e_id, e["id"])
+        self.assertEqual(ids[10], ent_2[0]["id"])
+
+    def test_get_all_entities(self):
+        cc = ContextCli(**config)
+        # Create dummy entities
+        test_type = str(uuid.uuid4())
+        ids = ["urn:ngsi-ld:Test:" + str(uuid.uuid4()) for _ in range(11)]
+        entity = {
+            "type": test_type,
+            "test_prop": {"type": "Property", "value": "test_val"}
+        }
+        for e_id in ids:
+            entity["id"] = e_id
+            r = requests.post(_entities_uri, json=entity)
+            self.assertEqual(r.status_code, 201, msg=r.text)
+        # Get all entities
+        entities = cc.get_all_entities(entity_type=test_type, as_dict=True)
+        self.assertEqual(len(entities), 11)
+        for e_id, e in zip(ids, entities):
+            self.assertEqual(e_id, e["id"])
+        
+        # Use toolbox data model
+        static_rand_id = "urn:ngsi-ld:Face:" + str(uuid.uuid4())
+        ids = [static_rand_id + str(uuid.uuid4()) for _ in range(3)]
+        e_type = "Face"
+        context = ["https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"]
+        date_observed = "2000-01-01T00:00:00Z"
+        image = "urn:ngsi-ld:Image:123"
+        bounding_box = {"xmin": 0.0, "ymin": 0.1, "xmax": 0.2, "ymax": 0.3}
+        detection_confidence = 0.99
+
+        # Post it to the broker
+        for e_id in ids:
+            r = requests.post(
+                _entities_uri,
+                headers={"Content-Type": "application/ld+json"},
+                data=json.dumps({
+                    "id": e_id,
+                    "type": e_type,
+                    "@context": context,
+                    "dateObserved": {"type": "Property", "value": {"@type": "DateTime", "@value": date_observed}},
+                    "image": {"type": "Relationship", "object": image},
+                    "boundingBox": {"type": "Property", "value": bounding_box},
+                    "detectionConfidence": {"type": "Property", "value": detection_confidence},
+                })
+            )
+
+        # Retrieve the data model by its ID
+        entities = cc.get_all_entities(id_pattern=static_rand_id+"*")
+        self.assertEqual(len(entities), len(ids))
+        for ret_dm in entities:        
+            self.assertIsInstance(ret_dm, DataModels.Face)
+            self.assertIn(ret_dm.id, ids)
+            ids.remove(ret_dm.id)
+            self.assertEqual(e_type, ret_dm.type)
+            self.assertEqual(image, ret_dm.image)
+            self.assertEqual(BoundingBox(bounding_box["xmin"], bounding_box["ymin"], bounding_box["xmax"], bounding_box["ymax"]),
+                            ret_dm.bounding_box)
+            self.assertEqual(detection_confidence, ret_dm.detection_confidence)
+        self.assertEqual(len(ids), 0)
+
+    def test_post_json(self):
         cc = ContextCli(**config)
         # Create an entity
         e = {
             "id": "urn:ngsi-ld:Test:" + str(uuid.uuid4()),
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
             "type": "Test",
             "test": {"type": "Property", "value": "test_value"}
         }
         # Post the entity
-        cc.post_entity(e)
+        cc.post_json(e)
         # Get and check the entity from the context broker
-        r = requests.get(urljoin(_entities_uri, e["id"]))
+        r = requests.get(urljoin(_entities_uri, e["id"]), headers={"Accept": "application/ld+json"})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json(), e)
+
+        # Using a toolbox data model
+        e = {
+            "id": "urn:ngsi-ld:Face:" + str(uuid.uuid4()),
+            "type": "Face",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "dateObserved": {"type": "Property", "value": {"@type": "DateTime", "@value": "2000-01-01T00:00:00Z"}},
+            "image": {"type": "Relationship", "object": "urn:ngsi-ld:Image:123",},
+            "boundingBox": {"type": "Property", "value": {"xmin": 0.0, "ymin": 0.1, "xmax": 0.2, "ymax": 0.3}},
+            "detectionConfidence": {"type": "Property", "value": 0.99},
+        }
+        cc.post_json(e)
+        # Get and check the entity from the context broker
+        r = requests.get(urljoin(_entities_uri, e["id"]), headers={"Accept": "application/ld+json"})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json(), e)
+
+    def test_update_json(self):
+        cc = ContextCli(**config)
+        # Create an entity
+        e = {
+            "id": "urn:ngsi-ld:Test:" + str(uuid.uuid4()),
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "type": "Test",
+            "test": {"type": "Property", "value": "test_value"}
+        }
+        # Post the entity
+        r = requests.post(_entities_uri, json=e, headers={"Content-Type": "application/ld+json"})
+        # Update the entity
+        e["test"]["value"] = "test_value2"
+        r = cc.update_json(e)
+        self.assertEqual(r, e)
+        # Get and check the entity from the context broker
+        r = requests.get(urljoin(_entities_uri, e["id"]), headers={"Accept": "application/ld+json"})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json(), e)
+
+        # Test update non existing entity
+        e = {
+            "id": "urn:ngsi-ld:Test:" + str(uuid.uuid4()),
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "type": "Test",
+            "test": {"type": "Property", "value": "test_value"}
+        }
+        # Update the entity
+        cc.update_json(e)
+        # Get and check the entity from the context broker
+        r = requests.get(urljoin(_entities_uri, e["id"]), headers={"Accept": "application/ld+json"})
+        self.assertEqual(r.json(), e)
+
+        # Using a toolbox data model
+        e = {
+            "id": "urn:ngsi-ld:Face:" + str(uuid.uuid4()),
+            "type": "Face",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "dateObserved": {"type": "Property", "value": {"@type": "DateTime", "@value": "2000-01-01T00:00:00Z"}},
+            "image": {"type": "Relationship", "object": "urn:ngsi-ld:Image:123",},
+            "boundingBox": {"type": "Property", "value": {"xmin": 0.0, "ymin": 0.1, "xmax": 0.2, "ymax": 0.3}},
+            "detectionConfidence": {"type": "Property", "value": 0.99},
+        }
+        r = requests.post(_entities_uri, json=e, headers={"Content-Type": "application/ld+json"})
+        # Update the entity
+        e["detectionConfidence"]["value"] = 0.98
+        cc.update_json(e)
+        # Get and check the entity from the context broker
+        r = requests.get(urljoin(_entities_uri, e["id"]), headers={"Accept": "application/ld+json"})
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.json(), e)
 
@@ -487,7 +682,8 @@ class TestContextCli(unittest.TestCase):
         # Create a Face data model
         dm = DataModels.Face(
             image="urn:ngsi-ld:Image:001",
-            featuresAlgorithm="Algo"
+            featuresAlgorithm="Algo",
+            boundingBox=BoundingBox(0.0,0.1,0.2,0.3)
         )
         # Post the data model with a None id
         entity = cc.post_data_model(dm)
@@ -499,15 +695,17 @@ class TestContextCli(unittest.TestCase):
         self.assertEqual(entity["image"]["object"], dm.image)
         self.assertEqual(entity["featuresAlgorithm"]
                          ["value"], dm.features_algorithm)
+        self.assertEqual(entity["boundingBox"]["value"], dm.bounding_box.serialize())
         # Get and check the entity from the context broker
-        r = requests.get(urljoin(_entities_uri, entity["id"]))
+        r = requests.get(urljoin(_entities_uri, entity["id"]), headers={"Accept": "application/ld+json"})
         self.assertEqual(r.status_code, 200)
         ret_entity = r.json()
         self.assertEqual(ret_entity["id"], entity["id"])
         self.assertEqual(ret_entity["image"]["object"], dm.image)
         self.assertEqual(ret_entity["featuresAlgorithm"]
                          ["value"], dm.features_algorithm)
-        # Set an id and post again
+        
+        # Set an ID and post again
         dm.id = "urn:ngsi-ld:Face:" + str(uuid.uuid4())
         entity = cc.post_data_model(dm)
         self.assertEqual(entity["id"], dm.id)
@@ -519,6 +717,47 @@ class TestContextCli(unittest.TestCase):
         self.assertEqual(ret_entity["image"]["object"], dm.image)
         self.assertEqual(ret_entity["featuresAlgorithm"]
                          ["value"], dm.features_algorithm)
+
+    def test_update_data_model(self):
+        cc = ContextCli(**config)
+        # Create a Face data model entity
+        dm = DataModels.Face(
+            image="urn:ngsi-ld:Image:001",
+            featuresAlgorithm="Algo",
+            boundingBox=BoundingBox(0.0,0.1,0.2,0.3)
+        )
+        ret = cc.post_data_model(dm)
+        # Update the data model
+        dm.features_algorithm = "Algo2"
+        cc.update_data_model(dm)
+        # Check the returned entity
+        ret = cc.get_entity(dm.id)
+        self.assertEqual(ret.image, dm.image)
+        self.assertEqual(ret.features_algorithm, dm.features_algorithm)
+        self.assertEqual(ret.bounding_box, dm.bounding_box)
+        self.assertEqual(ret.context, dm.context)
+
+        # Update non existing entity
+        dm = DataModels.Face(
+            image="urn:ngsi-ld:Image:001",
+            featuresAlgorithm="Algo",
+            boundingBox=BoundingBox(0.0,0.1,0.2,0.3)
+        )
+        cc.update_data_model(dm)
+        ret = cc.get_entity(dm.id)
+        self.assertEqual(ret.image, dm.image)
+        self.assertEqual(ret.features_algorithm, dm.features_algorithm)
+        self.assertEqual(ret.bounding_box, dm.bounding_box)
+        self.assertEqual(ret.context, dm.context)
+
+        # Update non existing entity with create=False
+        dm = DataModels.Face(
+            image="urn:ngsi-ld:Image:001",
+            featuresAlgorithm="Algo",
+            boundingBox=BoundingBox(0.0,0.1,0.2,0.3)
+        )
+        with self.assertRaises(ValueError):
+            cc.update_data_model(dm, create=False)
 
     def test_delete_entity(self):
         cc = ContextCli(**config)

@@ -1,21 +1,16 @@
 import copy
 import itertools
-import json
 import logging
 import uuid
-from datetime import datetime
 from typing import Iterator, List, Optional, Type, Union
 
 import requests
-from ngsildclient import Client as NgsiLdClient
 
 from toolbox import DataModels
-from toolbox.Context import entity_parser
 from toolbox.DataModels import BaseModel
-from toolbox.DataModels.DataModelsCatalog import data_models_catalog
 from toolbox.utils.utils import get_logger, urljoin
 
-from .entity_parser import create_entity
+from .entity_parser import data_model_to_json, json_to_data_model
 from .Subscription import Subscription
 
 logger = get_logger("toolbox.ContextCli")
@@ -28,6 +23,7 @@ class ContextCli:
     Attributes:
         notification_uri (str): The uri used for notifications.
         subscription_name (str): The name used in subscriptions.
+        headers (dict): The headers used in requests.
 
     Methods:
         subscribe(subscription, **kwargs) -> Union[str, None]
@@ -78,6 +74,10 @@ class ContextCli:
 
         self._subscription_ids: List[str] = []
         self.subscription_name = str(uuid.uuid4())
+        self.headers = {
+            "Accept": "application/ld+json",
+            "Content-Type": "application/ld+json"
+        }
 
         self._broker_url = urljoin(
             f"http://{self._broker_host}:{self._broker_port}",
@@ -91,8 +91,27 @@ class ContextCli:
             self._broker_url,
             "/ngsi-ld/v1/entities"
         )
+        self._entities_upsert_uri = urljoin(
+            self._broker_url,
+            "/ngsi-ld/v1/entityOperations/upsert"
+        )
 
         logger.info(f"Using context broker at {self._broker_url}")
+
+    def _check_entity(self, entity: dict):
+        """Check if the given entity is valid.
+
+        Args:
+            entity (dict): The entity to check.
+
+        Raises:
+            ValueError: If the entity is not valid.
+        """
+
+        if "id" not in entity:
+            raise ValueError("Entity must have an 'id' attribute.")
+        if "type" not in entity:
+            raise ValueError("Entity must have a 'type' attribute.")
 
     def _build_subscription(self, **kwargs) -> Subscription:
         """Create a Subscription object from the given kwargs.
@@ -146,17 +165,11 @@ class ContextCli:
                                f"{[c.subscription_id for c in conflicts]}. "
                                "Not creating the subscription.")
                 return conflicts[0].subscription_id
-
         logger.debug(f"Creating subscription {subscription}")
         response = requests.post(
             url=self._subscriptions_uri,
-            json=subscription.json,
-            headers={
-                "Accept": "application/ld+json",
-                "Content-Type": "application/json",
-            }
+            json=subscription.json
         )
-
         if response.ok:
             try:
                 location = response.headers.get("Location")
@@ -227,7 +240,7 @@ class ContextCli:
         response = requests.get(self._subscriptions_uri, params=params)
         if response.ok:
             return [Subscription.from_json(s) for s in response.json()]
-        logger.error(f"Error getting subscriptions from f"{response.url}: "
+        logger.error(f"Error getting subscriptions from {response.url}: "
                      f"{response.status_code} {response.text}")
         response.raise_for_status()
 
@@ -358,13 +371,16 @@ class ContextCli:
                 dictionary or None if the entity does not exist.
         """
         logger.debug(f"Getting entity {entity_id}")
-        response = requests.get(urljoin(self._entities_uri, entity_id))
+        response = requests.get(
+            urljoin(self._entities_uri, entity_id),
+            headers=self.headers
+        )
         if response.ok:
             entity_dict = response.json()
             if as_dict:
                 return entity_dict
-            return self.parse_data_model(entity_dict)
-        if response.status_code == 404:
+            return json_to_data_model(entity_dict)
+        if response.status_code in (404, 400):
             return None
         logger.error(f"Error getting entity {entity_id} from {response.url}: "
                      f"{response.status_code} {response.text}")
@@ -372,10 +388,10 @@ class ContextCli:
 
     def get_entities_page(
         self,
-        entity_id: Optional[List[str]] = None,
         entity_type: Optional[str] = None,
+        attrs: Optional[Union[List[str], str]] = None,
+        entity_id: Optional[Union[List[str], str]] = None,
         id_pattern: Optional[str] = None,
-        attrs: Optional[List[str]] = None,
         query: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
@@ -384,15 +400,15 @@ class ContextCli:
         """Get a list of entities from the context broker.
 
         Args:
-            entity_id (Optional[List[str]], optional): A list of entity IDs.
-                Defaults to None.
             entity_type (Optional[str], optional): An entity type. If not
                 provided, attrs must be provided. Defaults to None. 
+            attrs (Optional[Union[List[str], str]], optional): A list of
+                attributes to return. If not provided, entity_type must be
+                provided. Defaults to None.
+            entity_id (Optional[Union[List[str], str]], optional): A list of
+                entity IDs. Defaults to None.
             id_pattern (Optional[str], optional): A pattern to match entity
                 IDs. Defaults to None.
-            attrs (Optional[List[str]], optional): A list of attributes to
-                return. If not provided, entity_type must be provided.
-                Defaults to None.
             query (Optional[str], optional): A query to filter entities.
                 Defaults to None.
             limit (int, optional): Maximum number of entities to return.
@@ -414,23 +430,31 @@ class ContextCli:
         """
         params = {"limit": limit, "offset": offset}
         if entity_id:
+            if not isinstance(entity_id, list):
+                entity_id = [entity_id]
             params["id"] = ",".join(entity_id)
         if entity_type:
             params["type"] = entity_type
         if id_pattern:
             params["idPattern"] = id_pattern
         if attrs:
+            if not isinstance(attrs, list):
+                attrs = [attrs]
             params["attrs"] = ",".join(attrs)
         if query:
             params["q"] = query
         logger.debug(f"Getting entities from {self._entities_uri} with "
                      f"params {params}")
-        response = requests.get(self._entities_uri, params=params)
+        response = requests.get(
+            self._entities_uri,
+            headers=self.headers,
+            params=params
+        )
         if response.ok:
             entity_dicts = response.json()
             if as_dict:
                 return entity_dicts
-            return [self.parse_data_model(e) for e in entity_dicts]
+            return [json_to_data_model(e) for e in entity_dicts]
         logger.error(f"Error getting entities from {response.url}: "
                      f"{response.status_code} {response.text}")
         response.raise_for_status()
@@ -543,25 +567,6 @@ class ContextCli:
             )
         )
 
-    def parse_data_model(self, entity: dict) -> Type[BaseModel]:
-        """Parse an entity from a dict to a toolbox data model object.
-
-        Args:
-            entity (dict): A ngsi-ld entity as a dict.
-
-        Raises:
-            KeyError: If the entity type is not recognized.
-
-        Returns:
-            Type[BaseModel]: A data model object.
-        """
-        entity_type = entity["type"]
-        if entity_type not in data_models_catalog:
-            raise KeyError(f"Entity type {entity_type} not registered" +
-                           f" in data models catalog {data_models_catalog}")
-        data_model_cls = data_models_catalog[entity_type]
-        return entity_parser.parse_entity(entity, data_model_cls)
-
     @property
     def subscription_ids(self) -> List[str]:
         """Get the list of subscription IDs created within the ContextCli.
@@ -573,21 +578,63 @@ class ContextCli:
 
         Args:
             entity (dict): The entity to upload to the context broker as a
-                JSON dictionary.
+                dictionary.
+            ngsi_ld (bool, optional): If True, the entity data is in NGSI-LD
+                format. Defaults to True.
 
         Raises:
             requests.exceptions.HTTPError: If there was an error posting the
                 entity.
         """
         logger.debug(f"Posting entity to the context broker: \n{entity}")
+        self._check_entity(entity)
         response = requests.post(
             self._entities_uri,
+            headers=self.headers,
             json=entity
         )
         if not response.ok:
             logger.error(f"Error posting entity to {response.url}: "
                          f"{response.status_code} {response.text}")
             response.raise_for_status()
+
+    def update_json(self, entity: dict, create: bool = True) -> dict:
+        """Update a JSON entity in the context broker.
+
+        Args:
+            entity (dict): The entity to update in the context broker as a
+                dictionary.
+            create (bool, optional): If True, the entity will be created if it
+                does not exist in the context broker. Defaults to True.
+
+        Raises:
+            requests.exceptions.HTTPError: If there was an error updating the
+                entity.
+            ValueError: If the entity does not exist and create is False.
+        
+        Returns:
+            dict: The updated entity.
+        """
+        logger.debug(f"Updating entity in the context broker: \n{entity}")
+        self._check_entity(entity)
+        orig_entity = self.get_entity(entity["id"], as_dict=True)
+        if orig_entity is not None:
+            if "dateCreated" in orig_entity:
+                entity["dateCreated"] = orig_entity["dateCreated"]
+            response = requests.post(
+                self._entities_upsert_uri,
+                headers=self.headers,
+                json=[entity]
+            )
+            if not response.ok:
+                logger.error(f"Error updating entity in {response.url}: "
+                            f"{response.status_code} {response.text}")
+                response.raise_for_status()
+        else:
+            if not create:
+                raise ValueError(f"Entity {entity['id']} does not exist.")
+            self.post_json(entity)
+        return entity
 
     def post_data_model(self, data_model: Type[DataModels.BaseModel]) -> dict:
         """Post a toolbox data model object to the context broker. If the data
@@ -596,23 +643,24 @@ class ContextCli:
         Args:
             data_model (Type[DataModels.BaseModel]): The data model object to
                 upload to the context broker.
+        
+        Raises:
+            requests.exceptions.HTTPError: If there was an error posting the
+                data model.
 
         Returns:
             dict: The uploaded JSON.
         """
         logger.debug(f"Posting data model to the context broker: "
                      f"\n{data_model.pretty()}")
-        entity = create_entity(data_model)
-        entity.tprop("dateModified", datetime.now())
-        entity.tprop("dateCreated", datetime.now())
-        with NgsiLdClient(self._broker_host, self._broker_port) as cli:
-            cli.create(entity)
-            return json.loads(entity.to_json())
+        entity = data_model_to_json(data_model)
+        self.post_json(entity)
+        return entity
     
     def update_data_model(
         self,
         data_model: Type[DataModels.BaseModel],
-        create: bool = False
+        create: bool = True
     ) -> dict:
         """Update an existing entity in the context broker.
 
@@ -622,48 +670,15 @@ class ContextCli:
                 exists. Defaults to False.
 
         Raises:
-            ValueError: If the ID of the data model is None.
-            ngsildclient.api.exceptions.NgsiResourceNotFoundError: If the data
-                model does not exist on the context broker and  `create` is
-                False.
+            requests.exceptions.HTTPError: If there was an error updating the
+                entity.
+            ValueError: If the entity does not exist and create is False.
 
         Returns:
-            dict: The uploaded json.
+            dict: The updated JSON.
         """
-        logger.debug(f"Updating data model: \n{data_model.pretty()}")
-        with NgsiLdClient(self._broker_host, self._broker_port) as cli:
-            if create:
-                if data_model.id is None or not cli.exists(data_model.id):
-                    logger.debug(
-                        "Data model does not exist on the context broker")
-                    self.post_data_model(data_model)
-                    return
-            if data_model.id is None:
-                raise ValueError("Can not update entity with ID None")
-            orig_entity = self._broker.get(data_model.id)
-            new_entity = create_entity(data_model)
-            if "dateCreated" in orig_entity.to_dict():
-                created = orig_entity["dateCreated"]["value"]["@value"]
-                new_entity.tprop("dateCreated", created)
-            new_entity.tprop("dateModified", datetime.now())
-            self._broker.update(new_entity)
-            return new_entity.to_json()
-
-    @staticmethod
-    def data_model_to_dict(data_model: Type[DataModels.BaseModel]) -> dict:
-        """Convert a toolbox data model object to a dictionary.
-
-        Args:
-            data_model (Type[DataModels.BaseModel]): The data model object to
-                convert.
-
-        Returns:
-            dict: The converted dictionary.
-        """
-        entity = create_entity(data_model)
-        entity.tprop("dateModified", datetime.now())
-        entity.tprop("dateCreated", datetime.now())
-        return json.loads(entity.to_json())
+        entity = data_model_to_json(data_model)
+        return self.update_json(entity, create=create)
 
     def delete_entity(self, entity_id: str) -> bool:
         """Delete an entity from the context broker.
@@ -682,7 +697,7 @@ class ContextCli:
         if response.ok:
             logger.info(f"Entity deleted {entity_id}")
             return True
-        if response.status_code == 404:
+        if response.status_code in (404, 400):
             return False
         logger.error(f"Error deleting entity {entity_id} from "
                         f"{response.url}: {response.status_code} "
