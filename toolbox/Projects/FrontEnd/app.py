@@ -6,6 +6,7 @@ import logging
 import streamlit as st
 from project_templates import BaseTemplate, project_templates
 
+from toolbox.Context import ContextCli
 from toolbox.Projects.ImageStorage import ImageStorageCli
 from toolbox.utils.config_utils import parse_config
 from toolbox.utils.utils import get_logger
@@ -15,12 +16,14 @@ logger = get_logger("toolbox.FrontEnd")
 
 def get_project_templates(
     project_params: dict,
+    context_cli: ContextCli,
     image_storage_cli: ImageStorageCli
 ) -> Type[BaseTemplate]:
     """Get a project template object from the project parameters.
 
     Args:
         project_params (dict): A project parameters dict.
+        context_cli (ContextCli): A context client.
         image_storage_cli (ImageStorageCli): An image storage client.
 
     Returns:
@@ -30,6 +33,7 @@ def get_project_templates(
     template_cls = project_templates[project_params["template"]]
     template = template_cls(
         **project_params,
+        context_cli=context_cli,
         image_storage_cli=image_storage_cli
     )
     return template
@@ -50,17 +54,13 @@ def init(config: dict, log_level: str = "INFO"
     """
     logging.getLogger("toolbox").setLevel(log_level)
     config = parse_config(config)
-    
-    logger.info(f"Using the image storage {config['image_storage']}")
-    image_storage_cli = ImageStorageCli(
-        host=config["image_storage"]["host"],
-        port=config["image_storage"]["port"],
-        url_path=config["image_storage"]["url_path"]
-    )
+
+    context_cli = ContextCli(**config["context_broker"])
+    image_storage_cli = ImageStorageCli(**config["image_storage"])
 
     # Parse the Projects APIs configuration
     templates = [
-        get_project_templates(p, image_storage_cli)
+        get_project_templates(p, context_cli, image_storage_cli)
         for p in config["projects"]
     ]
 

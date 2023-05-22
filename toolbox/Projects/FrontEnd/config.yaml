@@ -1,6 +1,13 @@
 common-host: &common-host
   127.0.0.1
 
+pagination_limit: &pagination_limit
+  30
+
+context_broker:
+  host: *common-host
+  port: 1026
+
 image_storage: &image_storage
   host: *common-host
   port: 9001
@@ -14,6 +21,7 @@ projects:
     template: SimplePredict # TODO: Change to ContextBroker
   - name: Image Storage
     template: ImageStorageTemplate
+    pagination_limit: *pagination_limit
     <<: *image_storage
   - name: Face Detection
     port: 9007

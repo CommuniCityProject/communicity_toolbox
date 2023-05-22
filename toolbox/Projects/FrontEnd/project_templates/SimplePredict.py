@@ -63,7 +63,7 @@ class SimplePredict(BaseTemplate):
             response.raise_for_status()
         return response.json()
 
-    def parse_vis_params(self) -> dict:
+    def _parse_vis_params(self) -> dict:
         """Parse the visualization parameters from the session state.
 
         Returns:
@@ -97,7 +97,7 @@ class SimplePredict(BaseTemplate):
             return
 
         try:
-            vis_params = self.parse_vis_params()
+            vis_params = self._parse_vis_params()
             image = self._download_visualize_entities(entities, vis_params)
             st.session_state.output_image = image
         except Exception as e:
@@ -118,7 +118,6 @@ class SimplePredict(BaseTemplate):
             return st.session_state.input_image
         try:
             image = self.image_storage_cli.download(image_id)
-            image.id = image_id
             return image
         except:
             st.session_state.error_message = "Error: Image " + \
@@ -126,7 +125,7 @@ class SimplePredict(BaseTemplate):
                 f" not found on {self.image_storage_cli.url}"
             return None
 
-    def upload_input_image(self) -> Union[str, None]:
+    def _upload_input_image(self) -> Union[str, None]:
         """Uploads the input image to the image storage.
 
         Returns:
@@ -240,7 +239,7 @@ class SimplePredict(BaseTemplate):
             input_image_id = st.session_state.input_image_id
         else:
             # Get the image from the uploaded file
-            input_image_id = self.upload_input_image()
+            input_image_id = self._upload_input_image()
 
         # Download the input image from the image storage
         if input_image_id:

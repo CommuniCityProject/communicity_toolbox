@@ -1,1 +1,1 @@
-from .image_storage_cli import ImageStorageCli
+from .ImageStorageCli import ImageStorageCli

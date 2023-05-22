@@ -237,7 +237,7 @@ class ImageStorage:
                         raise HTTPException(
                             status.HTTP_422_UNPROCESSABLE_ENTITY,
                             f"Found entities with different images "
-                            f"({dm.image.image_id} != {image_id})",
+                            f"({dm.image} != {image_id})",
                         )
                     image_id = dm.image
 

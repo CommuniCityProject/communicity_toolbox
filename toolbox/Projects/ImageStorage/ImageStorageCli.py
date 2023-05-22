@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List
 
 import requests
 
@@ -9,6 +9,23 @@ logger = get_logger("toolbox.ImageStorageCli")
 
 
 class ImageStorageCli:
+    """A class to interact with the image storage server.
+
+    Attributes:
+        host (str): Host address of the image storage server.
+        port (int): Port of the image storage server.
+        url_path (str): URL path of the image storage server.
+        url (str): The full URL of the image storage server.
+    
+    Methods:
+        upload_bytes(image_bytes, name, file_type, source, purpose,
+                     raise_on_error) -> Union[str, None]
+        download(image_id, raise_on_error) -> Union[Image, None]
+        visualize(entity_ids, visualization_params, raise_on_error
+                 ) -> Union[str, None]
+        TODO: upload_image(...) np.ndarray or Image
+        TODO: upload_file(...)
+    """
 
     def __init__(self, host: str, port: int, url_path: str = ""):
         """Create the image storage client.
@@ -32,8 +49,7 @@ class ImageStorageCli:
         file_type: str,
         source: str = "",
         purpose: str = "",
-        raise_on_error: bool = True
-    ) -> Union[str, None]:
+    ) -> str:
         """Upload an image as bytes to the image storage.
 
         Args:
@@ -44,15 +60,12 @@ class ImageStorageCli:
                 Defaults to "".
             purpose (str, optional): Optional purpose of the image.
                 Defaults to "".
-            raise_on_error (bool, optional): Raises an exception if the request
-                fails. Defaults to True.
 
         Raises:
-            HTTPError: If the request fails and ``raise_on_error`` is True.
+            requests.exceptions.HTTPError: If the request fails.
 
         Returns:
-            Union[str, None]: The ID of the uploaded image if the request was
-                successful, else None.
+            str: The ID of the uploaded image.
         """
         files = {"file": (name, image_bytes, file_type)}
         data = {
@@ -62,79 +75,62 @@ class ImageStorageCli:
         headers = {"accept": "application/json"}
         logger.info(f"Uploading image {name} to {self.url}")
         r = requests.post(self.url, headers=headers, data=data, files=files)
-        if not r.ok:
-            logger.error(
-                f"Error uploading image. Got {r.status_code} ({r.text})")
-            if raise_on_error:
-                r.raise_for_status()
-            return None
-        return r.json()
+        if r.ok:
+            return r.json()
+        logger.error(
+            f"Error uploading image. Got {r.status_code} ({r.text})")
+        r.raise_for_status()
 
-    def download(
-        self,
-        image_id: str,
-        raise_on_error: bool = True
-    ) -> Union[Image, None]:
+    def download(self, image_id: str) -> Image:
         """Download an image from the image storage.
 
         Args:
             image_id (str): The ID of the image to download.
-            raise_on_error (bool, optional): Raises an exception if the request
-                fails. Defaults to True.
 
         Raises:
-            Exception if the request fails and ``raise_on_error`` is True.
+            Exception: If the request fails.
 
         Returns:
-            Union[Image, None]: The downloaded image if the request was
-                successful, else None.
+            Image: The downloaded image object.
         """
         url = urljoin(self.url, image_id)
-        logger.info(f"Downloading image {url}")
+        logger.debug(f"Downloading image {url}")
         try:
             img = Image.from_url(url)
             img.id = image_id
             return img
         except Exception as e:
             logger.error(f"Error downloading image {image_id}. Got {e}")
-            if raise_on_error:
-                raise e
-            return None
+            raise e
 
     def visualize(
         self,
         entity_ids: List[str],
         visualization_params: dict = {},
-        raise_on_error: bool = True
-    ) -> Union[str, None]:
+    ) -> str:
         """Create a visualization of the given entity ids.
 
         Args:
             entity_ids (List[str]): List of entity ids to visualize.
             visualization_params (dict, optional): Visualization parameters.
                 Defaults to {}.
-            raise_on_error (bool, optional): Raise an ``HTTPError`` exception
-                if the request fails. Defaults to True.
 
         Raises:
-            HTTPError: If the request fails and ``raise_on_error`` is True.
+            requests.exceptions.HTTPError: If the request fails.
 
         Returns:
-            Union[str, None]: ID of the generated image if the request was
-                successful, else None.
+            str: ID of the generated image.
         """
         url = urljoin(self.url, "visualize")
         content = {
             "entity_ids": entity_ids,
             "params": visualization_params
         }
-        logger.info(
+        logger.debug(
             f"Visualizing {entity_ids} with {visualization_params} on {url}")
         r = requests.post(url, json=content)
-        if not r.ok:
-            logger.error(
-                f"Error visualizing entities. Got {r.status_code} ({r.text})")
-            if raise_on_error:
-                r.raise_for_status()
-            return None
-        return r.json()
+        if r.ok:
+            return r.json()
+        logger.error(
+            f"Error visualizing entities. Got {r.status_code} ({r.text})")
+        r.raise_for_status()
