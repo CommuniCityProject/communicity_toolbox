@@ -52,5 +52,4 @@ api:
   max_entities_visualize: 100
 
 visualization: {}
-  # image_width: 1000
   

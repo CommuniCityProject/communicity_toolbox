@@ -1,18 +1,23 @@
-from typing import Union, List
+from typing import List, Union
+
 import numpy as np
 
 from toolbox import DataModels
-from toolbox.Visualization import utils
 from toolbox.utils.config_utils import update_dict
-from toolbox.Visualization.Defaults import (Defaults, COCO_KEYPOINTS_COLORS,
-    COCO_KEYPOINTS_CONNECTION_RULES)
+from toolbox.Visualization import utils
+from toolbox.Visualization.Defaults import (COCO_KEYPOINTS_COLORS,
+                                            COCO_KEYPOINTS_CONNECTION_RULES,
+                                            Defaults)
 
 
-
-def draw(image: np.ndarray,
-    data_models: Union[List[DataModels.PersonKeyPoints],
-    DataModels.PersonKeyPoints],
-    config: dict) -> np.ndarray:
+def draw(
+    image: np.ndarray,
+    data_models: Union[
+        List[DataModels.PersonKeyPoints],
+        DataModels.PersonKeyPoints
+    ],
+    config: dict
+) -> np.ndarray:
     """Draw PersonKeyPoints data models data on an image.
 
     Args:
@@ -25,11 +30,11 @@ def draw(image: np.ndarray,
     Returns:
         np.ndarray: The input image with the data models drawn.
     """
-    config = update_dict(Defaults.dict(), config.get("PersonKeyPoints", {}))
+    config = update_dict(Defaults.dict(), config)
 
     if not isinstance(data_models, (list, tuple)):
         data_models = [data_models]
-    
+
     # 1. Keypoints
     for dm in data_models:
         image = utils.draw_coco_keypoints(
@@ -69,7 +74,9 @@ def draw(image: np.ndarray,
                 text_bg_color=config["text_bg_color"],
                 text_bg_alpha=config["text_bg_alpha"],
                 text_line_space=config["text_line_space"],
-                text_box_position=utils.TextPosition[str(config["box_text_position"])],
-                text_direction=utils.TextPosition[str(config["text_direction"])]
+                text_box_position=utils.TextPosition[str(
+                    config["box_text_position"])],
+                text_direction=utils.TextPosition[str(
+                    config["text_direction"])]
             )
     return image

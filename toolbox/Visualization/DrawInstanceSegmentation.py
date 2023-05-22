@@ -1,16 +1,21 @@
-from typing import Union, List
+from typing import List, Union
+
 import numpy as np
 
 from toolbox import DataModels
-from toolbox.Visualization import utils
 from toolbox.utils.config_utils import update_dict
+from toolbox.Visualization import utils
 from toolbox.Visualization.Defaults import Defaults
 
 
-
-def draw(image: np.ndarray,
-    data_models: Union[List[DataModels.InstanceSegmentation],
-    DataModels.InstanceSegmentation], config: dict) -> np.ndarray:
+def draw(
+    image: np.ndarray,
+    data_models: Union[
+        List[DataModels.InstanceSegmentation],
+        DataModels.InstanceSegmentation
+    ],
+    config: dict
+) -> np.ndarray:
     """Draw data from one or more InstanceSegmentation data models on an
     image.
 
@@ -24,14 +29,11 @@ def draw(image: np.ndarray,
     Returns:
         np.ndarray: The input image with the data models drawn.
     """
-    config = update_dict(
-        Defaults.dict(),
-        config.get("InstanceSegmentation", {})
-    )
+    config = update_dict(Defaults.dict(), config)
 
     if not isinstance(data_models, (list, tuple)):
         data_models = [data_models]
-    
+
     # 1. Masks
     for dm in data_models:
         seg = dm.mask.resize(image.shape[1], image.shape[0])
@@ -47,7 +49,7 @@ def draw(image: np.ndarray,
     # 2. Bounding boxes
     if config["mask_show_box"]:
         for dm in data_models:
-            
+
             text = ""
             if config["mask_show_label"]:
                 text += f"{dm.label}"

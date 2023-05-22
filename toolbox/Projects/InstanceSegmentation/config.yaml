@@ -28,7 +28,6 @@ subscriptions:
     query: "purpose==%22InstanceSegmentation%22"
 
 visualization:
-  image_width: 1000
-  InstanceSegmentation:
-    text_background: True
-    mask_color_alpha: 0.7
+  image_width: 800
+  text_background: True
+  mask_color_alpha: 0.7

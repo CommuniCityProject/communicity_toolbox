@@ -3,7 +3,6 @@ from copy import deepcopy
 from toolbox.Visualization import utils
 
 
-
 COCO_KEYPOINTS_COLORS = {
     "left_ear": (255, 0, 255),
     "right_ear": (255, 255, 0),
@@ -28,7 +27,7 @@ COCO_KEYPOINTS_COLORS = {
 COCO_KEYPOINTS_CONNECTION_RULES = [
     # face
     ("left_ear", "left_eye", (239, 0, 255)),
-    ("right_ear", "right_eye", (239, 2355, 0)),
+    ("right_ear", "right_eye", (239, 235, 0)),
     ("left_eye", "nose", (255, 0, 255)),
     ("nose", "right_eye", (255, 255, 0)),
     # upper-body
@@ -52,21 +51,24 @@ COCO_KEYPOINTS_CONNECTION_RULES = [
 
 
 class Defaults:
+    # Image
+    image_width = None
+    image_height = None
     # Text
-    text_color = (255,255,255)
+    text_color = (255, 255, 255)
     text_scale = 1
     text_thickness = 1
     text_background = True
-    text_bg_color = (224,56,84)
+    text_bg_color = (224, 56, 84)
     text_bg_alpha = 0.75
-    text_line_space= 15
+    text_line_space = 15
     text_direction = utils.TextPosition.BOTTOM_RIGHT
     # BoundingBox
     box_thickness = 2
-    box_color = (224,56,84)
+    box_color = (224, 56, 84)
     box_text_position = utils.TextPosition.TOP_LEFT
     # Segmentation mask
-    mask_color = (21,57,255)
+    mask_color = (21, 57, 255)
     mask_alpha = 0.75
     mask_color_by_label = True
     mask_colors_list = None
@@ -74,7 +76,7 @@ class Defaults:
     mask_show_label = True
     mask_show_conf = True
     # Keypoints
-    kp_color = (0,0,255)
+    kp_color = (0, 0, 255)
     kp_color_by_label = True
     kp_radius = 5
     kp_line_thickness = 3
@@ -101,6 +103,6 @@ class Defaults:
         """Return the default attributes as a dict.
         """
         return deepcopy(
-            {k:v for k,v in Defaults.__dict__.items() 
-            if not k.startswith("_") and k != "dict"}
+            {k: v for k, v in Defaults.__dict__.items()
+             if not k.startswith("_") and k != "dict"}
         )

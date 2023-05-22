@@ -28,7 +28,6 @@ subscriptions:
     query: "purpose==%22Keypoints%22"
 
 visualization:
-  # image_width: 1000
-  PersonKeypoints:
-    kp_bounding_box: True
-    kp_names: False
+  image_width: 800
+  kp_bounding_box: True
+  kp_names: False

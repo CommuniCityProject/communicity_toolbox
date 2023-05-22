@@ -1,10 +1,9 @@
 import streamlit as st
-import pandas as pd
 
 from toolbox.Context import entity_parser
-from toolbox.Visualization.Defaults import Defaults
 
 from . import BaseTemplate
+from toolbox.Projects.FrontEnd.utils import utils
 
 
 class ImageStorageTemplate(BaseTemplate):
@@ -15,9 +14,7 @@ class ImageStorageTemplate(BaseTemplate):
         super().__init__(**kwargs)
         self.pagination_limit = kwargs.get("pagination_limit", 100)
 
-        vis_defaults = Defaults.dict()
-        self._vis_params_values = [str(v) for v in vis_defaults.values()]
-        self._vis_params_keys = list(vis_defaults.keys())
+        
 
         # Streamlit elements
 
@@ -190,17 +187,9 @@ class ImageStorageTemplate(BaseTemplate):
         entity_ids = [e for e in entity_ids["Entity IDs"] if e]
 
         # Visualizations parameters
-        vis_params = {}
         with st.expander("Visualization Parameters"):
-            vis_params = st.experimental_data_editor(
-                {
-                    "Parameters": self._vis_params_keys,
-                    "Values": self._vis_params_values,
-                },
-                use_container_width=True,
-            )
-            vis_params = dict(zip(vis_params["Parameters"],
-                                    vis_params["Values"]))
+            st_vis_params = st.empty()
+        vis_params = utils.add_visualization_params(st_vis_params)
         
         # Visualize button
         st.button(

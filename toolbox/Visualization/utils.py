@@ -1,11 +1,11 @@
 from enum import Enum, unique
-from typing import List, Optional, Tuple, Dict
+from typing import Dict, List, Optional, Tuple
+
+import cv2
 import numpy as np
 import seaborn as sns
-import cv2
 
-from toolbox.Structures import BoundingBox, SegmentationMask, Keypoints
-
+from toolbox.Structures import BoundingBox, Keypoints, SegmentationMask
 
 
 @unique
@@ -15,7 +15,7 @@ class TextPosition(Enum):
     BOTTOM_LEFT = "BOTTOM_LEFT"
     BOTTOM_RIGHT = "BOTTOM_RIGHT"
     TOP_LEFT
-    
+
     def __str__(self):
         return self.name
 
@@ -24,11 +24,11 @@ def draw_text(
     image: np.ndarray,
     text: str,
     position: Tuple[int, int],
-    color = (255,255,255),
+    color=(255, 255, 255),
     scale: int = 2,
     thickness: int = 2,
     background: bool = False,
-    bg_color: Tuple[int, int, int] = (0,0,255),
+    bg_color: Tuple[int, int, int] = (0, 0, 255),
     bg_alpha: Optional[float] = 0.5,
     line_space: int = 15,
     direction: TextPosition = TextPosition.BOTTOM_RIGHT
@@ -59,12 +59,12 @@ def draw_text(
     """
     if not text:
         return image
-        
+
     font = cv2.FONT_HERSHEY_SIMPLEX
     lines = text.splitlines()
-    max_text = max(lines, key=lambda x:len(x))
+    max_text = max(lines, key=lambda x: len(x))
     (text_w, text_h), _ = cv2.getTextSize(max_text, font, scale, thickness)
-    
+
     if direction is TextPosition.BOTTOM_RIGHT:
         x, y = position
     else:
@@ -85,7 +85,7 @@ def draw_text(
                 image[ymin:ymax, xmin:xmax, :],
                 1-bg_alpha,
                 rect,
-                bg_alpha, 
+                bg_alpha,
                 0
             )
         else:
@@ -96,7 +96,7 @@ def draw_text(
                 bg_color,
                 -1
             )
-    
+
     for i, line in enumerate(lines):
         dy = i * (text_h + scale * line_space)
         cv2.putText(
@@ -108,11 +108,11 @@ def draw_bounding_box(
     image: np.ndarray,
     box: Optional[BoundingBox],
     thickness: int = 2,
-    color: Tuple[int, int, int] = (0,0,255),
+    color: Tuple[int, int, int] = (0, 0, 255),
     text: Optional[str] = None,
     text_scale: int = 2,
     text_thickness: int = 2,
-    text_color: Tuple[int, int, int] = (0,0,0),
+    text_color: Tuple[int, int, int] = (0, 0, 0),
     text_background: bool = True,
     text_bg_color: Optional[Tuple[int, int, int]] = None,
     text_bg_alpha: Optional[float] = None,
@@ -166,7 +166,7 @@ def draw_bounding_box(
             color,
             thickness
         )
-    
+
     # Draw the text
     if text:
         if text_box_position is TextPosition.TOP_LEFT:
@@ -179,7 +179,7 @@ def draw_bounding_box(
         image = draw_text(
             image=image,
             text=text,
-            position=(x,y),
+            position=(x, y),
             color=text_color,
             scale=text_scale,
             thickness=text_thickness,
@@ -195,12 +195,12 @@ def draw_bounding_box(
 def draw_mask(
     image: np.ndarray,
     mask: SegmentationMask,
-    color: Optional[Tuple[int, int, int]] = (0,0,255),
+    color: Optional[Tuple[int, int, int]] = (0, 0, 255),
     alpha: float = 0.5,
     color_by_label: bool = False,
     label_id: Optional[int] = None,
     colors_list: Optional[List[Tuple[int, int, int]]] = None
-    ) -> np.ndarray:
+) -> np.ndarray:
     """Draw a segmentation mask on an image.
 
     Args:
@@ -241,11 +241,12 @@ def draw_mask(
 def draw_coco_keypoints(
     image: np.ndarray,
     keypoints: Keypoints.COCOKeypoints,
-    color: Optional[Tuple[int, int, int]] = (0,0,255),
+    color: Optional[Tuple[int, int, int]] = (0, 0, 255),
     color_by_label: bool = False,
     color_mapping: Optional[Dict[str, Tuple[int, int, int]]] = None,
     keypoint_radius: Optional[int] = 5,
-    connection_rules: Optional[List[Tuple[str, str, Tuple[int, int, int]]]] = None,
+    connection_rules: Optional[List[Tuple[str,
+                                          str, Tuple[int, int, int]]]] = None,
     line_thickness: int = 3,
     show_names: bool = False,
     show_conf: bool = True,
@@ -253,7 +254,7 @@ def draw_coco_keypoints(
     show_connections: bool = True,
     text_scale: int = 2,
     text_thickness: int = 2,
-    text_color: Tuple[int, int, int] = (255,255,255),
+    text_color: Tuple[int, int, int] = (255, 255, 255),
     text_bg_color: Optional[Tuple[int, int, int]] = None,
     text_bg_alpha: Optional[float] = None
 ) -> np.ndarray:

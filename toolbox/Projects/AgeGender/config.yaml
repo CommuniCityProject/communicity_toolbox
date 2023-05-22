@@ -63,5 +63,4 @@ subscriptions:
     query: "purpose==%22AgeGender%22"
 
 visualization:
-  image_height: 1000
-  Face: {}
+  image_height: 800
