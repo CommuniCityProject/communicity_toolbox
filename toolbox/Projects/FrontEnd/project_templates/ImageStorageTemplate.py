@@ -60,14 +60,17 @@ class ImageStorageTemplate(BaseTemplate):
         # Render pages
         page = st.session_state.images_page \
             if "images_page" in st.session_state else 1
-        for image in st.session_state.image_dms[page - 1]:
-            parsed_id = image.id.replace(":", "\:")
-            with st.expander(parsed_id):
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.image(image.url, channels="BGR")
-                with col2:
-                    st.write(entity_parser.data_model_to_json(image))
+        if st.session_state.image_dms:
+            for image in st.session_state.image_dms[page - 1]:
+                parsed_id = image.id.replace(":", "\:")
+                with st.expander(parsed_id):
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.image(image.url, channels="BGR")
+                    with col2:
+                        st.write(entity_parser.data_model_to_json(image))
+        else:
+            st.caption("No images found")
 
         # Page selector
         st.number_input(

@@ -34,6 +34,7 @@ class BaseKeypoints:
         __len__
         __eq__
         __str__
+        __repr__
         __iter__
     """
 
@@ -117,6 +118,9 @@ class BaseKeypoints:
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__} ({len(self)})"
+
+    def __repr__(self) -> str:
+        return f"BaseKeypoints({repr(self.keypoints)})"
 
     def serialize(self) -> dict:
         """Serialize to a basic Python datatype.

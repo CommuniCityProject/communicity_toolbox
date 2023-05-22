@@ -28,18 +28,19 @@ class SegmentationMask:
 
     Overloaded operators:
         __str__
+        __repr__
         __eq__
         __iter__
     """
 
     def __init__(self, mask: Optional[np.ndarray] = None,
-                 rle: Optional[str] = None):
+                 rle: Optional[dict] = None):
         """Create a SegmentationMask from a binary mask or an encoded rle.
 
         Args:
             mask (Optional[np.ndarray], optional): Binary mask of shape (H, W).
                 Defaults to None.
-            rle (Optional[str], optional): Encoded rle mask. Defaults to None.
+            rle (Optional[dict], optional): Encoded rle mask. Defaults to None.
         """
         self.mask = Mask.decode(rle) if rle is not None else mask
         self.mask = self.mask.astype(bool)
@@ -88,6 +89,9 @@ class SegmentationMask:
 
     def __str__(self) -> str:
         return f"SegmentationMask ({self.width} X {self.height})"
+
+    def __repr__(self) -> str:
+        return f"SegmentationMask(rle={self.rle})"
 
     def serialize(self) -> dict:
         """Serialize to a basic Python datatype.
