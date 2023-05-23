@@ -54,6 +54,7 @@ class ContextCli:
 
     Properties (read-only):
         subscription_ids (List[str]): List of ids of the created subscriptions.
+        broker_url (str): The url of the context broker.
     """
 
     def __init__(
@@ -530,7 +531,7 @@ class ContextCli:
                 break
             yield entities
             offset += limit
-    
+
     def get_all_entities(
         self,
         entity_type: Optional[str] = None,
@@ -630,7 +631,7 @@ class ContextCli:
             requests.exceptions.HTTPError: If there was an error updating the
                 entity.
             ValueError: If the entity does not exist and create is False.
-        
+
         Returns:
             dict: The updated entity.
         """
@@ -647,7 +648,7 @@ class ContextCli:
             )
             if not response.ok:
                 logger.error(f"Error updating entity in {response.url}: "
-                            f"{response.status_code} {response.text}")
+                             f"{response.status_code} {response.text}")
                 response.raise_for_status()
         else:
             if not create:
@@ -662,7 +663,7 @@ class ContextCli:
         Args:
             data_model (Type[DataModels.BaseModel]): The data model object to
                 upload to the context broker.
-        
+
         Raises:
             requests.exceptions.HTTPError: If there was an error posting the
                 data model.
@@ -675,7 +676,7 @@ class ContextCli:
         entity = data_model_to_json(data_model)
         self.post_entity_json(entity)
         return entity
-    
+
     def update_data_model(
         self,
         data_model: Type[DataModels.BaseModel],
@@ -719,8 +720,8 @@ class ContextCli:
         if response.status_code in (404, 400):
             return False
         logger.error(f"Error deleting entity {entity_id} from "
-                        f"{response.url}: {response.status_code} "
-                        f"{response.text}")
+                     f"{response.url}: {response.status_code} "
+                     f"{response.text}")
         response.raise_for_status()
 
     def get_types(self) -> List[str]:
@@ -734,5 +735,5 @@ class ContextCli:
         if response.ok:
             return response.json()["typeList"]
         logger.error(f"Error getting entity types from {response.url}: "
-                        f"{response.status_code} {response.text}")
+                     f"{response.status_code} {response.text}")
         response.raise_for_status()

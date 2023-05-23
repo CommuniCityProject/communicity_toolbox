@@ -1,7 +1,7 @@
 import argparse
+import logging
 from pathlib import Path
 from typing import List, Tuple, Type
-import logging
 
 import streamlit as st
 from project_templates import BaseTemplate, project_templates
