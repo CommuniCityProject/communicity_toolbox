@@ -180,16 +180,13 @@ class SimplePredict(BaseTemplate):
         """Set the UI elements.
         """
         # Title and error messages
-        st.title(self.name)
-        # st.markdown(
-        #     """
-        #     <details>
-        #     <summary>Description</summary>
-        #     <p>This Project aims to detect faces in images and estimate their age and gender. The input of the API is the ID of an [Image]() or a [Face]() entity present in the context broker. If an Image is provided, the model will detect all the faces on the image and will predict its age and gender. If a Face entity is provided, the coordinates of the face present in the entity will be used to locate the face and run the model and the output will be added to the original Face entity. The docs of the API can be found here: []()</p>
-        #     </details>
-        #     """,
-        #     unsafe_allow_html=True
-        # )
+        # st.title(self.name)
+
+        self.description = ""
+
+        title_info = st.empty()
+        utils.write_title_info_toggle(self.name, self.description, title_info)
+
         self._st_error = st.empty()
 
         # Input and output columns
