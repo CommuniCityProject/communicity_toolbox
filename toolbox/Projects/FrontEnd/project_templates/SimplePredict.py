@@ -11,7 +11,7 @@ from . import BaseTemplate
 
 class SimplePredict(BaseTemplate):
     """Streamlit template for Toolbox Projects which API implements a predict
-    method. It allows predicting an image by their ID or by uploading it and
+    method. It allows predicting images by their ID or by uploading them and
     shows the output JSON and image.
     """
 
@@ -22,13 +22,14 @@ class SimplePredict(BaseTemplate):
 
         # Streamlit elements
         self._st_input_image = None
-        self._st_input_image_id = None
         self._st_preview_image_id = None
         self._st_output_image = None
         self._st_output_json = None
         self._st_output_text = None
         self._st_button_predict = None
         self._st_error = None
+
+        self._upload_mimes = ["png", "jpg", "jpeg", "bmp", "tiff"]
 
     def _call_api_predict(
         self,
@@ -73,7 +74,7 @@ class SimplePredict(BaseTemplate):
         """
         try:
             entities = self._call_api_predict(
-                st.session_state.input_image.id,
+                st.session_state.input_entity_id,
                 accept=st.session_state.accept_header
             )
             st.session_state.output_json = entities
@@ -112,7 +113,7 @@ class SimplePredict(BaseTemplate):
             return image
         except:
             st.session_state.error_message = "Error: Image " + \
-                image_id.replace(":", "\:") + \
+                utils.format_id(image_id) + \
                 f" not found on {self.image_storage_cli.url}"
             return None
 
@@ -172,22 +173,39 @@ class SimplePredict(BaseTemplate):
             st.session_state.output_image = None
         if "uploaded_file_id" not in st.session_state:
             st.session_state.uploaded_file_id = None
+        if "input_entity_id" not in st.session_state:
+            st.session_state.input_entity_id = None
 
     def _ui(self):
         """Set the UI elements.
         """
+        # Title and error messages
         st.title(self.name)
+        # st.markdown(
+        #     """
+        #     <details>
+        #     <summary>Description</summary>
+        #     <p>This Project aims to detect faces in images and estimate their age and gender. The input of the API is the ID of an [Image]() or a [Face]() entity present in the context broker. If an Image is provided, the model will detect all the faces on the image and will predict its age and gender. If a Face entity is provided, the coordinates of the face present in the entity will be used to locate the face and run the model and the output will be added to the original Face entity. The docs of the API can be found here: []()</p>
+        #     </details>
+        #     """,
+        #     unsafe_allow_html=True
+        # )
         self._st_error = st.empty()
+
+        # Input and output columns
         col_input, col_output = st.columns(2, gap="large")
 
+        # Input column
         with col_input:
             st.subheader("Input")
             st.text_input(
-                "Image ID",
-                key="input_image_id",
-                disabled=("uploaded_file" in st.session_state and
-                          st.session_state.uploaded_file is not None
-                          )
+                "Input ID",
+                placeholder="e.g. urn:ngsi-ld:Image:IMG1",
+                key="input_id",
+                disabled=(
+                    "uploaded_file" in st.session_state and
+                    st.session_state.uploaded_file is not None
+                )
             )
             st.write(
                 "<p style='color: gray; text-align: center;'>- or -</p>",
@@ -195,7 +213,7 @@ class SimplePredict(BaseTemplate):
             )
             st.file_uploader(
                 "Upload an image",
-                type=["png", "jpg", "jpeg", "bmp", "tiff"],
+                type=self._upload_mimes,
                 key="uploaded_file",
             )
             with st.expander("Advanced"):
@@ -221,22 +239,60 @@ class SimplePredict(BaseTemplate):
             self._st_output_text = st.empty()
             self._st_output_json = st.empty()
 
+    def _get_image_from_entity(self, entity_id: str) -> Union[str, None]:
+        """Get the image ID from an entity. If the entity is an Image, return
+        its ID. If the entity is not an Image, return the ID of the image field
+        of the entity.
+
+        Args:
+            entity_id (str): An entity ID.
+
+        Returns:
+            Union[str, None]: The image ID or None if not found.
+        """
+        try:
+            entity = self.context_cli.get_entity(entity_id, as_dict=True)
+            if entity is None:
+                raise ValueError(
+                    f"Entity '{utils.format_id(entity_id)}' not found"
+                )
+            if entity["type"] == "Image":
+                return entity_id
+            if "image" in entity:
+                if "object" in entity["image"]:
+                    return entity["image"]["object"]
+                if "value" in entity["image"]:
+                    return entity["image"]["value"]
+            raise AttributeError(
+                f"Entity '{utils.format_id(entity_id)}' has no image field"
+            )
+        except Exception as e:
+            self.logger.exception(e, exc_info=True)
+            st.session_state.error_message = f"Error: {e}"
+        return None
+
     def _update(self):
         """Handle the UI logic.
         """
-        # Get the input image ID from the text input or the uploaded file
+        # Get the input entity ID from the text input or the uploaded file
         input_image_id = ""
         if st.session_state.uploaded_file is None:
             # Get the image from the id text input
-            input_image_id = st.session_state.input_image_id
+            if st.session_state.input_id:
+                st.session_state.input_entity_id = st.session_state.input_id
+                input_image_id = self._get_image_from_entity(
+                    st.session_state.input_entity_id
+                )
         else:
             # Get the image from the uploaded file
             input_image_id = self._upload_input_image()
+            st.session_state.input_entity_id = input_image_id
 
         # Download the input image from the image storage
         if input_image_id:
             st.session_state.input_image = self._get_image_from_id(
-                input_image_id)
+                input_image_id
+            )
 
         # Clear image if there is no input
         if st.session_state.input_image is None:
@@ -250,7 +306,7 @@ class SimplePredict(BaseTemplate):
                 channels="BGR"
             )
             self._st_preview_image_id.caption(
-                st.session_state.input_image.id.replace(":", "\:")
+                utils.format_id(st.session_state.input_image.id)
             )
         else:
             self._st_input_image.empty()

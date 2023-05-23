@@ -59,3 +59,14 @@ def get_entities_broker_link(
         context_broker_url,
         f"/ngsi-ld/v1/entities/?id={entity_ids}"
     )
+
+def format_id(ngsi_id: str) -> str:
+    """Format an NGSI-LD entity ID for streamlit.
+
+    Args:
+        ngsi_id (str): An NGSI-LD entity ID.
+
+    Returns:
+        str: The formatted entity ID.
+    """
+    return ngsi_id.replace(":", "\:")
