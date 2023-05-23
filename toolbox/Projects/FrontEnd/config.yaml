@@ -4,6 +4,9 @@ common-host: &common-host
 pagination_limit: &pagination_limit
   30
 
+context_broker_links: &context_broker_links
+  True
+
 context_broker:
   host: *common-host
   port: 1026
@@ -22,6 +25,7 @@ projects:
   - name: Image Storage
     template: ImageStorageTemplate
     pagination_limit: *pagination_limit
+    context_broker_links: *context_broker_links
     <<: *image_storage
   - name: Face Detection
     port: 9007

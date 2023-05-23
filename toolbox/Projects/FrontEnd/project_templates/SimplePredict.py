@@ -2,8 +2,8 @@ from typing import List, Optional, Union
 
 import requests
 import streamlit as st
-import json
 
+from toolbox.Projects.FrontEnd.utils import utils
 from toolbox.Structures import Image
 
 from . import BaseTemplate
@@ -26,6 +26,7 @@ class SimplePredict(BaseTemplate):
         self._st_preview_image_id = None
         self._st_output_image = None
         self._st_output_json = None
+        self._st_output_text = None
         self._st_button_predict = None
         self._st_error = None
 
@@ -63,18 +64,6 @@ class SimplePredict(BaseTemplate):
             response.raise_for_status()
         return response.json()
 
-    def _parse_vis_params(self) -> dict:
-        """Parse the visualization parameters from the session state.
-
-        Returns:
-            dict: The visualization parameters.
-        """
-        try:
-            return json.loads(st.session_state.visualization_parameters)
-        except Exception as e:
-            self.logger.exception(e, exc_info=True)
-            return {}
-
     def _on_predict(self):
         """Call the API to predict the given image and visualize the results.
         Store the results on the session state.
@@ -97,8 +86,10 @@ class SimplePredict(BaseTemplate):
             return
 
         try:
-            vis_params = self._parse_vis_params()
-            image = self._download_visualize_entities(entities, vis_params)
+            image = self._download_visualize_entities(
+                entities,
+                st.session_state.visualization_parameters
+            )
             st.session_state.output_image = image
         except Exception as e:
             self.logger.exception(e, exc_info=True)
@@ -213,11 +204,11 @@ class SimplePredict(BaseTemplate):
                     options=["application/json", "application/ld+json"],
                     key="accept_header",
                 )
-                st.text_area(
-                    "Visualization parameters (JSON)",
-                    key="visualization_parameters",
-                    value="{\n\n}"
-                )
+                st.markdown("Visualization parameters")
+                st_vis_params = st.empty()
+            st.session_state.visualization_parameters = \
+                utils.add_visualization_params(st_vis_params)
+
             self._st_button_predict = st.empty()
             st.divider()
             self._st_input_image = st.empty()
@@ -227,6 +218,7 @@ class SimplePredict(BaseTemplate):
             st.subheader("Output")
             self._st_output_image = st.empty()
             st.divider()
+            self._st_output_text = st.empty()
             self._st_output_json = st.empty()
 
     def _update(self):
@@ -258,7 +250,7 @@ class SimplePredict(BaseTemplate):
                 channels="BGR"
             )
             self._st_preview_image_id.caption(
-                "ID: " + st.session_state.input_image.id.replace(":", "\:")
+                st.session_state.input_image.id.replace(":", "\:")
             )
         else:
             self._st_input_image.empty()
@@ -286,7 +278,22 @@ class SimplePredict(BaseTemplate):
         if st.session_state.output_json is not None:
             if len(st.session_state.output_json) == 0:
                 self._st_output_image.warning("No entities found")
-            self._st_output_json.json(st.session_state.output_json)
+            else:
+                if self.context_broker_links:
+                    ids = [e["id"] for e in st.session_state.output_json]
+                    broker_url = utils.get_entities_broker_link(
+                        self.context_cli.broker_url,
+                        ids
+                    )
+                    link = f"[See the entities on the context broker]" \
+                           f"({broker_url}) <br/><br/>"
+                else:
+                    link = ""
+                self._st_output_text.markdown(
+                    link + "API response:",
+                    unsafe_allow_html=True
+                )
+                self._st_output_json.write(st.session_state.output_json)
         else:
             self._st_output_json.empty()
 

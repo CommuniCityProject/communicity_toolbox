@@ -1,9 +1,8 @@
 import streamlit as st
 
-from toolbox.Context import entity_parser
+from toolbox.Projects.FrontEnd.utils import utils
 
 from . import BaseTemplate
-from toolbox.Projects.FrontEnd.utils import utils
 
 
 class ImageStorageTemplate(BaseTemplate):
@@ -13,10 +12,6 @@ class ImageStorageTemplate(BaseTemplate):
         """
         super().__init__(**kwargs)
         self.pagination_limit = kwargs.get("pagination_limit", 100)
-
-        
-
-        # Streamlit elements
 
     def _init_session_state(self):
         """Initialize the session state variables.
@@ -65,7 +60,19 @@ class ImageStorageTemplate(BaseTemplate):
                     with col1:
                         st.image(image.url, channels="BGR")
                     with col2:
-                        st.write(entity_parser.data_model_to_json(image))
+                        if self.context_broker_links:
+                            url = utils.get_entities_broker_link(
+                                self.context_cli.broker_url,
+                                image.id
+                            )
+                            st.markdown(
+                                f"[See it in the Context Broker]({url})",
+                                unsafe_allow_html=True
+                            )
+                        st.write(self.context_cli.get_entity(
+                            image.id,
+                            as_dict=True
+                        ))
         else:
             st.caption("No images found")
 
@@ -170,6 +177,19 @@ class ImageStorageTemplate(BaseTemplate):
             try:
                 image = self.image_storage_cli.download(image_id)
                 st.image(image.image, channels="BGR")
+                if self.context_broker_links:
+                    url = utils.get_entities_broker_link(
+                        self.context_cli.broker_url,
+                        image.id
+                    )
+                    st.markdown(
+                        f"[See it in the Context Broker]({url})",
+                        unsafe_allow_html=True
+                    )
+                st.write(self.context_cli.get_entity(
+                    image.id,
+                    as_dict=True
+                ))
             except Exception as e:
                 self.logger.exception(e, exc_info=True)
                 st.error(f"Error downloading image: {e}")
@@ -178,7 +198,8 @@ class ImageStorageTemplate(BaseTemplate):
         """Define the visualization tab elements.
         """
         # Entity IDs input
-        st.caption("Double click on an empty row to add the IDs of the entities to visualize")
+        st.caption(
+            "Double click on an empty row to add the IDs of the entities to visualize")
         entity_ids = st.experimental_data_editor(
             {"Entity IDs": [""]},
             num_rows="dynamic",
@@ -190,7 +211,7 @@ class ImageStorageTemplate(BaseTemplate):
         with st.expander("Visualization Parameters"):
             st_vis_params = st.empty()
         vis_params = utils.add_visualization_params(st_vis_params)
-        
+
         # Visualize button
         st.button(
             "Visualize",
