@@ -33,8 +33,7 @@ def float_or_none(value: any):
 def str_separator(length: int = 80, title: str = "",
     char: str = "-", new_line: bool = True) -> str:
     """Create a separator string with an optional title.
-    e.g:
-        --------title--------
+    e.g: --------title--------
 
     Args:
         length (int, optional): Total character-length of the string.
