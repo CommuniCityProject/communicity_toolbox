@@ -46,6 +46,7 @@ projects:
     port: 9003
     host: *common-host
     url_path: /
+    description_path: res/descriptions/age_gender.txt
     template: SimplePredict
   - name: Instance Segmentation
     port: 9005

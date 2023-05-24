@@ -5,6 +5,8 @@ import streamlit as st
 
 from toolbox.Projects.FrontEnd.utils import utils
 from toolbox.Structures import Image
+from toolbox.utils.utils import urljoin
+
 
 from . import BaseTemplate
 
@@ -30,6 +32,8 @@ class SimplePredict(BaseTemplate):
         self._st_error = None
 
         self._upload_mimes = ["png", "jpg", "jpeg", "bmp", "tiff"]
+
+        self.docs_url = urljoin(self.url, "docs")
 
     def _call_api_predict(
         self,
@@ -179,14 +183,21 @@ class SimplePredict(BaseTemplate):
     def _ui(self):
         """Set the UI elements.
         """
-        # Title and error messages
-        # st.title(self.name)
-
-        self.description = ""
-
+        # Title
         title_info = st.empty()
-        utils.write_title_info_toggle(self.name, self.description, title_info)
+        if self.description:
+            description = self.description + \
+                f" The docs of the API can be found here: " +\
+                f'<a href="{self.docs_url}">{self.docs_url}</a>'
+            utils.write_title_info_toggle(
+                self.name,
+                description,
+                title_info
+            )
+        else:
+            title_info.title(self.name)
 
+        # Error message
         self._st_error = st.empty()
 
         # Input and output columns

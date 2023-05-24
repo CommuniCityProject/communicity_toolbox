@@ -15,7 +15,7 @@ class BaseTemplate:
     def __init__(self, name: str, host: str, port: int, url_path: str = "",
                  context_cli: Optional[ContextCli] = None,
                  image_storage_cli: Optional[ImageStorageCli] = None,
-                 context_broker_links: bool = True,
+                 context_broker_links: bool = True, description_path: str = "",
                  **kwargs):
         """Initialize a project template.
 
@@ -30,6 +30,8 @@ class BaseTemplate:
                 storage client object. Defaults to None.
             context_broker_links (bool, optional): If True, show links to the
                 Context Broker entities. Defaults to True.
+            description_path (str, optional): Path to a txt file with the
+                project description. Defaults to "".
         """
         self.logger = get_logger("toolbox.FrontEnd." + name.replace(" ", "_"))
         self.name = name
@@ -40,6 +42,12 @@ class BaseTemplate:
         self.context_cli = context_cli
         self.image_storage_cli = image_storage_cli
         self.context_broker_links = context_broker_links
+        
+        if description_path:
+            with open(description_path, "r") as f:
+                self.description = f.read()
+        else:
+            self.description = None
 
     def get_api_path(self, path: str) -> str:
         if not path:
