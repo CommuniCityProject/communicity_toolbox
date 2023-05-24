@@ -9,7 +9,6 @@ import aiofiles
 import cv2
 import fastapi
 import uvicorn
-from ContentSizeLimitMiddleware import ContentSizeLimitMiddleware
 from fastapi import (BackgroundTasks, Body, FastAPI, File, HTTPException,
                      UploadFile, status)
 from fastapi.responses import FileResponse
@@ -19,6 +18,8 @@ from Storage import Storage
 
 from toolbox import DataModels, Structures
 from toolbox.Context import ContextCli
+from toolbox.Projects.ImageStorage.ContentSizeLimitMiddleware import \
+    ContentSizeLimitMiddleware
 from toolbox.utils.config_utils import parse_config
 from toolbox.utils.utils import float_or_none, get_logger, hash_str, urljoin
 from toolbox.Visualization import DataModelVisualizer
