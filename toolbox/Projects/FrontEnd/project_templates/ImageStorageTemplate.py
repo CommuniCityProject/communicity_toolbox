@@ -47,43 +47,72 @@ class ImageStorageTemplate(BaseTemplate):
             self._get_image_dms()
 
         # Refresh image entities button
-        st.button("Refresh", on_click=self._get_image_dms)
+        col_refresh, col_search = st.columns(2, gap="small")
+        with col_refresh:
+            st.button("Refresh", on_click=self._get_image_dms)
+        with col_search:
+            id_search = st.text_input(
+                "Search",
+                placeholder="Search",
+                label_visibility="collapsed"
+            )
 
         # Render pages
-        page = st.session_state.images_page \
-            if "images_page" in st.session_state else 1
-        if st.session_state.image_dms:
-            for image in st.session_state.image_dms[page - 1]:
-                parsed_id = image.id.replace(":", "\:")
-                with st.expander(parsed_id):
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.image(image.url, channels="BGR")
-                    with col2:
-                        if self.context_broker_links:
-                            url = utils.get_entities_broker_link(
-                                self.context_cli.broker_url,
-                                image.id
-                            )
-                            st.markdown(
-                                f"[See it in the Context Broker]({url})",
-                                unsafe_allow_html=True
-                            )
-                        st.write(self.context_cli.get_entity(
-                            image.id,
-                            as_dict=True
-                        ))
+        if id_search:
+            # Show a single image
+            try:
+                image = self.image_storage_cli.download(id_search)
+                st.image(image.image, channels="BGR")
+                if self.context_broker_links:
+                    url = utils.get_entities_broker_link(
+                        self.context_cli.broker_url,
+                        image.id
+                    )
+                    st.markdown(
+                        f"[See it in the Context Broker]({url})",
+                        unsafe_allow_html=True
+                    )
+                st.write(self.context_cli.get_entity(
+                    image.id,
+                    as_dict=True
+                ))
+            except ValueError:
+                st.warning("Image not found")
         else:
-            st.caption("No images found")
-
-        # Page selector
-        st.number_input(
-            "Page",
-            min_value=1,
-            max_value=max(len(st.session_state.image_dms), 1),
-            value=1,
-            key="images_page",
-        )
+            # Show all images
+            page = st.session_state.images_page \
+                if "images_page" in st.session_state else 1
+            if st.session_state.image_dms:
+                for image in st.session_state.image_dms[page - 1]:
+                    parsed_id = image.id.replace(":", "\:")
+                    with st.expander(parsed_id):
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.image(image.url, channels="BGR")
+                        with col2:
+                            if self.context_broker_links:
+                                url = utils.get_entities_broker_link(
+                                    self.context_cli.broker_url,
+                                    image.id
+                                )
+                                st.markdown(
+                                    f"[See it in the Context Broker]({url})",
+                                    unsafe_allow_html=True
+                                )
+                            st.write(self.context_cli.get_entity(
+                                image.id,
+                                as_dict=True
+                            ))
+                # Page selector
+                st.number_input(
+                    "Page",
+                    min_value=1,
+                    max_value=max(len(st.session_state.image_dms), 1),
+                    value=1,
+                    key="images_page",
+                )
+            else:
+                st.caption("No images found")
 
     def _upload_image(self):
         """Uploads an image to the image storage.
@@ -165,35 +194,6 @@ class ImageStorageTemplate(BaseTemplate):
             else:
                 st.error(st.session_state.upload_msg)
 
-    def _ui_tab_download(self):
-        """Define the download tab elements.
-        """
-        image_id = st.text_input(
-            "Image ID",
-            placeholder="e.g. urn:ngsi-ld:Image:IMG1"
-        )
-
-        if image_id:
-            try:
-                image = self.image_storage_cli.download(image_id)
-                st.image(image.image, channels="BGR")
-                if self.context_broker_links:
-                    url = utils.get_entities_broker_link(
-                        self.context_cli.broker_url,
-                        image.id
-                    )
-                    st.markdown(
-                        f"[See it in the Context Broker]({url})",
-                        unsafe_allow_html=True
-                    )
-                st.write(self.context_cli.get_entity(
-                    image.id,
-                    as_dict=True
-                ))
-            except Exception as e:
-                self.logger.exception(e, exc_info=True)
-                st.error(f"Error downloading image: {e}")
-
     def _ui_tab_visualization(self):
         """Define the visualization tab elements.
         """
@@ -234,10 +234,9 @@ class ImageStorageTemplate(BaseTemplate):
         st.title(self.name)
         self._st_error = st.empty()
 
-        tab_images, tab_upload, tab_download, tab_visualization = st.tabs([
+        tab_images, tab_upload, tab_visualization = st.tabs([
             "All Images",
             "Image Upload",
-            "Image Retrieval",
             "Entity Visualization"
         ])
 
@@ -246,9 +245,6 @@ class ImageStorageTemplate(BaseTemplate):
 
         with tab_upload:
             self._ui_tab_upload()
-
-        with tab_download:
-            self._ui_tab_download()
 
         with tab_visualization:
             self._ui_tab_visualization()

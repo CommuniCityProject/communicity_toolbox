@@ -22,6 +22,7 @@ projects:
     host: *common-host
     url_path: /
     template: ContextBrokerTemplate
+    refresh_rate: 10 # seconds
   - name: Image Storage
     template: ImageStorageTemplate
     pagination_limit: *pagination_limit

@@ -61,6 +61,16 @@ def get_entities_broker_link(
     )
 
 
+def get_subscription_broker_link(
+    context_broker_url: str,
+    subscription_id: str
+) -> str:
+    return urljoin(
+        context_broker_url,
+        f"/ngsi-ld/v1/subscriptions/{subscription_id}"
+    )
+
+
 def format_id(ngsi_id: str) -> str:
     """Format an NGSI-LD entity ID for streamlit.
 

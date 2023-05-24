@@ -1,7 +1,9 @@
-import streamlit as st
 import time
 from datetime import timedelta
 
+import pandas
+import streamlit as st
+from streamlit_autorefresh import st_autorefresh
 from timeloop import Timeloop
 
 from toolbox.Projects.FrontEnd.utils import utils
@@ -16,7 +18,8 @@ class ContextBrokerTemplate(BaseTemplate):
         """
         super().__init__(**kwargs)
         self.pagination_limit = kwargs.get("pagination_limit", 100)
-        self.server_refresh_rate = kwargs.get("server_refresh_rate", 10) # seconds
+        self.refresh_rate = kwargs.get("refresh_rate", 10)  # seconds
+        assert self.refresh_rate >= 1, "Refresh rate must be >= 1s"
 
         # Context broker metrics (shared among all users)
         self._metrics = {
@@ -32,9 +35,10 @@ class ContextBrokerTemplate(BaseTemplate):
         }
 
         # Server metrics loop
+        self._update_metrics()
         self._time_loop = Timeloop()
         self._time_loop.job(
-            interval=timedelta(seconds=self.server_refresh_rate)
+            interval=timedelta(seconds=self.refresh_rate)
         )(self._update_metrics)
         self._time_loop.start()
 
@@ -43,13 +47,20 @@ class ContextBrokerTemplate(BaseTemplate):
         """
         if "error_message" not in st.session_state:
             st.session_state.error_message = None
-    
+        if "subscriptions" not in st.session_state:
+            st.session_state.subscriptions = None
+
     def _update_metrics(self):
+        """Update the context broker metrics.
+        """
         # Get types
         types = self.context_cli.get_types()
         # Get count per type
         for t in types:
-            entities = self.context_cli.get_all_entities(entity_type=t)
+            entities = self.context_cli.get_all_entities(
+                entity_type=t,
+                as_dict=True
+            )
             if t not in self._metrics["entity_type_count"]:
                 self._metrics["entity_type_count"][t] = 0
             self._metrics["entity_type_count"][t] = len(entities)
@@ -61,7 +72,7 @@ class ContextBrokerTemplate(BaseTemplate):
         subscriptions_count = len(
             self.context_cli.get_all_subscriptions()
         )
-        
+
         # Set deltas
         self._metrics_deltas["entities_count"] = (
             entities_count - self._metrics["entities_count"]
@@ -79,7 +90,15 @@ class ContextBrokerTemplate(BaseTemplate):
         self._metrics["entities_count"] = entities_count
 
     def _ui_tab_metrics(self):
-        cols = st.columns(4)
+        """Show context broker real time metrics.
+        """
+        # Run the client auto refresh loop
+        st_autorefresh(
+            interval=self.refresh_rate * 1000,
+            key="metrics_update"
+        )
+
+        cols = st.columns(3, gap="small")
         with cols[0]:
             st.metric(
                 "Subscriptions",
@@ -98,9 +117,90 @@ class ContextBrokerTemplate(BaseTemplate):
                 len(self._metrics["entity_types"]),
                 self._metrics_deltas["entity_types"]
             )
-        with cols[3]:
-            st.table(self._metrics["entity_type_count"])
+        st.divider()
+        st.subheader("Entity types")
+        pd = pandas.DataFrame(
+            self._metrics["entity_type_count"].values(),
+            index=self._metrics["entity_type_count"].keys(),
+            columns=["Count"],
 
+        )
+        st.experimental_data_editor(
+            pd,
+            use_container_width=True,
+            disabled=True
+        )
+
+    def _get_subscriptions(self):
+        st.session_state.subscriptions = list(
+            self.context_cli.iterate_subscriptions(
+                limit=self.pagination_limit
+            )
+        )
+
+    def _ui_tab_subscriptions(self):
+        # Get the subscriptions
+        if st.session_state.subscriptions is None:
+            self._get_subscriptions()
+
+        # Refresh subscriptions button
+        col_refresh, col_search = st.columns(2, gap="small")
+        with col_refresh:
+            st.button("Refresh", on_click=self._get_subscriptions)
+        with col_search:
+            id_search = st.text_input(
+                "Search",
+                placeholder="Search",
+                label_visibility="collapsed"
+            )
+
+        # Render pages
+        if id_search:
+            # Show a single image
+            try:
+                subscription = self.context_cli.get_subscription(id_search)
+                if subscription is not None:
+                    if self.context_broker_links:
+                        url = utils.get_subscription_broker_link(
+                            self.context_cli.broker_url,
+                            subscription.subscription_id
+                        )
+                        st.markdown(
+                            f"[See it in the Context Broker]({url})",
+                            unsafe_allow_html=True
+                        )
+                    st.write(subscription.json)
+                else:
+                    st.warning("Subscription not found")
+            except Exception as e:
+                st.session_state.error_message = str(e)
+        else:
+            # Show all subscriptions
+            page = st.session_state.subscription_page \
+                if "subscription_page" in st.session_state else 1
+            if st.session_state.subscriptions:
+                for sub in st.session_state.subscriptions[page - 1]:
+                    parsed_id = utils.format_id(sub.subscription_id)
+                    with st.expander(parsed_id):
+                        if self.context_broker_links:
+                            url = utils.get_subscription_broker_link(
+                                self.context_cli.broker_url,
+                                sub.subscription_id
+                            )
+                            st.markdown(
+                                f"[See it in the Context Broker]({url})"
+                            )
+                        st.write(sub.json)
+                # Page selector
+                st.number_input(
+                    "Page",
+                    min_value=1,
+                    max_value=max(len(st.session_state.subscriptions), 1),
+                    value=1,
+                    key="subscription_page",
+                )
+            else:
+                st.caption("No subscriptions found")
 
     def _ui(self):
         """Set the UI elements.
@@ -122,15 +222,15 @@ class ContextBrokerTemplate(BaseTemplate):
         # Error message
         self._st_error = st.empty()
 
-        tab_metrics, a = st.tabs([
+        tab_metrics, tab_subscriptions = st.tabs([
             "Real Time Metrics",
-            "a"
+            "Subscriptions",
         ])
 
         with tab_metrics:
             self._ui_tab_metrics()
-        with a:
-            st.text("a")
+        with tab_subscriptions:
+            self._ui_tab_subscriptions()
 
         # with tab_upload:
         #     self._ui_tab_upload()
