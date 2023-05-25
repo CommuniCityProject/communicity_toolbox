@@ -167,18 +167,12 @@ class SimplePredict(BaseTemplate):
     def _init_session_state(self):
         """Initialize the session state variables.
         """
-        if "input_image" not in st.session_state:
-            st.session_state.input_image = None
-        if "error_message" not in st.session_state:
-            st.session_state.error_message = None
-        if "output_json" not in st.session_state:
-            st.session_state.output_json = None
-        if "output_image" not in st.session_state:
-            st.session_state.output_image = None
-        if "uploaded_file_id" not in st.session_state:
-            st.session_state.uploaded_file_id = None
-        if "input_entity_id" not in st.session_state:
-            st.session_state.input_entity_id = None
+        st.session_state.setdefault("error_message", None)
+        st.session_state.setdefault("input_image", None)
+        st.session_state.setdefault("output_json", None)
+        st.session_state.setdefault("output_image", None)
+        st.session_state.setdefault("uploaded_file_id", None)
+        st.session_state.setdefault("input_entity_id", None)
 
     def _ui(self):
         """Set the UI elements.

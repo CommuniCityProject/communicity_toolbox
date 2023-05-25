@@ -1,3 +1,4 @@
+# ======= Anchors ==============================================================
 common-host: &common-host
   127.0.0.1
 
@@ -6,6 +7,11 @@ pagination_limit: &pagination_limit
 
 context_broker_links: &context_broker_links
   True
+# ==============================================================================
+
+use_cookies: True
+show_agreement: True
+agreement_text: res/texts/agreement.txt
 
 context_broker:
   host: *common-host
@@ -47,7 +53,7 @@ projects:
     port: 9003
     host: *common-host
     url_path: /
-    description_path: res/descriptions/age_gender.txt
+    description_path: res/texts/age_gender.txt
     template: SimplePredict
   - name: Instance Segmentation
     port: 9005

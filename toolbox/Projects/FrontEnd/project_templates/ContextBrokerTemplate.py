@@ -45,10 +45,8 @@ class ContextBrokerTemplate(BaseTemplate):
     def _init_session_state(self):
         """Initialize the session state variables.
         """
-        if "error_message" not in st.session_state:
-            st.session_state.error_message = None
-        if "subscriptions" not in st.session_state:
-            st.session_state.subscriptions = None
+        st.session_state.setdefault("error_message", None)
+        st.session_state.setdefault("subscriptions", None)
 
     def _update_metrics(self):
         """Update the context broker metrics.

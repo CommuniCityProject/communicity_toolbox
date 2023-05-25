@@ -16,20 +16,13 @@ class ImageStorageTemplate(BaseTemplate):
     def _init_session_state(self):
         """Initialize the session state variables.
         """
-        if "error_message" not in st.session_state:
-            st.session_state.error_message = None
-        if "image_dms" not in st.session_state:
-            st.session_state.image_dms = None
-        if "st_file_id" not in st.session_state:
-            st.session_state.st_file_id = None
-        if "upload_msg" not in st.session_state:
-            st.session_state.upload_msg = None
-        if "upload_success" not in st.session_state:
-            st.session_state.upload_success = None
-        if "visualized_image" not in st.session_state:
-            st.session_state.visualized_image = None
-        if "visualized_id" not in st.session_state:
-            st.session_state.visualized_id = None
+        st.session_state.setdefault("error_message", None)
+        st.session_state.setdefault("image_dms", None)
+        st.session_state.setdefault("st_file_id", None)
+        st.session_state.setdefault("upload_msg", None)
+        st.session_state.setdefault("upload_success", None)
+        st.session_state.setdefault("visualized_image", None)
+        st.session_state.setdefault("visualized_id", None)
 
     def _get_image_dms(self):
         st.session_state.image_dms = list(
