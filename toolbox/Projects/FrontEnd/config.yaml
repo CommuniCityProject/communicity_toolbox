@@ -28,8 +28,9 @@ projects:
     host: *common-host
     pagination_limit: *pagination_limit
     url_path: /
-    template: ContextBrokerTemplate
     refresh_rate: 10 # seconds
+    description_path: res/texts/context_broker.txt
+    template: ContextBrokerTemplate
   - name: Image Storage
     template: ImageStorageTemplate
     pagination_limit: *pagination_limit
@@ -39,6 +40,7 @@ projects:
     port: 9007
     host: *common-host
     url_path: /
+    description_path: res/texts/face_detection.txt
     template: SimplePredict
   - name: Face Recognition
     port: 9002
@@ -49,6 +51,7 @@ projects:
     port: 9004
     host: *common-host
     url_path: /
+    description_path: res/texts/face_emotions.txt
     template: SimplePredict
   - name: Age Gender
     port: 9003
@@ -60,9 +63,11 @@ projects:
     port: 9005
     host: *common-host
     url_path: /
+    description_path: res/texts/instance_segmentation.txt
     template: SimplePredict
   - name: Keypoints
     port: 9006
     host: *common-host
     url_path: /
+    description_path: res/texts/keypoints.txt
     template: SimplePredict

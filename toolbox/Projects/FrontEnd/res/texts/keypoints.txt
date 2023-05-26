@@ -1,0 +1,1 @@
+This API aims to detect persons in images and predict their pose. It generates up to 17 body key points that encode the position of different body parts like elbows, shoulders or eyes. It generates entities following the "PersonKeyPoints" data model (one for each person) that are posted to the context broker and returned as a JSON. The input of the API is the ID of an Image.

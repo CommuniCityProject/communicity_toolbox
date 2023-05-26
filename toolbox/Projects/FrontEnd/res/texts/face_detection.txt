@@ -1,0 +1,1 @@
+This API aims to detect the position of faces in images. It generates entities following the "Face" data model (one for each face) that are posted to the context broker and returned as a JSON. The input of the API is the ID of an Image.
