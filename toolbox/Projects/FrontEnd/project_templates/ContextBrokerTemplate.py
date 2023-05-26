@@ -302,7 +302,6 @@ class ContextBrokerTemplate(BaseTemplate):
             else:
                 st.caption("No entities found")
 
-
     def _ui(self):
         """Set the UI elements.
         """

@@ -41,33 +41,33 @@ projects:
     host: *common-host
     url_path: /
     description_path: res/texts/face_detection.txt
-    template: SimplePredict
+    template: SimplePredictTemplate
   - name: Face Recognition
     port: 9002
     host: *common-host
     url_path: /
-    template: SimplePredict # TODO: Change to FaceRecognition
+    template: FaceRecognitionTemplate # TODO: Change to FaceRecognition
   - name: Face Emotions
     port: 9004
     host: *common-host
     url_path: /
     description_path: res/texts/face_emotions.txt
-    template: SimplePredict
+    template: SimplePredictTemplate
   - name: Age Gender
     port: 9003
     host: *common-host
     url_path: /
     description_path: res/texts/age_gender.txt
-    template: SimplePredict
+    template: SimplePredictTemplate
   - name: Instance Segmentation
     port: 9005
     host: *common-host
     url_path: /
     description_path: res/texts/instance_segmentation.txt
-    template: SimplePredict
+    template: SimplePredictTemplate
   - name: Keypoints
     port: 9006
     host: *common-host
     url_path: /
     description_path: res/texts/keypoints.txt
-    template: SimplePredict
+    template: SimplePredictTemplate

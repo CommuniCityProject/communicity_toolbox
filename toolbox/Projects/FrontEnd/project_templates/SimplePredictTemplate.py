@@ -11,14 +11,14 @@ from toolbox.utils.utils import urljoin
 from . import BaseTemplate
 
 
-class SimplePredict(BaseTemplate):
+class SimplePredictTemplate(BaseTemplate):
     """Streamlit template for Toolbox Projects which API implements a predict
     method. It allows predicting images by their ID or by uploading them and
     shows the output JSON and image.
     """
 
     def __init__(self, **kwargs):
-        """Create the SimplePredict Project template.
+        """Create the simple predict Project template.
         """
         super().__init__(**kwargs)
 

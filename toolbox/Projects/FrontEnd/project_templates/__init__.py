@@ -1,11 +1,13 @@
 from .BaseTemplate import BaseTemplate
-from .SimplePredict import SimplePredict
+from .SimplePredictTemplate import SimplePredictTemplate
 from .ImageStorageTemplate import ImageStorageTemplate
 from .ContextBrokerTemplate import ContextBrokerTemplate
+from .FaceRecognitionTemplate import FaceRecognitionTemplate
 
 project_templates = {
     "BaseTemplate": BaseTemplate,
-    "SimplePredict": SimplePredict,
+    "SimplePredictTemplate": SimplePredictTemplate,
     "ImageStorageTemplate": ImageStorageTemplate,
     "ContextBrokerTemplate": ContextBrokerTemplate,
+    "FaceRecognitionTemplate": FaceRecognitionTemplate,
 }
