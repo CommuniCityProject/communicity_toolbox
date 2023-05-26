@@ -404,7 +404,7 @@ class ContextCli:
 
     def get_entities_page(
         self,
-        entity_type: Optional[str] = None,
+        entity_type: Optional[Union[List[str], str]] = None,
         attrs: Optional[Union[List[str], str]] = None,
         entity_id: Optional[Union[List[str], str]] = None,
         id_pattern: Optional[str] = None,
@@ -416,13 +416,12 @@ class ContextCli:
         """Get a list of entities from the context broker.
 
         Args:
-            entity_type (Optional[str], optional): An entity type. If not
-                provided, attrs must be provided. Defaults to None. 
-            attrs (Optional[Union[List[str], str]], optional): A list of
-                attributes to return. If not provided, entity_type must be
-                provided. Defaults to None.
-            entity_id (Optional[Union[List[str], str]], optional): A list of
-                entity IDs. Defaults to None.
+            entity_type (Optional[Union[List[str], str]], optional): A single
+                or a list of entity types. Defaults to None. 
+            attrs (Optional[Union[List[str], str]], optional): A single or a 
+                list of attributes to return. Defaults to None.
+            entity_id (Optional[Union[List[str], str]], optional): A single or 
+                a list of entity IDs. Defaults to None.
             id_pattern (Optional[str], optional): A pattern to match entity
                 IDs. Defaults to None.
             query (Optional[str], optional): A query to filter entities.
@@ -446,16 +445,18 @@ class ContextCli:
         """
         params = {"limit": limit, "offset": offset}
         if entity_id:
-            if not isinstance(entity_id, list):
-                entity_id = [entity_id]
-            params["id"] = ",".join(entity_id)
+            if isinstance(entity_id, (list, tuple)):
+                entity_id = ",".join(entity_id)
+            params["id"] = entity_id
         if entity_type:
+            if isinstance(entity_type, (list, tuple)):
+                entity_type = ",".join(entity_type)
             params["type"] = entity_type
         if id_pattern:
             params["idPattern"] = id_pattern
         if attrs:
-            if not isinstance(attrs, list):
-                attrs = [attrs]
+            if isinstance(attrs, (list, tuple)):
+                attrs = ",".join(attrs)
             params["attrs"] = ",".join(attrs)
         if query:
             params["q"] = query
@@ -477,10 +478,10 @@ class ContextCli:
 
     def iterate_entities(
         self,
-        entity_type: Optional[str] = None,
-        entity_id: Optional[List[str]] = None,
+        entity_type: Optional[Union[List[str], str]] = None,
+        attrs: Optional[Union[List[str], str]] = None,
+        entity_id: Optional[Union[List[str], str]] = None,
         id_pattern: Optional[str] = None,
-        attrs: Optional[List[str]] = None,
         query: Optional[str] = None,
         limit: int = 100,
         as_dict: bool = False
@@ -488,19 +489,18 @@ class ContextCli:
         """Iterate through a list of entities from the context broker.
 
         Args:
-            entity_type (Optional[str], optional): An entity type. If not
-                provided, attrs must be provided. Defaults to None. 
-            entity_id (Optional[List[str]], optional): A list of entity IDs.
-                Defaults to None.
+            entity_type (Optional[Union[List[str], str]], optional): A single
+                or a list of entity types. Defaults to None. 
+            attrs (Optional[Union[List[str], str]], optional): A single or a 
+                list of attributes to return. Defaults to None.
+            entity_id (Optional[Union[List[str], str]], optional): A single or 
+                a list of entity IDs. Defaults to None.
             id_pattern (Optional[str], optional): A pattern to match entity
                 IDs. Defaults to None.
-            attrs (Optional[List[str]], optional): A list of attributes to
-                return. If not provided, entity_type must be provided.
-                Defaults to None.
             query (Optional[str], optional): A query to filter entities.
                 Defaults to None.
-            limit (int, optional): Maximum number of entities to return in each
-                iteration. Maximum value is 1000. Defaults to 100.
+            limit (int, optional): Maximum number of entities to return.
+                Maximum value is 1000. Defaults to 100.
             as_dict (bool, optional): If True, the entities will be returned as
                 dictionaries. Otherwise, they will be converted to a toolbox
                 data model. Defaults to False.
@@ -534,25 +534,24 @@ class ContextCli:
 
     def get_all_entities(
         self,
-        entity_type: Optional[str] = None,
-        entity_id: Optional[List[str]] = None,
+        entity_type: Optional[Union[List[str], str]] = None,
+        attrs: Optional[Union[List[str], str]] = None,
+        entity_id: Optional[Union[List[str], str]] = None,
         id_pattern: Optional[str] = None,
-        attrs: Optional[List[str]] = None,
         query: Optional[str] = None,
         as_dict: bool = False
     ) -> List[Union[Type[BaseModel], dict]]:
         """Get all entities from the context broker.
 
         Args:
-            entity_type (Optional[str], optional): An entity type. If not
-                provided, attrs must be provided. Defaults to None. 
-            entity_id (Optional[List[str]], optional): A list of entity IDs.
-                Defaults to None.
+            entity_type (Optional[Union[List[str], str]], optional): A single
+                or a list of entity types. Defaults to None. 
+            attrs (Optional[Union[List[str], str]], optional): A single or a 
+                list of attributes to return. Defaults to None.
+            entity_id (Optional[Union[List[str], str]], optional): A single or 
+                a list of entity IDs. Defaults to None.
             id_pattern (Optional[str], optional): A pattern to match entity
                 IDs. Defaults to None.
-            attrs (Optional[List[str]], optional): A list of attributes to
-                return. If not provided, entity_type must be provided.
-                Defaults to None.
             query (Optional[str], optional): A query to filter entities.
                 Defaults to None.
             as_dict (bool, optional): If True, the entities will be returned as

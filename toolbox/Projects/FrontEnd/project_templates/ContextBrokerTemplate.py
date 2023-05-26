@@ -47,6 +47,8 @@ class ContextBrokerTemplate(BaseTemplate):
         """
         st.session_state.setdefault("error_message", None)
         st.session_state.setdefault("subscriptions", None)
+        st.session_state.setdefault("entity_types", None)
+        st.session_state.setdefault("entities", None)
 
     def _update_metrics(self):
         """Update the context broker metrics.
@@ -141,20 +143,25 @@ class ContextBrokerTemplate(BaseTemplate):
         if st.session_state.subscriptions is None:
             self._get_subscriptions()
 
-        # Refresh subscriptions button
+        # Refresh and search
         col_refresh, col_search = st.columns(2, gap="small")
         with col_refresh:
-            st.button("Refresh", on_click=self._get_subscriptions)
+            st.button(
+                "Refresh",
+                on_click=self._get_subscriptions,
+                key="refresh_subscriptions"
+            )
         with col_search:
             id_search = st.text_input(
                 "Search",
                 placeholder="Search",
-                label_visibility="collapsed"
+                label_visibility="collapsed",
+                key="text_input_subscriptions_search"
             )
 
         # Render pages
         if id_search:
-            # Show a single image
+            # Show a single subscription
             try:
                 subscription = self.context_cli.get_subscription(id_search)
                 if subscription is not None:
@@ -165,7 +172,6 @@ class ContextBrokerTemplate(BaseTemplate):
                         )
                         st.markdown(
                             f"[See it in the Context Broker]({url})",
-                            unsafe_allow_html=True
                         )
                     st.write(subscription.json)
                 else:
@@ -174,8 +180,8 @@ class ContextBrokerTemplate(BaseTemplate):
                 st.session_state.error_message = str(e)
         else:
             # Show all subscriptions
-            page = st.session_state.subscription_page \
-                if "subscription_page" in st.session_state else 1
+            page = st.session_state.subscriptions_page \
+                if "subscriptions_page" in st.session_state else 1
             if st.session_state.subscriptions:
                 for sub in st.session_state.subscriptions[page - 1]:
                     parsed_id = utils.format_id(sub.subscription_id)
@@ -195,10 +201,107 @@ class ContextBrokerTemplate(BaseTemplate):
                     min_value=1,
                     max_value=max(len(st.session_state.subscriptions), 1),
                     value=1,
-                    key="subscription_page",
+                    key="subscriptions_page",
                 )
             else:
                 st.caption("No subscriptions found")
+
+    def _get_entity_types(self):
+        st.session_state.entity_types = self.context_cli.get_types()
+    
+    def _get_entities(self):
+        if not st.session_state.selected_types:
+            st.session_state.entities = []
+        else:
+            st.session_state.entities = list(
+                self.context_cli.iterate_entities(
+                    entity_type=st.session_state.selected_types,
+                    limit=self.pagination_limit,
+                    as_dict=True
+                )
+            )
+
+    def _ui_tab_entities(self):
+        # Get the entity types
+        if st.session_state.entity_types is None:
+            self._get_entity_types()
+        
+        # Types selector
+        st.multiselect(
+            "Entity type",
+            options=st.session_state.entity_types,
+            default=st.session_state.entity_types,
+            key="selected_types",
+            on_change=self._get_entities
+        )
+        
+        # Get the entities from the selected types
+        if st.session_state.entities is None:
+            self._get_entities()
+
+        # Refresh and search
+        col_refresh, col_search = st.columns(2, gap="small")
+        with col_refresh:
+            st.button(
+                "Refresh",
+                on_click=self._get_entities,
+                key="refresh_entities"
+            )
+        with col_search:
+            id_search = st.text_input(
+                "Search",
+                placeholder="Search",
+                label_visibility="collapsed",
+                key="text_input_entities_search"
+            )
+
+        # Render pages
+        if id_search:
+            # Show a single entity
+            try:
+                entity = self.context_cli.get_entity(id_search, as_dict=True)
+                if entity is not None:
+                    if self.context_broker_links:
+                        url = utils.get_entities_broker_link(
+                            self.context_cli.broker_url,
+                            entity["id"]
+                        )
+                        st.markdown(
+                            f"[See it in the Context Broker]({url})",
+                        )
+                    st.write(entity)
+                else:
+                    st.warning("Entity not found")
+            except Exception as e:
+                st.session_state.error_message = str(e)
+        else:
+            # Show all entities from the selected types
+            page = st.session_state.entities_page \
+                if "entities_page" in st.session_state else 1
+            if st.session_state.entities:
+                for ent in st.session_state.entities[page - 1]:
+                    parsed_id = utils.format_id(ent["id"])
+                    with st.expander(parsed_id):
+                        if self.context_broker_links:
+                            url = utils.get_entities_broker_link(
+                                self.context_cli.broker_url,
+                                ent["id"]
+                            )
+                            st.markdown(
+                                f"[See it in the Context Broker]({url})"
+                            )
+                        st.write(ent)
+                # Page selector
+                st.number_input(
+                    "Page",
+                    min_value=1,
+                    max_value=max(len(st.session_state.entities), 1),
+                    value=1,
+                    key="entities_page",
+                )
+            else:
+                st.caption("No entities found")
+
 
     def _ui(self):
         """Set the UI elements.
@@ -220,24 +323,20 @@ class ContextBrokerTemplate(BaseTemplate):
         # Error message
         self._st_error = st.empty()
 
-        tab_metrics, tab_subscriptions = st.tabs([
+        tab_metrics, tab_subscriptions, tab_entities = st.tabs([
             "Real Time Metrics",
             "Subscriptions",
+            "Entities",
         ])
 
         with tab_metrics:
             self._ui_tab_metrics()
+
         with tab_subscriptions:
             self._ui_tab_subscriptions()
 
-        # with tab_upload:
-        #     self._ui_tab_upload()
-
-        # with tab_download:
-        #     self._ui_tab_download()
-
-        # with tab_visualization:
-        #     self._ui_tab_visualization()
+        with tab_entities:
+            self._ui_tab_entities()
 
     def _update(self):
         """Handle the UI logic.
