@@ -1,8 +1,8 @@
 version: "3.9"
 
 x-common-env: &common-env
-  HOST: 192.168.0.100
-  BROKER_HOST: 192.168.0.100
+  HOST: 158.109.9.60
+  BROKER_HOST: 158.109.9.60
   BROKER_PORT: 1026
   TOOLBOX_DATA: /etc/communicity_toolbox
 
@@ -108,6 +108,25 @@ services:
     command: python ./toolbox/Projects/FaceDetection/api.py --config /etc/communicity_toolbox/configs/FaceDetection.yaml
     volumes:
       - image_storage:/var/communicity_toolbox/image_storage
+      - ./data:/etc/communicity_toolbox/:ro
+
+  front_end:
+    build: .
+    restart: always
+    environment:
+      <<: *common-env
+      PORT: 9000
+      IMAGE_STORAGE_PORT: 9001
+      FACE_DETECTION_PORT: 9007
+      FACE_RECOGNITION_PORT: 9002
+      FACE_EMOTIONS_PORT: 9004
+      AGE_GENDER_PORT: 9003
+      INSTANCE_SEGMENTATION_PORT: 9005
+      KEYPOINTS_PORT: 9006
+    ports:
+      - "9000:8080"
+    command: python -m streamlit run --server.headless true --runner.magicEnabled false  --server.port 8080 ./toolbox/Projects/FrontEnd/app.py -- --config /etc/communicity_toolbox/configs/FrontEnd.yaml
+    volumes:
       - ./data:/etc/communicity_toolbox/:ro
 
 volumes:

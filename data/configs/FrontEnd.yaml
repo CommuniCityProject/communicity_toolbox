@@ -1,0 +1,74 @@
+# ======= Anchors ==============================================================
+common-host: &common-host
+  !ENV ${HOST}
+
+pagination_limit: &pagination_limit
+  30
+
+context_broker_links: &context_broker_links
+  True
+# ==============================================================================
+
+use_cookies: True
+show_agreement: True
+agreement_text: ./toolbox/Projects/FrontEnd/res/texts/agreement.txt
+
+context_broker:
+  host: !ENV ${BROKER_HOST}
+  port: !ENV ${BROKER_PORT}
+
+image_storage: &image_storage
+  host: !ENV ${HOST}
+  port: !ENV ${IMAGE_STORAGE_PORT}
+  url_path: /
+
+projects:
+  - name: Context Broker
+    port: !ENV ${BROKER_PORT}
+    host: !ENV ${BROKER_HOST}
+    pagination_limit: *pagination_limit
+    url_path: /
+    refresh_rate: 10 # seconds
+    description_path: ./toolbox/Projects/FrontEnd/res/texts/context_broker.txt
+    template: ContextBrokerTemplate
+  - name: Image Storage
+    template: ImageStorageTemplate
+    pagination_limit: *pagination_limit
+    context_broker_links: *context_broker_links
+    <<: *image_storage
+  - name: Face Detection
+    port: !ENV ${FACE_DETECTION_PORT}
+    host: !ENV ${HOST}
+    url_path: /
+    description_path: ./toolbox/Projects/FrontEnd/res/texts/face_detection.txt
+    template: SimplePredictTemplate
+  - name: Face Recognition
+    port: !ENV ${FACE_RECOGNITION_PORT}
+    host: !ENV ${HOST}
+    url_path: /
+    description_path: ./toolbox/Projects/FrontEnd/res/texts/face_recognition.txt
+    template: FaceRecognitionTemplate
+  - name: Face Emotions
+    port: !ENV ${FACE_EMOTIONS_PORT}
+    host: !ENV ${HOST}
+    url_path: /
+    description_path: ./toolbox/Projects/FrontEnd/res/texts/face_emotions.txt
+    template: SimplePredictTemplate
+  - name: Age Gender
+    port: !ENV ${AGE_GENDER_PORT}
+    host: !ENV ${HOST}
+    url_path: /
+    description_path: ./toolbox/Projects/FrontEnd/res/texts/age_gender.txt
+    template: SimplePredictTemplate
+  - name: Instance Segmentation
+    port: !ENV ${INSTANCE_SEGMENTATION_PORT}
+    host: !ENV ${HOST}
+    url_path: /
+    description_path: ./toolbox/Projects/FrontEnd/res/texts/instance_segmentation.txt
+    template: SimplePredictTemplate
+  - name: Keypoints
+    port: !ENV ${KEYPOINTS_PORT}
+    host: !ENV ${HOST}
+    url_path: /
+    description_path: ./toolbox/Projects/FrontEnd/res/texts/keypoints.txt
+    template: SimplePredictTemplate

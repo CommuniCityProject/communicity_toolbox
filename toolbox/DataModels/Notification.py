@@ -16,7 +16,7 @@ class Notification(BaseModel):
     """
 
     id: str = Field(description="Notification identifier")
-    type: Literal["Notification"] = Field(description="``Notification``")
+    type: str = Field(description="``Notification``")
     subscriptionId: str = Field(description="Subscription identifier")
     notifiedAt: datetime = Field(description="""DateTime corresponding to the
         instant when the notification was generated""")

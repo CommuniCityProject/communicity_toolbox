@@ -91,7 +91,9 @@ def parse_args() -> argparse.Namespace:
     Returns:
         argparse.Namespace: The parsed arguments.
     """
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(description="App parameters. Use '--' at the end of "
+                                 "the streamlit command line to separate the "
+                                 "streamlit arguments from the App ones.")
     ap.add_argument(
         "--config",
         help="Path to the configuration yaml (default: 'config.yaml')",

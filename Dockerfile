@@ -30,11 +30,13 @@ RUN sudo update-alternatives --set python3 /usr/bin/python3.9
 # Install dependencies
 RUN python -m pip install --upgrade pip
 RUN python -m pip install --upgrade setuptools
-RUN python -m pip install ngsildclient
-RUN python -m pip install tensorflow==2.7.0
-RUN python -m pip install torch==1.8.1+cu101 torchvision==0.9.1+cu101 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
-RUN python -m pip install matplotlib==3.5.1 PyYAML==6.0 opencv-python-headless==4.6.0.66 seaborn==0.12.2 "fastapi[all]" scipy fastapi-utils onnxruntime-gpu
-RUN python -m pip install tensorboard cmake onnx tqdm cython pycocotools
+COPY ./requirements.txt /home/user/requirements.txt
+RUN python -m pip install -r /home/user/requirements.txt
+# RUN python -m pip install ngsildclient
+# RUN python -m pip install tensorflow==2.7.0
+# RUN python -m pip install torch==1.8.1+cu101 torchvision==0.9.1+cu101 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
+# RUN python -m pip install matplotlib==3.5.1 PyYAML==6.0 opencv-python-headless==4.6.0.66 seaborn==0.12.2 "fastapi[all]" scipy fastapi-utils onnxruntime-gpu
+# RUN python -m pip install tensorboard cmake onnx tqdm cython pycocotools
 
 # Install detectron2
 RUN python -m pip install --user 'git+https://github.com/facebookresearch/fvcore'
