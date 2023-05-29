@@ -4,9 +4,7 @@ import requests
 import streamlit as st
 
 from toolbox.Projects.FrontEnd.utils import utils
-from toolbox.Structures import Image
 from toolbox.utils.utils import urljoin
-
 
 from . import BaseTemplate
 
@@ -35,29 +33,6 @@ class SimplePredictTemplate(BaseTemplate):
 
         self.docs_url = urljoin(self.url, "docs")
 
-    # def _get_image_from_id(self, image_id: str) -> Image:
-    #     """Get an image from the image storage by its ID.
-
-    #     Args:
-    #         image_id (str): ID of the image on the image storage.
-
-    #     Returns:
-    #         Image: The downloaded image.
-    #     """
-    #     if st.session_state.input_image is not None and \
-    #             st.session_state.input_image.id == image_id:
-    #         return st.session_state.input_image
-    #     try:
-    #         image = self.image_storage_cli.download(image_id)
-    #         return image
-    #     except:
-    #         st.session_state.error_message = "Error: Image " + \
-    #             utils.format_id(image_id) + \
-    #             f" not found on {self.image_storage_cli.url}"
-    #         return None
-
-
-
     def _init_session_state(self):
         """Initialize the session state variables.
         """
@@ -66,7 +41,7 @@ class SimplePredictTemplate(BaseTemplate):
         st.session_state.setdefault("output_json", None)
         st.session_state.setdefault("output_image", None)
         st.session_state.setdefault("uploaded_file_id", None)
-        st.session_state.setdefault("input_entity_id", None)
+        st.session_state.setdefault("input_entity", None)
 
     def _ui(self):
         """Set the UI elements.
@@ -134,39 +109,6 @@ class SimplePredictTemplate(BaseTemplate):
             st.divider()
             self._st_output_text = st.empty()
             self._st_output_json = st.empty()
-
-    # def _get_image_from_entity(self, entity_id: str) -> Union[str, None]:
-    #     """Get the image ID from an entity. If the entity is an Image, return
-    #     its ID. If the entity is not an Image, return the ID of the image field
-    #     of the entity.
-
-    #     Args:
-    #         entity_id (str): An entity ID.
-
-    #     Returns:
-    #         Union[str, None]: The image ID or None if not found.
-    #     """
-    #     try:
-    #         entity = self.context_cli.get_entity(entity_id, as_dict=True)
-    #         if entity is None:
-    #             raise ValueError(
-    #                 f"Entity '{utils.format_id(entity_id)}' not found"
-    #             )
-    #         if entity["type"] == "Image":
-    #             return entity_id
-    #         if "image" in entity:
-    #             if "object" in entity["image"]:
-    #                 return entity["image"]["object"]
-    #             if "value" in entity["image"]:
-    #                 return entity["image"]["value"]
-    #         raise AttributeError(
-    #             f"Entity '{utils.format_id(entity_id)}' has no image field"
-    #         )
-    #     except Exception as e:
-    #         self.logger.exception(e, exc_info=True)
-    #         st.session_state.error_message = f"Error: {e}"
-    #     return None
-
 
     def _on_predict(self):
         """Call the API to predict the given image and visualize the results.
@@ -388,92 +330,6 @@ class SimplePredictTemplate(BaseTemplate):
     def _update(self):
         """Handle the UI logic.
         """
-        # # Get the input entity ID from the text input or the uploaded file
-        # input_image_id = ""
-        # if st.session_state.uploaded_file is None:
-        #     # Get the image from the id text input
-        #     if st.session_state.input_id:
-        #         st.session_state.input_entity_id = st.session_state.input_id
-        #         input_image_id = self._get_image_from_entity(
-        #             st.session_state.input_entity_id
-        #         )
-        # else:
-        #     # Get the image from the uploaded file
-        #     input_image_id = self._upload_input_image()
-        #     st.session_state.input_entity_id = input_image_id
-
-        # # Download the input image from the image storage
-        # if input_image_id:
-        #     st.session_state.input_image = self._get_image_from_id(
-        #         input_image_id
-        #     )
-
-        # # Clear image if there is no input
-        # if st.session_state.input_image is None:
-        #     st.session_state.output_image = None
-        #     st.session_state.output_json = None
-
-        # # Set the input_image an id caption widgets
-        # if st.session_state.input_image is not None:
-        #     self._st_input_image.image(
-        #         st.session_state.input_image.image,
-        #         channels="BGR"
-        #     )
-        #     self._st_preview_image_id.caption(
-        #         utils.format_id(st.session_state.input_image.id)
-        #     )
-        # else:
-        #     self._st_input_image.empty()
-        #     self._st_preview_image_id.empty()
-
-        # # Set the predict button
-        # self._st_button_predict.button(
-        #     "Predict",
-        #     type="primary",
-        #     use_container_width=True,
-        #     on_click=self._on_predict,
-        #     disabled=st.session_state.input_image is None
-        # )
-
-        # # Show the output image if any
-        # if st.session_state.output_image is not None:
-        #     self._st_output_image.image(
-        #         st.session_state.output_image.image,
-        #         channels="BGR"
-        #     )
-        # else:
-        #     self._st_output_image.empty()
-
-        # # Show the output JSON if any
-        # if st.session_state.output_json is not None:
-        #     if len(st.session_state.output_json) == 0:
-        #         self._st_output_image.warning("No entities found")
-        #     else:
-        #         if self.context_broker_links:
-        #             ids = [e["id"] for e in st.session_state.output_json]
-        #             broker_url = utils.get_entities_broker_link(
-        #                 self.context_cli.broker_url,
-        #                 ids
-        #             )
-        #             link = f"[See the entities on the context broker]" \
-        #                    f"({broker_url}) <br/><br/>"
-        #         else:
-        #             link = ""
-        #         self._st_output_text.markdown(
-        #             link + "API response:",
-        #             unsafe_allow_html=True
-        #         )
-        #         self._st_output_json.write(st.session_state.output_json)
-        # else:
-        #     self._st_output_json.empty()
-
-        # # Show the error message if any
-        # if st.session_state.error_message is not None:
-        #     self._st_error.error(st.session_state.error_message)
-        # else:
-        #     self._st_error.empty()
-        # st.session_state.error_message = None
-        
         # Get the input entity ID from the text input or the uploaded file
         if st.session_state.uploaded_file is None:
             if st.session_state.input_id:

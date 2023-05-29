@@ -1,6 +1,4 @@
-from typing import Optional, List
 import streamlit as st
-import requests
 
 from toolbox.Projects.FrontEnd.utils import utils
 
@@ -77,10 +75,6 @@ class FaceRecognitionTemplate(SimplePredictTemplate):
             st.divider()
             self._st_output_text = st.empty()
             self._st_output_json = st.empty()
-
-    def _init_session_state(self):
-        super()._init_session_state()
-        st.session_state.setdefault("input_entity", None)
 
     def _on_extract(self):
         try:
@@ -175,7 +169,7 @@ class FaceRecognitionTemplate(SimplePredictTemplate):
         if st.session_state.input_entity is None:
             st.session_state.output_image = None
             st.session_state.output_json = None
-        
+
         # Show the inout image if any
         self._show_input_image()
 

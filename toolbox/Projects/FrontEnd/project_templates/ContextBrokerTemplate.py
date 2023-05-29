@@ -136,6 +136,9 @@ class ContextBrokerTemplate(BaseTemplate):
                 limit=self.pagination_limit
             )
         )
+        # Newest to oldest
+        st.session_state.subscriptions.reverse()
+        [l.reverse() for l in st.session_state.subscriptions]
 
     def _ui_tab_subscriptions(self):
         # Get the subscriptions
@@ -219,6 +222,9 @@ class ContextBrokerTemplate(BaseTemplate):
                     as_dict=True
                 )
             )
+            # Newest to oldest
+            st.session_state.entities.reverse()
+            [l.reverse() for l in st.session_state.entities]
 
     def _ui_tab_entities(self):
         # Get the entity types
