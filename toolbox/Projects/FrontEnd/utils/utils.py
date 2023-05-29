@@ -80,7 +80,7 @@ def format_id(ngsi_id: str) -> str:
     Returns:
         str: The formatted entity ID.
     """
-    return ngsi_id.replace(":", "\:")
+    return str(ngsi_id).replace(":", "\:")
 
 
 def write_title_info_toggle(

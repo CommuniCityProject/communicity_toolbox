@@ -46,7 +46,8 @@ projects:
     port: 9002
     host: *common-host
     url_path: /
-    template: FaceRecognitionTemplate # TODO: Change to FaceRecognition
+    description_path: res/texts/face_recognition.txt
+    template: FaceRecognitionTemplate
   - name: Face Emotions
     port: 9004
     host: *common-host

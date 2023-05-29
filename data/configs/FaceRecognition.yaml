@@ -28,11 +28,11 @@ api:
 
   # Create a new entity in the context broker with the recognized data when
   # an unrecognized entity is received and processed from the context broker.
-  post_new_entity: True
+  post_new_entity: False
   
   # Update the unrecognized received entity from the context broker with
   # the recognized data.
-  update_entity: False
+  update_entity: True
 
 subscriptions:
   - entity_type: FaceRecognition
