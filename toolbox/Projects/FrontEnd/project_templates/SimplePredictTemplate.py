@@ -194,7 +194,7 @@ class SimplePredictTemplate(BaseTemplate):
         )
         if st.session_state.input_entity is None:
             st.session_state.error_message = "Error: Entity " + \
-                f"{utils.format_id(entity_id)} not found"
+                f"{utils.format_st_id(entity_id)} not found"
 
     def _get_image_from_input(self):
         """Get the input image from the input entity.
@@ -232,7 +232,7 @@ class SimplePredictTemplate(BaseTemplate):
             st.session_state.input_image = image
         except:
             st.session_state.error_message = "Error: Image " + \
-                utils.format_id(image_id) + \
+                utils.format_st_id(image_id) + \
                 f" not found on {self.image_storage_cli.url}"
 
     def _show_input_image(self):
@@ -244,12 +244,12 @@ class SimplePredictTemplate(BaseTemplate):
                 channels="BGR"
             )
             self._st_preview_image_id.caption(
-                utils.format_id(st.session_state.input_image.id)
+                utils.format_st_id(st.session_state.input_image.id)
             )
         elif st.session_state.input_entity is not None:
             self._st_input_image.write(st.session_state.input_entity)
             self._st_preview_image_id.caption(
-                utils.format_id(st.session_state.input_entity["id"])
+                utils.format_st_id(st.session_state.input_entity["id"])
             )
         else:
             self._st_input_image.empty()
@@ -334,7 +334,9 @@ class SimplePredictTemplate(BaseTemplate):
         if st.session_state.uploaded_file is None:
             if st.session_state.input_id:
                 # Get the entity from the id text input
-                self._set_input_entity_by_id(st.session_state.input_id)
+                self._set_input_entity_by_id(
+                    utils.format_input_id(st.session_state.input_id)
+                )
             else:
                 # Clear the input entity
                 st.session_state.input_entity = None

@@ -157,6 +157,7 @@ class ContextBrokerTemplate(BaseTemplate):
                 label_visibility="collapsed",
                 key="text_input_subscriptions_search"
             )
+            id_search = utils.format_input_id(id_search)
 
         # Render pages
         if id_search:
@@ -183,7 +184,7 @@ class ContextBrokerTemplate(BaseTemplate):
                 if "subscriptions_page" in st.session_state else 1
             if st.session_state.subscriptions:
                 for sub in st.session_state.subscriptions[page - 1]:
-                    parsed_id = utils.format_id(sub.subscription_id)
+                    parsed_id = utils.format_st_id(sub.subscription_id)
                     with st.expander(parsed_id):
                         if self.context_broker_links:
                             url = utils.get_subscription_broker_link(
@@ -254,6 +255,7 @@ class ContextBrokerTemplate(BaseTemplate):
                 label_visibility="collapsed",
                 key="text_input_entities_search"
             )
+            id_search = utils.format_input_id(id_search)
 
         # Render pages
         if id_search:
@@ -280,7 +282,7 @@ class ContextBrokerTemplate(BaseTemplate):
                 if "entities_page" in st.session_state else 1
             if st.session_state.entities:
                 for ent in st.session_state.entities[page - 1]:
-                    parsed_id = utils.format_id(ent["id"])
+                    parsed_id = utils.format_st_id(ent["id"])
                     with st.expander(parsed_id):
                         if self.context_broker_links:
                             url = utils.get_entities_broker_link(

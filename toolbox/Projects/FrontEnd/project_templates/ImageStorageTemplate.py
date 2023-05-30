@@ -50,6 +50,7 @@ class ImageStorageTemplate(BaseTemplate):
                 placeholder="Search",
                 label_visibility="collapsed"
             )
+            id_search = utils.format_input_id(id_search)
 
         # Render pages
         if id_search:
