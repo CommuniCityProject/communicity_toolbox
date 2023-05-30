@@ -109,6 +109,7 @@ def write_title_info_toggle(
         element (st.delta_generator.DeltaGenerator): The streamlit element
             where the title and info will be written.
     """
+    info = str(info).replace("\n", "")
     element.markdown(
         """
         <style>

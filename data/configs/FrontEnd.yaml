@@ -35,6 +35,7 @@ projects:
     template: ImageStorageTemplate
     pagination_limit: *pagination_limit
     context_broker_links: *context_broker_links
+    description_path: ./toolbox/Projects/FrontEnd/res/texts/image_storage.txt
     <<: *image_storage
   - name: Face Detection
     port: !ENV ${FACE_DETECTION_PORT}
