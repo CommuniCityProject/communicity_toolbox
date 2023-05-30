@@ -28,12 +28,10 @@ class ImageStorageTemplate(BaseTemplate):
         st.session_state.image_dms = list(
             self.context_cli.iterate_entities(
                 entity_type="Image",
-                limit=self.pagination_limit
+                limit=self.pagination_limit,
+                order_by="!dateModified,!dateCreated,!dateObserved"
             )
         )
-        # Newest to oldest
-        st.session_state.image_dms.reverse()
-        [l.reverse() for l in st.session_state.image_dms]
 
     def _ui_tab_images(self):
         """Define the images tab elements.

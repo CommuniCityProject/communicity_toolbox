@@ -411,6 +411,7 @@ class ContextCli:
         query: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
+        order_by: Optional[str] = None,
         as_dict: bool = False
     ) -> List[Union[Type[BaseModel], dict]]:
         """Get a list of entities from the context broker.
@@ -429,6 +430,11 @@ class ContextCli:
             limit (int, optional): Maximum number of entities to return.
                 Maximum value is 1000. Defaults to 100.
             offset (int, optional): Pagination offset. Defaults to 0.
+            order_by (Optional[str], optional): Order entities by an attribute.
+                Comma-separated list of attributes can be used to order by the
+                first attribute and on tie ones ordered by the subsequent
+                attributes. A "!" before the attribute name means that the
+                order is reversed. e.g. !dateCreated. Default to None.
             as_dict (bool, optional): If True, the entities will be returned as
                 dictionaries. Otherwise, they will be converted to a toolbox
                 data model. Defaults to False.
@@ -460,6 +466,8 @@ class ContextCli:
             params["attrs"] = ",".join(attrs)
         if query:
             params["q"] = query
+        if order_by:
+            params["orderBy"] = order_by
         logger.debug(f"Getting entities from {self._entities_uri} with "
                      f"params {params}")
         response = requests.get(
@@ -484,6 +492,7 @@ class ContextCli:
         id_pattern: Optional[str] = None,
         query: Optional[str] = None,
         limit: int = 100,
+        order_by: Optional[str] = None,
         as_dict: bool = False
     ) -> Iterator[List[Union[Type[BaseModel], dict]]]:
         """Iterate through a list of entities from the context broker.
@@ -501,6 +510,11 @@ class ContextCli:
                 Defaults to None.
             limit (int, optional): Maximum number of entities to return.
                 Maximum value is 1000. Defaults to 100.
+            order_by (Optional[str], optional): Order entities by an attribute.
+                Comma-separated list of attributes can be used to order by the
+                first attribute and on tie ones ordered by the subsequent
+                attributes. A "!" before the attribute name means that the
+                order is reversed. e.g. !dateCreated. Default to None.
             as_dict (bool, optional): If True, the entities will be returned as
                 dictionaries. Otherwise, they will be converted to a toolbox
                 data model. Defaults to False.
@@ -525,6 +539,7 @@ class ContextCli:
                 query=query,
                 limit=limit,
                 offset=offset,
+                order_by=order_by,
                 as_dict=as_dict
             )
             if not entities:
@@ -539,6 +554,7 @@ class ContextCli:
         entity_id: Optional[Union[List[str], str]] = None,
         id_pattern: Optional[str] = None,
         query: Optional[str] = None,
+        order_by: Optional[str] = None,
         as_dict: bool = False
     ) -> List[Union[Type[BaseModel], dict]]:
         """Get all entities from the context broker.
@@ -554,6 +570,11 @@ class ContextCli:
                 IDs. Defaults to None.
             query (Optional[str], optional): A query to filter entities.
                 Defaults to None.
+            order_by (Optional[str], optional): Order entities by an attribute.
+                Comma-separated list of attributes can be used to order by the
+                first attribute and on tie ones ordered by the subsequent
+                attributes. A "!" before the attribute name means that the
+                order is reversed. e.g. !dateCreated. Default to None.
             as_dict (bool, optional): If True, the entities will be returned as
                 dictionaries. Otherwise, they will be converted to a toolbox
                 data model. Defaults to False.
@@ -577,6 +598,7 @@ class ContextCli:
                     attrs=attrs,
                     query=query,
                     as_dict=as_dict,
+                    order_by=order_by,
                     limit=1000
                 )
             )

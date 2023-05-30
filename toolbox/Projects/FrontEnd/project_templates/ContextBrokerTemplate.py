@@ -133,12 +133,9 @@ class ContextBrokerTemplate(BaseTemplate):
     def _get_subscriptions(self):
         st.session_state.subscriptions = list(
             self.context_cli.iterate_subscriptions(
-                limit=self.pagination_limit
+                limit=self.pagination_limit,
             )
         )
-        # Newest to oldest
-        st.session_state.subscriptions.reverse()
-        [l.reverse() for l in st.session_state.subscriptions]
 
     def _ui_tab_subscriptions(self):
         # Get the subscriptions
@@ -219,12 +216,10 @@ class ContextBrokerTemplate(BaseTemplate):
                 self.context_cli.iterate_entities(
                     entity_type=st.session_state.selected_types,
                     limit=self.pagination_limit,
+                    order_by="!dateModified,!dateCreated,!dateObserved",
                     as_dict=True
                 )
             )
-            # Newest to oldest
-            st.session_state.entities.reverse()
-            [l.reverse() for l in st.session_state.entities]
 
     def _ui_tab_entities(self):
         # Get the entity types
