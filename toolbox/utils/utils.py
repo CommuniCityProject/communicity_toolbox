@@ -1,11 +1,12 @@
-from typing import Optional
+import functools
+import hashlib
 import logging
+import math
 import random
 import string
-import math
-import hashlib
+from pathlib import Path
+from typing import Optional
 from urllib.parse import urlparse
-
 
 
 def random_string(length: int = 8) -> str:
@@ -141,3 +142,9 @@ def hash_str(value: str, algorithm="sha1") -> str:
             f"({algorithm})")
     hasher = getattr(hashlib, algorithm)
     return hasher(value.encode()).hexdigest()
+
+
+@functools.cache
+def get_version():
+    version_file = Path(__file__).parent.parent.joinpath("version")
+    return version_file.read_text()

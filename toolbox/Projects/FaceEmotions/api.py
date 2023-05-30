@@ -14,7 +14,6 @@ logger = get_logger("toolbox.FaceEmotionsApi")
 
 class FaceEmotionsApi(ApiBase):
     
-    VERSION = "0.2.0"
     TITLE = "Face Emotions API"
 
     def __init__(self):

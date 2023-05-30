@@ -13,7 +13,6 @@ logger = get_logger("toolbox.AgeGenderApi")
 
 class AgeGenderApi(ApiBase):
 
-    VERSION = "0.2.0"
     TITLE = "Age Gender API"
 
     def __init__(self):
