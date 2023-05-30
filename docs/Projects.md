@@ -5,7 +5,7 @@ Projects are the key component of the Toolbox that will be used by the end users
 Each Project is a Python module that can be used as a library or as a service. They are located on [toolbox/Projects](/toolbox/Projects/)
 
 Projects work in conjunction with a context broker, which acts as a mediator between the Projects and the data sources. The input data is received from the context broker, which is then processed to generate an output that is posted back to the context broker.
-This generated data uses the [NGSI-LD](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_cim009v010601p.pdf) format and follows the [data models](/docs/DataModels/) defined by the Toolbox.
+This generated data uses the [NGSI-LD](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_cim009v010601p.pdf) format and follows the [data models](/docs/DataModels/README.md) defined by the Toolbox.
 
 
 The following table lists the currently provided Projects:
