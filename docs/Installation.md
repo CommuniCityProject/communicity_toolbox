@@ -27,14 +27,6 @@ Requirements:
 
 4. Install Detectron2
 
-    <!-- <details>
-    <summary>Optional GPU support:</summary>
-        
-        export FORCE_CUDA="1"
-        export TORCH_CUDA_ARCH_LIST="Kepler;Kepler+Tesla;Maxwell;Maxwell+Tegra;Pascal;Volta;Turing"
-        export TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST}"
-    </details> -->
-
     ```
     python -m pip install --user 'git+https://github.com/facebookresearch/fvcore'
     git clone https://github.com/facebookresearch/detectron2 detectron2

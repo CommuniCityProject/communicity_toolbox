@@ -59,9 +59,9 @@ docker run -it -v <path_to_the_toolbox>/data:/home/user/communicity_toolbox/data
 ## Use Docker compose
 
 Docker compose can be used to run multiple containers with different toolbox components at once.
-A [Docker compose file](/docker-compose.yaml) is provided to run each one of the Toolbox Project APIs.
+A [Docker compose file](https://github.com/CommuniCityProject/communicity_toolbox/blob/master/docker-compose.yaml) is provided to run each one of the Toolbox Project APIs.
 
-First, edit the following fields on the [docker-compose.yaml](docker-compose.yaml) file:
+First, edit the following fields on the ``docker-compose.yaml`` file:
 - ``x-common-env: BROKER_HOST``: The context broker IP address.
 - ``x-common-env: BROKER_PORT``: The context broker port.
 - ``x-common-env: HOST``: The address of the machine where the services will run.
