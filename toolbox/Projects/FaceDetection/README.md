@@ -2,7 +2,7 @@
 
 This Project aims to detect faces in images.
 
-![face detection](/docs/res/face_detection.jpg)
+![face detection](../../../docs/res/face_detection.jpg)
 
 ## Data models
 

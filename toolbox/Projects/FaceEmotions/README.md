@@ -2,7 +2,7 @@
 
 This Project aims to detect faces in images and infer their emotion.
 
-![emotions](/docs/res/emotions.jpg)
+![emotions](../../../docs/res/emotions.jpg)
 
 ## Data models
 

@@ -2,7 +2,7 @@
 
 This Project aims to detect body keypoints in images. Keypoints are the location of some body parts such as elbows, wrists or knees. This allows us to get an estimation of the pose of a person in a given image.
 
-![keypoints detection](/docs/res/keypoints.jpg)
+![keypoints detection](../../../docs/res/keypoints.jpg)
 
 ## Data models
 

@@ -2,7 +2,7 @@
 
 This Project aims to detect faces in images and infer their age and gender.
 
-![age gender](/docs/res/age_gender.jpg)
+![age gender](../../../docs/res/age_gender.jpg)
 
 ## Data models
 
