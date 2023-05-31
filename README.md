@@ -23,6 +23,7 @@ More precisely, the main features that the Toolbox offers are:
 - Specifications of the used data models.
 - Full support of the first three MIMs.
 - A collection of machine learning models spanning various domains.
+- A collection of tools and implementations that helps developers build MIM-based solutions.
 
 ### OASC MIMs
 
@@ -66,7 +67,7 @@ The following table contains the currently provided Projects:
 |----------------------------------------------------------------|---------------|
 | [FaceDetection](toolbox/Projects/FaceDetection/README.md)              | Detect faces on images |
 | [FaceRecognition](toolbox/Projects/FaceRecognition/README.md)           | Detect and extract features of faces, create a facial dataset and recognize faces |
-| [AgeGender](toolbox/Projects/AgeGender/README.md)                       | Detects faces, predicts its gender and estimates its age |
+| [AgeGender](toolbox/Projects/AgeGender/README.md)                       | Detect faces, predicts their gender and estimate their age |
 | [InstanceSegmentation](toolbox/Projects/InstanceSegmentation/README.md) | Performs instance segmentation on images |
 | [Keypoints](toolbox/Projects/Keypoints/README.md)                       | Predicts the position of body key points |
 | [FaceEmotions](toolbox/Projects/FaceEmotions/README.md)                 | Classify different types of face expressions |
@@ -88,6 +89,8 @@ The Toolbox provides a set of standardized data models that define the structure
 The data models specifications can be found [here](docs/DataModels/README.md).
 
 ## Installation
+
+The Toolbox can be installed manually as a Python package or it can be used with the provided Docker image and Docker compose:
 
 - To install the Toolbox as a Python package, refer to the [installation guide](docs/Installation.md).
 

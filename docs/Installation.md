@@ -1,10 +1,10 @@
-# Toolbox installation
+# Toolbox installation guide
 
-This guide shows how to manually install the Toolbox and its requirements on a Linux machine with optional GPU support.
+This guide shows how to manually install the Toolbox and its requirements as a Python package.
 
 Requirements:
 - Python [3.9 - 3.10]
-- Optional for GPU support: CUDA >=10.1 
+- Optional for GPU support: CUDA >=10.1
 
 1. Clone the repository and navigate to the project directory
 
@@ -13,11 +13,24 @@ Requirements:
     cd communicity_toolbox
     ```
 
-2. The machine learning models and some additional resources are available in the repository releases, on a _data.zip_ file. To download and extract it run:
+2. The machine learning models and some additional resources are available in the repository [releases](https://github.com/CommuniCityProject/communicity_toolbox/releases), on a _data.zip_ file. To download and extract it run:
     
+    <details>
+    <summary>Linux</summary>
+
     ```
     bash ./download_data.sh
     ```
+
+    </details>
+    <details>
+    <summary>Windows</summary>
+
+    ```
+    ./download_data.bat
+    ```
+    
+    </details>
 
 3. Install the Python requirements
 
@@ -40,53 +53,11 @@ Requirements:
     ```
 
 ## Optional: Install Orion-LD
-Some Toolbox components require an NGSI-LD context broker to work. The recommended one is [Orion-LD](https://github.com/FIWARE/context.Orion-LD). You can install it by following the next steps:
+Some Toolbox components require an NGSI-LD context broker to function. The recommended one is [Orion-LD](https://github.com/FIWARE/context.Orion-LD). You can launch an instance with Docker Compose using the provided [docker-compose]() file.
 
 Requirements:
 - docker-compose
 
-1. Create a folder named _orion-ld_ and navigate to it
-
-    ```
-    mkdir orion-ld
-    cd orion-ld
-    ```
-
-2. Create a file named _docker-compose.yaml_ with the following content:
-    ```
-    version: "3.5"
-    services:
-      orion:
-        image: fiware/orion-ld:1.1.0
-        hostname: orion
-        restart: always
-        container_name: fiware-orion
-        depends_on:
-          - mongo-db
-        expose:
-          - "1026"
-        ports:
-          - "1026:1026" 
-        command: -dbhost mongo-db -logLevel DEBUG
-        healthcheck:
-          test: curl --fail -s http://orion:1026/version || exit 1
-      mongo-db:
-        image: mongo:4.0
-        hostname: mongo-db
-        container_name: db-mongo
-        expose:
-          - "27017"
-        ports:
-          - "27017:27017" 
-        command: --nojournal
-        volumes:
-          - mongo-db:/data
-    volumes:
-      mongo-db: ~
-    ```
-
-3. Run docker compose
-
-    ```
-    docker compose up -d
-    ```
+```
+docker compose -f Orion-LD.yaml up -d
+```

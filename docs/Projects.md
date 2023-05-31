@@ -1,4 +1,4 @@
-# Projects
+# Toolbox Projects
 
 Projects are the key component of the Toolbox that will be used by the end users and applications. They are designed to perform different types of tasks mostly related to computer vision and machine learning.
 
@@ -14,7 +14,7 @@ The following table lists the currently provided Projects:
 |----------------------------------------------------------------|---------------|
 | [FaceDetection](../toolbox/Projects/FaceDetection/README.md)              | Detect faces on images |
 | [FaceRecognition](../toolbox/Projects/FaceRecognition/README.md)           | Detect and extract features of faces, create a facial dataset and recognize faces |
-| [AgeGender](../toolbox/Projects/AgeGender/README.md)                       | Detects faces, predicts its gender and estimates its age |
+| [AgeGender](../toolbox/Projects/AgeGender/README.md)                       | Detect faces, predicts their gender and estimate their age |
 | [InstanceSegmentation](../toolbox/Projects/InstanceSegmentation/README.md) | Performs instance segmentation on images |
 | [Keypoints](../toolbox/Projects/Keypoints/README.md)                       | Predicts the position of body key points |
 | [FaceEmotions](../toolbox/Projects/FaceEmotions/README.md)                 | Classify different types of face expressions |

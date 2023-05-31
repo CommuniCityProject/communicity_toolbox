@@ -1,4 +1,4 @@
-# Docker
+# Docker guide
 
 This guide shows how to run the Toolbox with Docker.
 
@@ -13,7 +13,7 @@ Requirements:
     cd communicity_toolbox
     ```
 
-2. The machine learning models and some additional resources are available in the repository releases, on _data.zip_. To download and extract it just run the _download_data_ script:
+2. The machine learning models and some additional resources are available in the repository [releases](https://github.com/CommuniCityProject/communicity_toolbox/releases), on _data.zip_. To download and extract it just run the _download_data_ script:
 
     <details>
     <summary>Linux</summary>
