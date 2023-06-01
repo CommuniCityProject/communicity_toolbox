@@ -53,7 +53,7 @@ Requirements:
     ```
 
 ## Optional: Install Orion-LD
-Some Toolbox components require an NGSI-LD context broker to function. The recommended one is [Orion-LD](https://github.com/FIWARE/context.Orion-LD). You can launch an instance with Docker Compose using the provided [docker-compose](https://github.com/CommuniCityProject/communicity_toolbox/blob/master/Orion-LD.yaml) file.
+Some Toolbox components require an NGSI-LD context broker to function. The recommended one is [Orion-LD](https://github.com/FIWARE/context.Orion-LD). You can launch an instance with Docker Compose using the provided [docker-compose](../Orion-LD.yaml) file.
 
 Requirements:
 - docker-compose

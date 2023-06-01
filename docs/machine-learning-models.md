@@ -1,12 +1,12 @@
 # Machine learning models
 
-This page lists the provided machine learning models that are pre-trained and ready to use for inference. The Toolbox Models are located by default on ``/data/models/`` and are available to download on the [GitHub releases](https://github.com/CommuniCityProject/communicity_toolbox/releases).
+This page lists the provided machine learning models that are pre-trained and ready to use for inference. The weights of the models are located by default on ``data/models/`` and can be downloaded from the [GitHub releases](https://github.com/CommuniCityProject/communicity_toolbox/releases).
 
 ## Face analysis
 | Name | Description | Weights | CPU inference time (s) | Output |
 |------|-------------|---------|------------------------|--------|
-| [age_gender](/toolbox/Models/age_gender/) | Predict the age and gender of facial images | age_gender/age_model.onnx </br> age_gender/gender_model.onnx | Age + Gender: 0.318 <br/> Age: 0.164 <br/> Gender: 0.157 | ([Gender](/toolbox/Structures/Gender.py), float)
-| [emotions_hse](/toolbox/Models/emotions_hse/) | Classify 7 different emotions from a face image | emotions_hse/mobilenet_7.h5 | 0.059 | [Emotion](/toolbox/Structures/Emotion.py)
+| [age_gender](/toolbox/Models/age_gender/) | Predict the age and gender of facial images | age_gender/age_model.onnx </br> age_gender/gender_model.onnx | Age + Gender: 0.318 <br/> Age: 0.164 <br/> Gender: 0.157 | ([Gender](../toolbox/Structures/Gender.py), float)
+| [emotions_hse](/toolbox/Models/emotions_hse/) | Classify 7 different emotions from a face image | emotions_hse/mobilenet_7.h5 | 0.059 | ([Emotion](/toolbox/Structures/Emotion.py), float)
 | [face_recognition_facenet](/toolbox/Models/face_recognition_facenet/) | Perform face recognition | face_recognition_facenet/squeezenet_VGGFace2/model-20180204-160909.* | 0.019 | (str, float) \| np.ndarray
 
 ## Object detection
@@ -17,7 +17,7 @@ This page lists the provided machine learning models that are pre-trained and re
 | [face_detector_retinaface](/toolbox/Models/face_detector_retinaface/) | Detect faces on images | face_detector_retinaface/mobilenet0.25_Final.pth | 0.071 | [BoundingBox](/toolbox/Structures/BoundingBox.py)
 | [face_detector_mtcnn](/toolbox/Models/face_detector_mtcnn/) | Detect faces on images | face_detector_mtcnn/mtcnn.pb | 0.042 | [BoundingBox](/toolbox/Structures/BoundingBox.py)
 | [face_detector_ultraface](/toolbox/Models/face_detector_ultraface/) | Detect faces on images | face_detector_ultraface/version-RFB-320.onnx | 0.014 | [BoundingBox](/toolbox/Structures/BoundingBox.py)
-| [face_detector_ultraface](/toolbox/Models/face_detector_ultraface/) | Detect faces on images | face_detector_ultraface//version-RFB-640.onnx | 0.043 | [BoundingBox](/toolbox/Structures/BoundingBox.py)
+| [face_detector_ultraface](/toolbox/Models/face_detector_ultraface/) | Detect faces on images | face_detector_ultraface/version-RFB-640.onnx | 0.043 | [BoundingBox](/toolbox/Structures/BoundingBox.py)
 
 ## Instance segmentation
 
@@ -31,4 +31,4 @@ This page lists the provided machine learning models that are pre-trained and re
 |------|-------------|---------|------------------------|--------|
 | [detectron2](/toolbox/Models/detectron2/) | Predict the position of 17 body key points | detectron2/COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x/model_final_a6e10b.pkl | 2.263 | [COCOKeypoints](/toolbox/Structures/Keypoints.py)
 
-<sub>*CPU inference time is the average time taken to predict a black image of size 512x512, on an Intel(R) Xeon(R) CPU E5-1620 v4 </sup>
+<sub>*CPU inference time is the average time taken to predict an image of size 512x512, on an Intel(R) Xeon(R) CPU E5-1620 v4 </sup>
