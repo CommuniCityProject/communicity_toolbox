@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Literal, Optional
+from typing import Literal, Optional
 
 import cv2
 import numpy as np
@@ -24,6 +24,7 @@ class FaceDetector:
         confidence_threshold: float = 0.7,
         landmarks: bool = True,
         nms_threshold: Optional[float] = 0.4,
+        max_input_size: Optional[int] = None,
         use_cuda: bool = False
     ):
         """Create the face detector.
@@ -39,6 +40,8 @@ class FaceDetector:
             nms_threshold (Optional[float], optional):
                 Non-maximum-suppression threshold. None to disable. Defaults
                 to 0.4.
+            max_input_size (Optional[int], optional): Maximum size of the
+                image larger side. If None it is ignored. Defaults to None. 
             use_cuda (bool, optional): Run the model on a cuda device.
                 Defaults to False.
 
@@ -51,6 +54,7 @@ class FaceDetector:
         self._confidence_threshold = confidence_threshold
         self._parse_landmarks = landmarks
         self._nms_threshold = nms_threshold
+        self._max_input_size = max_input_size
 
         if model_name == "mobile0.25":
             self._cfg = cfg_mnet
@@ -82,6 +86,28 @@ class FaceDetector:
         image = image.to(self._device)
         return image
 
+    def _scale_input_image(self, image: np.ndarray) -> np.ndarray:
+        """Scale down an image if its larger side is greater than
+        ``self._max_input_size``.
+
+        Args:
+            image (np.ndarray): The image to scale.
+
+        Returns:
+            np.ndarray: The scaled image.
+        """
+        if self._max_input_size is None:
+            return image
+        h, w, _ = image.shape
+        f = 1
+        if h >= w and h > self._max_input_size:
+            f = self._max_input_size / h
+        elif w > h and w > self._max_input_size:
+            f = self._max_input_size / w
+        if f != 1:
+            image = cv2.resize(image, None, fx=f, fy=f)
+        return image
+
     def predict(self, image: np.ndarray):
         """Detect faces on an image and return its bounding boxes and landmarks.
 
@@ -96,6 +122,7 @@ class FaceDetector:
                 landmarks (np.ndarray): Predicted face landmarks if
                     ``landmarks`` is set to True.
         """
+        image = self._scale_input_image(image)
         h, w, _ = image.shape
         scale = torch.Tensor([w, h, w, h])
         scale = scale.to(self._device)

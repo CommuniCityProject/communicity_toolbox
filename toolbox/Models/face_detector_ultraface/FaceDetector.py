@@ -219,7 +219,9 @@ class FaceDetector:
 
         boxes = [
             BoundingBox.from_absolute(
-                b[0], b[1], b[2], b[3], image.shape[1], image.shape[0]
+                b[0], b[1], b[2], b[3],
+                image_width=image.shape[1],
+                image_height=image.shape[0]
             )
             for b in boxes
         ]

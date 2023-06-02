@@ -9,29 +9,23 @@ age_gender:
 
 face_detector:
   face_box_scale: 1.2
-  # model_name: face_detector_opencv
-  # params:
-  #   txt_path: ../../Models/face_detector_opencv/models/res10_ssd/deploy.prototxt
-  #   weights_path: ../../Models/face_detector_opencv/models/res10_ssd/res10_300x300_ssd_iter_140000.caffemodel
-  #   confidence_threshold: 0.5
-  #   use_cuda: False
   # model_name: face_detector_ultraface
   # params:
-  #   model_path: ../../Models/face_detector_ultraface/models/version-RFB-320.onnx
+  #   model_path: ../../../data/models/face_detector_ultraface/version-RFB-320.onnx
   #   input_size: [320, 240] # [640, 480] # [320, 240]
-  #   use_cuda: False
+  #   use_cuda: True
   # model_name: face_detector_mtcnn
   # params:
   #   model_path: ../../../data/models/face_detector_mtcnn/mtcnn.pb
   #   use_cuda: True
-  model_name: face_detector_retinaface
-  params:
-    weights_path: ../../../data/models/face_detector_retinaface/Resnet50_Final.pth
-    model_name: resnet50
-    confidence_threshold: 0.7
-    landmarks: False
-    nms_threshold: 0.4
-    use_cuda: False
+  # model_name: face_detector_retinaface
+  # params:
+  #   weights_path: ../../../data/models/face_detector_retinaface/Resnet50_Final.pth
+  #   model_name: resnet50
+  #   confidence_threshold: 0.7
+  #   landmarks: False
+  #   nms_threshold: 0.4
+  #   use_cuda: True
 
 context_broker:
   host: 192.168.0.100

@@ -1,12 +1,26 @@
 face_detector:
-  model_name: face_detector_retinaface
-  params:
-    weights_path: ../../../data/models/face_detector_retinaface/Resnet50_Final.pth
-    model_name: resnet50
-    confidence_threshold: 0.7
-    landmarks: False
-    nms_threshold: 0.4
-    use_cuda: False
+#   model_name: face_detector_retinaface
+#   params:
+#     weights_path: ../../../data/models/face_detector_retinaface/Resnet50_Final.pth
+#     model_name: resnet50
+#     confidence_threshold: 0.7
+#     landmarks: False
+#     nms_threshold: 0.4
+#     use_cuda: True
+    # model_name: face_detector_ultraface
+    # params:
+    #   model_path: ../../../data/models/face_detector_ultraface/version-RFB-320.onnx
+    #   input_size: [320, 240] # [640, 480] # [320, 240]
+    #   use_cuda: True
+    model_name: face_detector_retinaface
+    params:
+      weights_path: ../../../data/models/face_detector_retinaface/Resnet50_Final.pth
+      model_name: resnet50
+      confidence_threshold: 0.7
+      landmarks: False
+      nms_threshold: 0.4
+      max_input_size: 512
+      use_cuda: True
 
 context_broker:
   host: 192.168.0.100

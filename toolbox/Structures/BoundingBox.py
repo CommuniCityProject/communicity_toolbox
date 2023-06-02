@@ -49,10 +49,10 @@ class BoundingBox:
             xmax (float): Maximum relative x coordinate.
             ymax (float): Maximum relative y coordinate.
         """
-        self.xmin = float(xmin)
-        self.ymin = float(ymin)
-        self.xmax = float(xmax)
-        self.ymax = float(ymax)
+        self.xmin = max(min(float(xmin), 1), 0)
+        self.ymin = max(min(float(ymin), 1), 0)
+        self.xmax = max(min(float(xmax), 1), 0)
+        self.ymax = max(min(float(ymax), 1), 0)
 
     def _to_absolute(self, rel_value: float, dim: int) -> int:
         """Convert a relative value to absolute.
