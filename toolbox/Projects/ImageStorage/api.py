@@ -21,7 +21,8 @@ from toolbox.Context import ContextCli
 from toolbox.Projects.ImageStorage.ContentSizeLimitMiddleware import \
     ContentSizeLimitMiddleware
 from toolbox.utils.config_utils import parse_config
-from toolbox.utils.utils import float_or_none, get_logger, hash_str, urljoin
+from toolbox.utils.utils import (float_or_none, get_logger, get_version,
+                                 hash_str, urljoin)
 from toolbox.Visualization import DataModelVisualizer
 
 logger = get_logger("toolbox.ImageStorage")
@@ -33,7 +34,7 @@ class ImageStorage:
     data models.
     """
 
-    VERSION = "0.2.1"
+    VERSION = get_version()
     TITLE = "Image Storage API"
 
     def __init__(self, config: dict):

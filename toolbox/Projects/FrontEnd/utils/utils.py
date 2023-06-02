@@ -71,7 +71,7 @@ def get_subscription_broker_link(
     )
 
 
-def format_id(ngsi_id: str) -> str:
+def format_st_id(ngsi_id: str) -> str:
     """Format an NGSI-LD entity ID for streamlit.
 
     Args:
@@ -81,6 +81,18 @@ def format_id(ngsi_id: str) -> str:
         str: The formatted entity ID.
     """
     return str(ngsi_id).replace(":", "\:")
+
+
+def format_input_id(input_id: str) -> str:
+    """Format a user input ID.
+
+    Args:
+        input_id (str): The input ID
+
+    Returns:
+        str: The formatted input ID.
+    """
+    return str(input_id).replace('"', "").replace("'", "")
 
 
 def write_title_info_toggle(
@@ -97,6 +109,7 @@ def write_title_info_toggle(
         element (st.delta_generator.DeltaGenerator): The streamlit element
             where the title and info will be written.
     """
+    info = str(info).replace("\n", "")
     element.markdown(
         """
         <style>

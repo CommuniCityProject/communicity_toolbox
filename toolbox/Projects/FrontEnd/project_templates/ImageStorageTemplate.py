@@ -1,5 +1,6 @@
 import streamlit as st
 
+from toolbox.utils.utils import urljoin
 from toolbox.Projects.FrontEnd.utils import utils
 
 from . import BaseTemplate
@@ -11,6 +12,7 @@ class ImageStorageTemplate(BaseTemplate):
         """Create the SimplePredict Project template.
         """
         super().__init__(**kwargs)
+        self.docs_url = urljoin(self.url, "docs")
         self.pagination_limit = kwargs.get("pagination_limit", 100)
 
     def _init_session_state(self):
@@ -28,12 +30,10 @@ class ImageStorageTemplate(BaseTemplate):
         st.session_state.image_dms = list(
             self.context_cli.iterate_entities(
                 entity_type="Image",
-                limit=self.pagination_limit
+                limit=self.pagination_limit,
+                order_by="!dateModified,!dateCreated,!dateObserved"
             )
         )
-        # Newest to oldest
-        st.session_state.image_dms.reverse()
-        [l.reverse() for l in st.session_state.image_dms]
 
     def _ui_tab_images(self):
         """Define the images tab elements.
@@ -52,6 +52,7 @@ class ImageStorageTemplate(BaseTemplate):
                 placeholder="Search",
                 label_visibility="collapsed"
             )
+            id_search = utils.format_input_id(id_search)
 
         # Render pages
         if id_search:
@@ -227,7 +228,20 @@ class ImageStorageTemplate(BaseTemplate):
     def _ui(self):
         """Set the UI elements.
         """
-        st.title(self.name)
+        # Title
+        title_info = st.empty()
+        if self.description:
+            description = self.description + \
+                f" The docs of the API can be found here: " +\
+                f'<a href="{self.docs_url}">{self.docs_url}</a>'
+            utils.write_title_info_toggle(
+                self.name,
+                description,
+                title_info
+            )
+        else:
+            title_info.title(self.name)
+
         self._st_error = st.empty()
 
         tab_images, tab_upload, tab_visualization = st.tabs([

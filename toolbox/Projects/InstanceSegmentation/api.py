@@ -14,7 +14,6 @@ logger = get_logger("toolbox.InstanceSegmentationApi")
 
 class InstanceSegmentationApi(ApiBase):
     
-    VERSION = "0.2.0"
     TITLE = "Instance Segmentation API"
 
     def __init__(self):

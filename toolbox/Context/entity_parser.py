@@ -80,6 +80,8 @@ def data_model_to_json(data_model: Type[BaseModel]) -> dict:
     entity.ctx += data_model.context
     # Set dateCreated attribute
     entity.tprop("dateCreated", datetime.now())
+    # Set dateModified attribute
+    entity.tprop("dateModified", datetime.now())
     # Set dateObserved attribute
     entity.tprop("dateObserved", data_model.dateObserved)
     # Set relationship attributes

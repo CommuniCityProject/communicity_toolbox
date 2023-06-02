@@ -2,7 +2,7 @@
 
 This Project aims to detect and segment objects in images.
 
-![instance segmentation](/docs/res/instance_segmentation.jpg)
+![instance segmentation](../../../docs/res/instance_segmentation.jpg)
 
 ## Data models
 

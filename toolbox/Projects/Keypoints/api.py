@@ -14,7 +14,6 @@ logger = get_logger("toolbox.KeypointsApi")
 
 class KeypointsApi(ApiBase):
     
-    VERSION = "0.2.0"
     TITLE = "Keypoints API"
 
     def __init__(self):

@@ -14,7 +14,7 @@ from toolbox import DataModels, Structures
 from toolbox.Context import ContextCli, entity_parser
 from toolbox.DataModels import BaseModel, Notification
 from toolbox.utils.config_utils import parse_config
-from toolbox.utils.utils import get_logger
+from toolbox.utils.utils import get_logger, get_version
 
 logger = get_logger("toolbox.Api")
 
@@ -47,7 +47,7 @@ class ApiBase:
         run()
     """
 
-    VERSION = "0.2.0"
+    VERSION = get_version()
     TITLE = "BASE API"
 
     def __init__(self, base_dm: Optional[Type[BaseModel]] = None):

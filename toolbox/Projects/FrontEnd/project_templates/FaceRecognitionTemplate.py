@@ -130,7 +130,9 @@ class FaceRecognitionTemplate(SimplePredictTemplate):
         if st.session_state.uploaded_file is None:
             if st.session_state.input_id:
                 # Get the entity from the id text input
-                self._set_input_entity_by_id(st.session_state.input_id)
+                self._set_input_entity_by_id(
+                    utils.format_input_id(st.session_state.input_id)
+                )
             else:
                 # Clear the input entity
                 st.session_state.input_entity = None

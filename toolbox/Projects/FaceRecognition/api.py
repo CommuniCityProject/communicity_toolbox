@@ -14,7 +14,6 @@ logger = get_logger("FaceRecognitionApi")
 
 class FaceRecognitionApi(ApiBase):
     
-    VERSION = "0.2.0"
     TITLE = "Face Recognition API"
 
     def __init__(self):

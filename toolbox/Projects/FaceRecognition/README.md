@@ -8,7 +8,7 @@ This project allows to detect faces, extract its features, recognize people and 
 
 The process of features extraction and face recognition can be done separately on different process/machines.
 
-![face recognition](/docs/res/face_recognition.jpg)
+![face recognition](../../../docs/res/face_recognition.jpg)
 
 ## Data models
 

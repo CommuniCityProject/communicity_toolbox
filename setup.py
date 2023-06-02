@@ -1,3 +1,6 @@
 from setuptools import setup, find_packages
 
-setup(name='toolbox', version='1.0', packages=find_packages())
+with open("toolbox/version") as f:
+    version = f.read()
+
+setup(name='toolbox', version=version, packages=find_packages())
