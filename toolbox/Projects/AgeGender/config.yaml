@@ -18,14 +18,14 @@ face_detector:
   # params:
   #   model_path: ../../../data/models/face_detector_mtcnn/mtcnn.pb
   #   use_cuda: True
-  # model_name: face_detector_retinaface
-  # params:
-  #   weights_path: ../../../data/models/face_detector_retinaface/Resnet50_Final.pth
-  #   model_name: resnet50
-  #   confidence_threshold: 0.7
-  #   landmarks: False
-  #   nms_threshold: 0.4
-  #   use_cuda: True
+  model_name: face_detector_retinaface
+  params:
+    weights_path: ../../../data/models/face_detector_retinaface/Resnet50_Final.pth
+    model_name: resnet50
+    confidence_threshold: 0.7
+    landmarks: False
+    nms_threshold: 0.4
+    use_cuda: True
 
 context_broker:
   host: 192.168.0.100
