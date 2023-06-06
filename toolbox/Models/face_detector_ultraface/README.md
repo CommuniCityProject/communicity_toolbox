@@ -12,7 +12,7 @@ Weights are available in the [releases](https://github.com/CommuniCityProject/co
 
 | Backbone | AP - easy | AP - medium | AP - hard | Inference time (s/img) - CPU | Inference time (s/img) - GPU|
 |-|-|-|-|-|-|
-| version-RFB-640 | 85.5% | 82.2% | 57.9% | 0.067 | 0.0191 |
+| version-RFB-640 | 85.5% | 82.2% | 57.9% | 0.0675 | 0.0191 |
 | version-RFB-320 | 78.7% | 69.8% | 43.8% | 0.0251 | 0.0085 |
 
 <sup>**CPU:** Intel(R) Xeon(R) Silver 4116 || **GPU:** Quadro RTX 8000</sup>
