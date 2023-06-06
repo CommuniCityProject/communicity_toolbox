@@ -2,7 +2,7 @@
 
 This Project aims to perform face recognition in images. This process can be split in two main tasks:
 The first one uses a machine learning model to extract face features from images, which are vectors that represent faces in a high dimensional space.
-The second one uses this features to compare them with a previously created dataset of known faces and recognize them.
+The second one uses this features to compare them with a previously created dataset of known faces and find the most similar one.
 
 This project allows to detect faces, extract its features, recognize people and also to create a dataset from a set of images of known people.
 
