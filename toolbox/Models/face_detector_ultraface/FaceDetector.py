@@ -23,7 +23,8 @@ class FaceDetector:
 
         Args:
             model_path (Path): Path to the onnx model file.
-            input_size (Tuple[int, int]): Model input size.
+            input_size (Tuple[int, int]): Model input size. (640, 480) or
+                (320, 240).
             confidence_threshold (float, optional): Confidence threshold.
                 Defaults to 0.7.
             use_cuda (bool, optional): If True, tries to execute the model on

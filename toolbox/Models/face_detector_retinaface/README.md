@@ -1,6 +1,6 @@
 # RetinaFace
 
-RetinaFace is a single-stage face detector implemented on [PyTorch](https://pytorch.org/) based on the original paper ['RetinaFace: Single-stage Dense Face Localisation in the Wild'](https://arxiv.org/abs/1905.00641).
+RetinaFace is a single-stage face detector implemented in [PyTorch](https://pytorch.org/) based on the original paper ['RetinaFace: Single-stage Dense Face Localisation in the Wild'](https://arxiv.org/abs/1905.00641).
 
 The official code can be found [here](https://github.com/biubug6/Pytorch_Retinaface).
 
@@ -36,7 +36,7 @@ print(instances[0].fields)
 # > ['bounding_box', 'confidence']
 
 for instance in instances:
-    print(instance.bounding_box)
+    print(instance.bounding_box, instance.confidence)
 # > BoundingBox(0.130,0.565,0.360,0.800) 0.9999852
 # > BoundingBox(0.604,0.077,0.838,0.350) 0.9998944
 # > BoundingBox(0.580,0.565,0.800,0.853) 0.9998043
