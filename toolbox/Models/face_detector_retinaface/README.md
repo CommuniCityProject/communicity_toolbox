@@ -1,2 +1,29 @@
-Known limitations: The model may struggle to detect large faces since it was trained with anchors of sizes from ~16 to ~512 pixels.
-A solution for this problem could be to resize the input images to a smaller size, but this could involve a decrease in performance with the smaller faces.
+# Retinaface
+## Face Detector
+
+Retinaface is a single-stage face detector implemented on [PyTorch](https://pytorch.org/) based on the original paper [RetinaFace: Single-stage Dense Face Localisation in the Wild](https://arxiv.org/abs/1905.00641).
+
+The official code can be found [here](https://github.com/biubug6/Pytorch_Retinaface).
+
+Weights path:
+- Resnet50: ``data/models/face_detector_retinaface/mobilenet0.25_Final.pth``
+- Mobilenet0.25: ``data/models/face_detector_retinaface/Resnet50_Final.pth``
+
+### WIDER Face Val Performance
+
+| Backbone | AP - easy | AP - medium | AP - hard | Inference time (s/img) - CPU | Inference time (s/img) - GPU|
+|-|-|-|-|-|-|
+| Resnet50 | 95.48% |94.04% | 84.43% | 0. | 0. |
+| Mobilenet0.25 | 90.70% | 88.16% | 73.82% | 0. | 0. |
+
+<sup>GPU: Quadro RTX 8000</sup>
+<sup>CPU: Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz</sup>
+
+
+
+<details>
+<summary>Note:</summary>
+
+The model may struggle to detect large faces since it was trained with anchors of sizes from ~16 to ~512 pixels. To solve this issue, use the parameter ``max_input_size`` to scale down larger images (for example to ``512``).
+    
+</details>
