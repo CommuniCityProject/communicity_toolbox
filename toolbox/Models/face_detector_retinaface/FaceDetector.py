@@ -22,7 +22,7 @@ class FaceDetector:
         weights_path: Path,
         model_name: Literal["mobile0.25", "resnet50"],
         confidence_threshold: float = 0.7,
-        landmarks: bool = True,
+        landmarks: bool = False,
         nms_threshold: Optional[float] = 0.4,
         max_input_size: Optional[int] = None,
         use_cuda: bool = False
@@ -36,7 +36,7 @@ class FaceDetector:
             confidence_threshold (float, optional): The minimum detection
                 confidence. Defaults to 0.7.
             landmarks (bool, optional): Process the face landmarks.
-                Defaults to True.
+                Defaults to False.
             nms_threshold (Optional[float], optional):
                 Non-maximum-suppression threshold. None to disable. Defaults
                 to 0.4.
