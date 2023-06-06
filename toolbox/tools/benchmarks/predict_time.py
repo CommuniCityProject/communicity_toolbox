@@ -46,12 +46,16 @@ def main(images_path: Path, config_path: Path, model_key: Optional[str] = None):
 
     # Predict the images
     times = []
-    for img_path in tqdm(paths):
-        img = cv2.imread(str(img_path))
-        ti = time.time()
-        model.predict(img)
-        tf = time.time()
-        times.append(tf-ti)
+    try:
+        for img_path in tqdm(paths):
+            img = cv2.imread(str(img_path))
+            ti = time.time()
+            model.predict(img)
+            tf = time.time()
+            times.append(tf-ti)
+    except KeyboardInterrupt:
+        # Show partial results if ctrl+c
+        pass
 
     times = np.array(times)
 
