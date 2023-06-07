@@ -22,7 +22,7 @@ Models:
 | Backbone | box AP| mask AP | Inference time (s/img) - CPU | Inference time (s/img) - GPU|
 |-|-|-|-|-|
 | mask_rcnn_R_50_FPN_3x | 41.0% | 37.2% | 6.4292 | 0.0690 |
-| mask_rcnn_X_101_32x8d_FPN_3x | 44.3% | 39.5% |  |  |
+| mask_rcnn_X_101_32x8d_FPN_3x | 44.3% | 39.5% | 21.2994 | 0.1598 |
 
 <sup>**CPU:** Intel(R) Xeon(R) Silver 4116 || **GPU:** Quadro RTX 8000</sup>
 
@@ -41,6 +41,8 @@ Models:
 | Backbone | box AP| kp AP | Inference time (s/img) - CPU | Inference time (s/img) - GPU|
 |-|-|-|-|-|
 | keypoint_rcnn_R_50_FPN_3x | 55.4% | 65.5% | 11.4326 | 0.1099 |
-| keypoint_rcnn_X_101_32x8d_FPN_3x | 57.3% | 66.0% |  |  |
+| keypoint_rcnn_X_101_32x8d_FPN_3x | 57.3% | 66.0% | 12.6266 | 0.1316 |
 
 <sup>**CPU:** Intel(R) Xeon(R) Silver 4116 || **GPU:** Quadro RTX 8000</sup>
+
+<!-- TODO: examples -->
