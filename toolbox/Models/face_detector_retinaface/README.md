@@ -8,7 +8,7 @@ Weights are available in the [releases](https://github.com/CommuniCityProject/co
 - Resnet50: ``data/models/face_detector_retinaface/mobilenet0.25_Final.pth``
 - Mobilenet0.25: ``data/models/face_detector_retinaface/Resnet50_Final.pth``
 
-### Performance on WIDER Face Val dataset
+### Performance on [WIDER](http://shuoyang1213.me/WIDERFACE/) Face Val dataset
 
 | Backbone | AP - easy | AP - medium | AP - hard | Inference time (s/img) - CPU | Inference time (s/img) - GPU|
 |-|-|-|-|-|-|

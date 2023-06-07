@@ -8,7 +8,7 @@ Weights are available in the [releases](https://github.com/CommuniCityProject/co
 - version-RFB-640.onnx: ``data/models/face_detector_ultraface/version-RFB-640.onnx``
 - version-RFB-320.onnx: ``data/models/face_detector_ultraface/version-RFB-320.onnx``
 
-### Performance on WIDER Face Val dataset
+### Performance on [WIDER](http://shuoyang1213.me/WIDERFACE/) Face Val dataset
 
 | Backbone | AP - easy | AP - medium | AP - hard | Inference time (s/img) - CPU | Inference time (s/img) - GPU|
 |-|-|-|-|-|-|
