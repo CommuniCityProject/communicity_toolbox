@@ -23,13 +23,13 @@ class Detectron2:
     """
 
     def __init__(self, model_config: Path,
-        model_weights: Optional[Path] = None,
+        model_weights: Optional[str] = None,
         confidence_threshold: Optional[float] = 0.5, use_cuda: bool = False):
         """Create and load a detectron2 model.
 
         Args:
             model_config (Path): Path to the detectron2 configuration yaml.
-            model_weights (Optional[Path], optional): Optional path or URL to
+            model_weights (Optional[str], optional): Optional path or URL to
                 the model weights file. Defaults to None.
             confidence_threshold (Optional[float], optional): Minimum
                 detection confidence of the instances. Defaults to 0.5.
@@ -151,12 +151,12 @@ class Detectron2:
             return [str(i) for i in classes]
 
     def _setup_cfg(self, config_path: Path,
-        model_weights: Optional[Path] = None, use_cuda: bool = False):
+        model_weights: Optional[str] = None, use_cuda: bool = False):
         """Create the model cfg.
 
         Args:
             config_path (Path): Path to the detectron2 configuration yaml.
-            model_weights (Optional[Path], optional): Optional path or URL to
+            model_weights (Optional[str], optional): Optional path or URL to
                 the model weights file. Defaults to None.
             use_cuda (bool, optional): Execute the model on a cuda device.
                 Defaults to False.

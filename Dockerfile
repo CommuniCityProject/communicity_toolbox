@@ -32,15 +32,11 @@ RUN python -m pip install --upgrade pip
 RUN python -m pip install --upgrade setuptools
 COPY ./requirements.txt /home/user/requirements.txt
 RUN python -m pip install -r /home/user/requirements.txt
-# RUN python -m pip install ngsildclient
-# RUN python -m pip install tensorflow==2.7.0
-# RUN python -m pip install torch==1.8.1+cu101 torchvision==0.9.1+cu101 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
-# RUN python -m pip install matplotlib==3.5.1 PyYAML==6.0 opencv-python-headless==4.6.0.66 seaborn==0.12.2 "fastapi[all]" scipy fastapi-utils onnxruntime-gpu
-# RUN python -m pip install tensorboard cmake onnx tqdm cython pycocotools
 
 # Install detectron2
 RUN python -m pip install --user 'git+https://github.com/facebookresearch/fvcore'
 RUN git clone https://github.com/facebookresearch/detectron2 detectron2
+RUN git --work-tree=detectron2 checkout tags/v0.6
 ENV FORCE_CUDA="1"
 ARG TORCH_CUDA_ARCH_LIST="Kepler;Kepler+Tesla;Maxwell;Maxwell+Tegra;Pascal;Volta;Turing"
 ENV TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST}"
