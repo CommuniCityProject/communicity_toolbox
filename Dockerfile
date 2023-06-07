@@ -36,7 +36,7 @@ RUN python -m pip install -r /home/user/requirements.txt
 # Install detectron2
 RUN python -m pip install --user 'git+https://github.com/facebookresearch/fvcore'
 RUN git clone https://github.com/facebookresearch/detectron2 detectron2
-RUN git --work-tree=detectron2 checkout tags/v0.6
+RUN git -C detectron2 checkout tags/v0.6
 ENV FORCE_CUDA="1"
 ARG TORCH_CUDA_ARCH_LIST="Kepler;Kepler+Tesla;Maxwell;Maxwell+Tegra;Pascal;Volta;Turing"
 ENV TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST}"
