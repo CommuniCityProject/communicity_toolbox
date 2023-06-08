@@ -69,7 +69,7 @@ class AgeGenderPredictor:
         if isinstance(images, np.ndarray) and images.ndim == 3:
             images = [images]
 
-        input_blob = np.ones((len(images), 3, 224, 224))
+        input_blob = np.zeros((len(images), 3, 224, 224))
         for i, img in enumerate(images):
             img = cv2.resize(img, (224, 224))
             input_blob[i] = img.transpose(2, 0, 1)
@@ -170,30 +170,25 @@ class AgeGenderPredictor:
 
         Args:
             images (Union[List[np.ndarray], np.ndarray]): A single image or a
-                list of images of face crops, BGR uint8 of shape (H, W, 3).
+                list of face images, BGR uint8 of shape (H, W, 3).
 
         Returns:
-            List[Instance]: A Instance for each image with the following fields:
-                age (float): The age of the face
-                    (if ``do_age`` is set to True).
-                gender (Gender): A Gender enum
-                    (if ``do_gender`` is set to True).
+            List[Instance]: An Instance for each image with the following fields:
+                age (float): The age of the face (if ``do_age`` is True).
+                gender (Gender): A Gender enum (if ``do_gender`` is True).
                 gender_confidence (float) The gender confidence
-                    (if ``do_gender`` is set to True).
+                    (if ``do_gender`` is True).
         """
         input_blob = self._preprocess_image(images)
-        ages = self._predict_age(input_blob) if self._do_age else []
-        genders, confidences = self._predict_gender(input_blob) \
-            if self._do_gender else ([], [])
-
-        instances = []
-        for i in range(max(len(ages), len(genders))):
-            instance = Instance()
-            if self._do_age:
-                instance.set("age", ages[i])
-            if self._do_gender:
-                instance.set("gender", genders[i]). \
-                    set("gender_confidence", confidences[i])
-            instances.append(instance)
-
+        instances = [Instance() for _ in range(len(input_blob))]
+        
+        if self._do_age:
+            ages = self._predict_age(input_blob)
+            [ins.set("age", age) for ins, age in zip(instances, ages)]
+        
+        if self._do_gender:
+            genders, confidences = self._predict_gender(input_blob)
+            [ins.set("gender", gender).set("gender_confidence", conf)
+             for ins, gender, conf in zip(instances, genders, confidences)]
+        
         return instances

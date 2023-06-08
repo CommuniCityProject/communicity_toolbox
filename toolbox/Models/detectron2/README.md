@@ -1,6 +1,6 @@
 # Detectron2
 
-[Detectron2](https://github.com/facebookresearch/detectron2) is a library that provides state-of-the-art detection and segmentation algorithms implemented in [PyTorch](https://pytorch.org/).
+Detectron2 is a library that provides state-of-the-art detection and segmentation algorithms implemented in [PyTorch](https://pytorch.org/).
 
 The official code can be found [here](https://github.com/facebookresearch/detectron2).
 

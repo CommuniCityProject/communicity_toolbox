@@ -10,10 +10,10 @@ Weights are available in the [releases](https://github.com/CommuniCityProject/co
 
 ### Performance on [WIDER](http://shuoyang1213.me/WIDERFACE/) Face Val dataset
 
-| Backbone | AP - easy | AP - medium | AP - hard | Inference time (s/img) - CPU | Inference time (s/img) - GPU|
-|-|-|-|-|-|-|
-| version-RFB-640 | 85.5% | 82.2% | 57.9% | 0.0675 | 0.0191 |
-| version-RFB-320 | 78.7% | 69.8% | 43.8% | 0.0251 | 0.0085 |
+| Backbone | Input size (W, H) | AP - easy | AP - medium | AP - hard | Inference time (s/img) - CPU | Inference time (s/img) - GPU|
+|-|-|-|-|-|-|-|
+| version-RFB-640 | (640, 480) | 85.5% | 82.2% | 57.9% | 0.0675 | 0.0191 |
+| version-RFB-320 | (320, 240) | 78.7% | 69.8% | 43.8% | 0.0251 | 0.0085 |
 
 <sup>**CPU:** Intel(R) Xeon(R) Silver 4116 || **GPU:** Quadro RTX 8000</sup>
 
@@ -27,7 +27,7 @@ img = cv2.imread("data/samples/images/faces/celeb/ben_mad_min_jer.png")
 
 detector = FaceDetector(
     model_path="../../../data/models/face_detector_ultraface/version-RFB-640.onnx",
-    input_size=(640, 480),  # (320, 240)
+    input_size=(640, 480),
     use_cuda=False
 )
 

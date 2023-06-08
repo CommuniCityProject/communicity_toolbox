@@ -21,8 +21,10 @@ Weights are available in the [releases](https://github.com/CommuniCityProject/co
 import cv2
 from toolbox.Models.face_recognition_facenet import FaceRecognition
 
-img = cv2.imread("data/samples/images/faces/celeb_single/urn;ngsi-ld;Person;elton_john.jpg")
+img = cv2.imread("data/samples/images/faces/celeb_single/urn;ngsi-ld;Person;Elton_John.jpg")
+img_flip = cv2.flip(img, 1)
 
+# Load the face recognition models
 recognition = FaceRecognition(
     model_path="data/models/face_recognition_facenet/squeezenet_VGGFace2/model-20180204-160909.ckpt-266000",
     use_cuda=False
@@ -39,12 +41,12 @@ print(type(features), features.shape, features.dtype)
 
 recognition.add_features("elton_john", features)
 
-instances = recognition.recognize_image(img)
+instances = recognition.recognize_image(img_flip)
 print(len(instances), instances[0].fields)
 # > 1 ['name', 'distance']
 
 print(instances[0].name, instances[0].distance)
-# > elton_john 0.0
+# > elton_john 0.07795006
 
 ```
 

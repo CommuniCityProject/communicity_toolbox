@@ -1,7 +1,7 @@
 
 # HSEmotion
 
-HSEmotion (High-Speed face Emotion recognition) offers a model to perform facial emotion recognition, distinguishing between 7 different expressions.
+HSEmotion (High-Speed face Emotion recognition) is a model that performs facial emotion recognition, distinguishing between 7 different expressions.
 
 It is implemented in [TensorFlow](https://www.tensorflow.org). The official code can be found [here](https://github.com/HSE-asavchenko/face-emotion-recognition).
 
