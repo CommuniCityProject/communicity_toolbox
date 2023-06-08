@@ -1,6 +1,6 @@
-# Structures
+# Toolbox Structures
 
-Structures are a set of Python Classes used to represent the output of machine learning algorithms.
+The Toolbox Structures are a set of Python Classes used to represent the output of machine learning algorithms.
 
 The following Structures are implemented:
 

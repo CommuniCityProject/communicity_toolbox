@@ -84,8 +84,7 @@ A complete list of the currently implemented models can be found [here](docs/mac
 
 ### Data models
 
-The Toolbox provides a set of standardized data models that define the structure and content of the data generated and consumed by the Toolbox components.
-<!-- A set of interfaces and parsers are provided to handle the creation and consumption of these data. -->
+The Toolbox provides a set of standardized data models that define the structure and content of the data generated and consumed by the Toolbox components. Also, components to interact with the context broker and parse its data are provided.
 
 The data models specifications can be found [here](docs/DataModels/README.md).
 
