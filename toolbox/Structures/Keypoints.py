@@ -17,10 +17,10 @@ class BaseKeypoints:
 
     Properties (read-only):
         named_keypoints (Dict[str, Tuple[float, float, float]]): A dict of
-            keypoints by its name.
-        visible_keypoints (Dict[str, Tuple[float, float, float]]) A dict of
-            keypoints by its name only with the visible ones
-            (confidence >= confidence_threshold)
+            keypoints by their names.
+        visible_keypoints (Dict[str, Tuple[float, float, float]]) A dict with
+            the visible keypoints by their names
+            (those with confidence >= confidence_threshold).
 
     Methods:
         serialize() -> dict
@@ -186,10 +186,10 @@ class COCOKeypoints(BaseKeypoints):
 
     Properties (read-only):
         named_keypoints (Dict[str, Tuple[float, float, float]]): A dict of
-            keypoints by its name.
-        visible_keypoints (Dict[str, Tuple[float, float, float]]) A dict of
-            keypoints by its name only with the visible ones
-            (confidence >= confidence_threshold)
+            keypoints by their names.
+        visible_keypoints (Dict[str, Tuple[float, float, float]]) A dict with
+            the visible keypoints by their names
+            (those with confidence >= confidence_threshold).
 
     Methods:
         serialize() -> dict
