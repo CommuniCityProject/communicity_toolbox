@@ -9,32 +9,22 @@ logger = get_logger("toolbox.ImageStorageCli")
 
 
 class ImageStorageCli:
-    """A class to interact with the image storage server.
+    """A class to interact with the ImageStorage API.
 
     Attributes:
-        host (str): Host address of the image storage server.
-        port (int): Port of the image storage server.
-        url_path (str): URL path of the image storage server.
-        url (str): The full URL of the image storage server.
-    
-    Methods:
-        upload_bytes(image_bytes, name, file_type, source, purpose,
-                     raise_on_error) -> Union[str, None]
-        download(image_id, raise_on_error) -> Union[Image, None]
-        visualize(entity_ids, visualization_params, raise_on_error
-                 ) -> Union[str, None]
-        TODO: upload_image(...) np.ndarray or Image
-        TODO: upload_file(...)
+        host (str): address of the API.
+        port (int): Port of API.
+        url_path (str): URL path of the API.
+        url (str): The full URL of the API.
     """
 
     def __init__(self, host: str, port: int, url_path: str = ""):
         """Create the image storage client.
 
         Args:
-            host (str): Host address of the image storage server.
-            port (int): Port of the image storage server.
-            url_path (str, optional): URL path of the image storage server. 
-                Defaults to "".
+            host (str): Address of the API.
+            port (int): Port of the API.
+            url_path (str, optional): URL path of the API. Defaults to "".
         """
         self.host = host
         self.port = port
@@ -50,13 +40,13 @@ class ImageStorageCli:
         source: str = "",
         purpose: str = "",
     ) -> str:
-        """Upload an image as bytes to the image storage.
+        """Upload an image bytes to the image storage.
 
         Args:
             image_bytes (bytes): The image bytes.
             name (str): The filename of the image.
             file_type (str): The MIME type of the image.
-            source (str, optional): Optional source os the image.
+            source (str, optional): Optional source of the image.
                 Defaults to "".
             purpose (str, optional): Optional purpose of the image.
                 Defaults to "".
@@ -91,7 +81,7 @@ class ImageStorageCli:
             Exception: If the request fails.
 
         Returns:
-            Image: The downloaded image object.
+            Structures.Image.Image: The downloaded image object.
         """
         url = urljoin(self.url, image_id)
         logger.debug(f"Downloading image {url}")
@@ -108,10 +98,10 @@ class ImageStorageCli:
         entity_ids: List[str],
         visualization_params: dict = {},
     ) -> str:
-        """Create a visualization of the given entity ids.
+        """Create a visualization of the given entity IDs.
 
         Args:
-            entity_ids (List[str]): List of entity ids to visualize.
+            entity_ids (List[str]): List of entity IDs to visualize.
             visualization_params (dict, optional): Visualization parameters.
                 Defaults to {}.
 
