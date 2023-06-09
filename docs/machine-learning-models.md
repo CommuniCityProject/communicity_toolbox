@@ -2,7 +2,7 @@
 
 This page lists the provided machine learning models that are pre-trained and ready to use for inference. The weights of the models are located by default on ``data/models/`` and can be downloaded from the [GitHub releases](https://github.com/CommuniCityProject/communicity_toolbox/releases).
 
-The output of the models is composed of [Toolbox Structures]().
+The output of the models is composed of [Toolbox Structures](./structures.md).
 
 ## Face analysis
 | Name | Description | Output |

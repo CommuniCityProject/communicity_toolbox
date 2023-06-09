@@ -46,7 +46,7 @@ class DemoBase:
         parent_ap.add_argument(
             "-c",
             "--config",
-            help="Path to the configuration yaml (default 'config.yaml')",
+            help="Path to the configuration YAML (default 'config.yaml')",
             type=Path,
             default="config.yaml"
         )
@@ -69,13 +69,13 @@ class DemoBase:
         local_ap.add_argument(
             "-i",
             "--image",
-            help="Path or URL to an image or a folder with images",
+            help="Path or URL to an image or folder with images",
             required=True
         )
         local_ap.add_argument(
             "-o",
             "--output",
-            help="Optional output image file path when running a single"
+            help="Optional output image file path when running a single "
             "image or an output folder when running on multiple images",
             type=Path,
             default=None
@@ -100,7 +100,7 @@ class DemoBase:
         prod_ap.add_argument(
             "-i",
             "--image",
-            help="Path or URL to an image or a folder with images",
+            help="Path or URL to an image or folder with images",
             required=True
         )
         return prod_ap
@@ -122,7 +122,7 @@ class DemoBase:
         cons_ap.add_argument(
             "-i",
             "--id",
-            help="Optional entity id",
+            help="Optional entity ID",
             default=None
         )
         cons_ap.add_argument(
@@ -151,18 +151,18 @@ class DemoBase:
         """
         vis_ap = sub_parser.add_parser(
             "visualize",
-            help="Visualize an entity form the context broker"
+            help="Visualize an entity from the context broker"
         )
         vis_ap.add_argument(
             "-i",
             "--id",
-            help="Entity id",
+            help="Entity ID",
             required=True
         )
         vis_ap.add_argument(
             "--image",
             help="Optional image file where draw the retrieved entity. "
-            "If not set, will try to get the image by its id.",
+            "If not set, it will try to get the image by its ID",
             default=None
         )
         vis_ap.add_argument(
@@ -244,7 +244,7 @@ class DemoBase:
         """Run the project locally on images.
 
         Args:
-            image_path (str): Path or URL to an image or a folder with images.
+            image_path (str): Path or URL to an image or folder with images.
             output (Optional[Path], optional): Output image or folder path.
                 Defaults to None.
         """
@@ -277,7 +277,7 @@ class DemoBase:
         and print the generated entities.
 
         Args:
-            image_path (Path): Path or URL to an image or a folder with images.
+            image_path (Path): Path or URL to an image or folder with images.
         """
         if not is_url(image_path) and os.path.isdir(image_path):
             image_paths = list(Path(image_path).iterdir())
@@ -305,7 +305,7 @@ class DemoBase:
         """Retrieve and parse entities from a context broker.
 
         Args:
-            e_id (Optional[str]): The id of an entity.
+            e_id (Optional[str]): The ID of an entity.
             config (dict): The configuration dict.
             subscribe (bool, optional): Subscribe to a context broker to
                 process every new entity. Defaults to False.
@@ -356,7 +356,7 @@ class DemoBase:
         """Visualize one entity from a context broker.
 
         Args:
-            e_id (str): The id of an entity.
+            e_id (str): The ID of an entity.
             output (Path): The output image file path.
         """
         data_model = self.context_cli.get_entity(e_id)
