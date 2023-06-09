@@ -3,10 +3,13 @@
 This guide shows how to use the Toolbox with Docker.
 
 Requirements:
+- Git
 - Docker
-- Optional for GPU support: CUDA >=10.1 
+- Optional GPU support: CUDA >=10.1 
 
 ## Clone the repository
+
+First of all, download the Toolbox repository and the required data:
 
 1. Clone the repository and navigate to the project directory.
 
@@ -15,26 +18,11 @@ Requirements:
     cd communicity_toolbox
     ```
 
-2. The machine learning models and some additional resources are available in the repository [releases](https://github.com/CommuniCityProject/communicity_toolbox/releases), on _data.zip_. To download and extract it just run the _download_data_ script:
-
-    <details>
-    <summary>Linux</summary>
-
-    ```
-    bash ./download_data.sh
-    ```
-
-    </details>
-    <details>
-    <summary>Windows</summary>
-
-    ```
-    ./download_data.bat
-    ```
+2. Download the Toolbox's data from the repository [releases](https://github.com/CommuniCityProject/communicity_toolbox/releases), which includes machine learning models and additional resources. Download and extract it manually or run the following script:
     
-    </details>
-
-</br>
+    ```
+    python download_data.py
+    ```
 
 ## Get the Toolbox Docker image
 
@@ -42,14 +30,12 @@ We provide a Docker image with the Toolbox and all its requirements already inst
 
 ### Use an already-built Docker image
 
-A Toolbox image can be pulled from the CommuniCity Docker hub. Refer to [https://hub.docker.com/r/egracia/toolbox/tags](https://hub.docker.com/r/egracia/toolbox/tags) to get the latest version.
+Use ``docker pull`` to download the image from the CommuniCity Docker hub: [https://hub.docker.com/r/egracia/toolbox/tags](https://hub.docker.com/r/egracia/toolbox/tags):
 
-Use ``docker pull`` to download the desired image.
 
 ### Build the image from source
 
-The Docker image can be also built with the [Dockerfile]() provided in the Toolbox repository. It will install the Toolbox from the current source code.
-
+Build the image with the provided [Dockerfile](../Dockerfile).
 Use this method to get the latest version of the Toolbox or to install your own modified version.
 
 Inside the Toolbox repository, run:
@@ -70,17 +56,15 @@ It will also mount a volume on the ``/home/user/communicity_toolbox/data`` path,
 
 To enable GPU support, add the argument: ``--gpus all``
 
-## Use Docker compose
+## Use Docker Compose
 
-Docker compose can be used to run multiple containers with different services at once.
-A [Docker compose file](../docker-compose.yaml) is provided to run each one of the Toolbox Project APIs.
+A [Docker Compose file](../docker-compose.yaml) is provided to run all the Toolbox Project APIs.
 
-First, edit the following fields on the ``docker-compose.yaml`` file:
-- ``x-common-env: BROKER_HOST``: The context broker IP address.
-- ``x-common-env: BROKER_PORT``: The context broker port.
-- ``x-common-env: HOST``: The address of the machine where the services will run.
+It also includes an Orion-LD context broker required by the Toolbox services. If you want to use your own context broker, remove the ``orion`` and ``mongo-db`` services, remove the ``mongo-db`` volume and change the fields ``x-common-env: BROKER_HOST`` and ``x-common-env: BROKER_PORT``.
 
-The ``services`` section defines the containers that will be created. Here is created one for each Toolbox Project, and its API is served on different ports.
+Edit the ``x-common-env: HOST`` field to point to the IP address of the machine where the services will run.
+
+<!-- The ``services`` section defines the containers that will be created. Here is created one for each Toolbox Project, and its API is served on different ports. -->
 
 In the ``volumes`` section are defined the file system volumes that will be mounted on each container. Most of the services have a volume bound to the ``data`` host directory, so the configuration files and machine learning models can be shared among services and the host. Also, another volume is created to share the uploaded images to the ImageStorage service. This allows other services to directly access the images from the disk.
 

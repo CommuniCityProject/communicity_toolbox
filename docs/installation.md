@@ -3,8 +3,9 @@
 This guide shows how to manually install the Toolbox and its requirements as a Python package.
 
 Requirements:
+- Git
 - Python [3.9 - 3.10]
-- Optional for GPU support: CUDA >=10.1
+- Optional GPU support: CUDA >=10.1
 
 1. Clone the repository and navigate to the project directory
 
@@ -13,24 +14,11 @@ Requirements:
     cd communicity_toolbox
     ```
 
-2. The machine learning models and some additional resources are available in the repository [releases](https://github.com/CommuniCityProject/communicity_toolbox/releases), on a _data.zip_ file. To download and extract it run:
+2. Download the Toolbox's data from the repository [releases](https://github.com/CommuniCityProject/communicity_toolbox/releases), which includes machine learning models and additional resources. Download and extract it manually or run the following script:
     
-    <details>
-    <summary>Linux</summary>
-
     ```
-    bash ./download_data.sh
+    python download_data.py
     ```
-
-    </details>
-    <details>
-    <summary>Windows</summary>
-
-    ```
-    ./download_data.bat
-    ```
-    
-    </details>
 
 3. Install the Python requirements
 
@@ -53,7 +41,7 @@ Requirements:
     ```
 
 ## Optional: Install Orion-LD
-Some Toolbox components require an NGSI-LD context broker to function. The recommended one is [Orion-LD](https://github.com/FIWARE/context.Orion-LD). You can launch an instance with Docker Compose using the provided [docker-compose](../Orion-LD.yaml) file.
+Some Toolbox components require an NGSI-LD context broker to function. The recommended one is [Orion-LD](https://github.com/FIWARE/context.Orion-LD). You can launch an instance with Docker Compose using the provided [Orion-LD.yaml](../Orion-LD.yaml) docker compose file.
 
 Requirements:
 - docker-compose
