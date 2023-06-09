@@ -6,8 +6,8 @@ from typing import List, Optional
 
 import requests
 
-# REPO_RUL = "https://github.com/CommuniCityProject/communicity_toolbox"
-REPO_RUL = "https://github.com/edgarGracia/models/"
+REPO_RUL = "https://github.com/CommuniCityProject/communicity_toolbox"
+FILE_PREFIX = "data."
 
 
 def download(
@@ -24,7 +24,11 @@ def download(
     if tag_name is not None:
         response = requests.get(url)
         response.raise_for_status()
-        release = [r for r in response.json() if r["tag_name"] == tag_name][0]
+        try:
+            release = [r for r in response.json() if r["tag_name"] == tag_name][0]
+        except IndexError:
+            print("Tag not found!")
+            return []
     else:
         response = requests.get(url + "/latest")
         response.raise_for_status()
@@ -33,7 +37,7 @@ def download(
     file_paths = []
     assets = release["assets"]
     for asset in assets:
-        if asset["name"].startswith("data."):
+        if asset["name"].startswith(FILE_PREFIX):
             download_url = asset["browser_download_url"]
             file_path = output_path / asset["name"]
             with open(file_path, "wb") as file:
@@ -45,44 +49,24 @@ def download(
     return file_paths
 
 
-# def extract_parts():
-#     with open("new.zip", 'wb') as combined_zip:
-#         # Concatenate the split files into a single file
-#         for split_file in ["data.zip", "data.z01"]:
-#             with open(split_file, 'rb') as part:
-#                 combined_zip.write(part.read())
-#     with zipfile.ZipFile("new.zip", 'r') as zip_ref:
-#         zip_ref.extractall("./mew_data")
-
-
-#     with open(zip_file_path, "rb") as file:
-#     # Create a ZipFile object
-#     zip_file = zipfile.ZipFile(file, "r")
-
-#     # Extract the contents of the zip file to the specified extract path
-#     zip_file.extractall(extract_path)
-
-#     # Close the zip file
-#     zip_file.close()
+def extract(zip_path: Path, out_path: Path):
+    print(f"Extracting {zip_path} to {out_path}")
+    zip_file = zipfile.ZipFile(zip_path, 'r')
+    zip_file.extractall(out_path)
 
 
 def main(repo_url: str, output_path: Path, tag_name: Optional[str] = None):
     with tempfile.TemporaryDirectory() as tmp_dir:
         file_paths = download(repo_url, Path(tmp_dir), tag_name)
-        # with open(zip_file_path, "rb") as file:
-        # input(tmp_dir)
-    # Create a ZipFile object
-    # zip_file = zipfile.ZipFile(file, "r")
-
-    # Extract the contents of the zip file to the specified extract path
-    # zip_file.extractall(extract_path)
-
-    # Close the zip file
-    # zip_file.close()
+        for file_path in file_paths:
+            extract(file_path, output_path)
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(
+        description="Download and extract the Toolbox data from the Github"
+                    "repository."
+    )
     ap.add_argument(
         "--repo",
         default=REPO_RUL,
@@ -97,8 +81,8 @@ if __name__ == "__main__":
     ap.add_argument(
         "-o",
         "--output",
-        default=Path("data"),
-        help="Output path. Defaults to './data/'"
+        default=Path("./"),
+        help="Output path. Defaults to './'"
     )
     args = ap.parse_args()
     main(args.repo, args.output, args.tag)
