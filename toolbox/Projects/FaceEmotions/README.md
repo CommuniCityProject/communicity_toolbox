@@ -6,7 +6,7 @@ This Project aims to detect faces in images and infer their emotion.
 
 ## Data models
 
-This project uses the [Face](/docs/DataModels/Face/) data model.
+This project uses the _[Face](https://github.com/CommuniCityProject/communicity_toolbox/tree/master/docs/DataModels/Face)_ data model.
 
 ## Configuration
 

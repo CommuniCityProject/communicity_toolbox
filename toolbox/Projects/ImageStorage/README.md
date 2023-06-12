@@ -6,11 +6,11 @@ This Project offers a REST API server to store and retrieve images, as well as v
 
 The Toolbox Projects APIs typically require an image as input. To facilitate this, this service offers common image storage for uploading and accessing images.
 
-Since a context broker is not intended for storing large files, this service instead stores images in a local folder and maintains a reference to them in the context broker via the _[Image](/docs/DataModels/Image/)_ data model.
+Since a context broker is not intended for storing large files, this service instead stores images in a local folder and maintains a reference to them in the context broker via the _[Image](https://github.com/CommuniCityProject/communicity_toolbox/tree/master/docs/DataModels/Image)_ data model.
 
 ### Overview
 
-When an image is uploaded a URL-safe, secure and random id is generated. This id is returned as a response and it can be used to retrieve back the image. An entity is created with some metadata about the image on the context broker, with the same id, following the _[Image](/docs/DataModels/Image/)_ data model. This data model includes a URL that can be used to retrieve the image, a path to the image file that can be used by applications running on the same machine and some metadata about the image, such as its size.
+When an image is uploaded a URL-safe, secure and random id is generated. This id is returned as a response and it can be used to retrieve back the image. An entity is created with some metadata about the image on the context broker, with the same id, following the _[Image](https://github.com/CommuniCityProject/communicity_toolbox/tree/master/docs/DataModels/Image)_ data model. This data model includes a URL that can be used to retrieve the image, a path to the image file that can be used by applications running on the same machine and some metadata about the image, such as its size.
 
 The API also includes a route to visualize the Toolbox data models which draws its content to the source image. It also accepts the visualization parameters, such as colors, font size or image size. When a data model is visualized, a new image is created and its id is returned as a response which can then be used to retrieve the image. This id is a hash of the data models and the visualization parameters, so the same calls will return the same image/id.
 
@@ -18,7 +18,7 @@ This API also allows limiting the type and size of the uploaded images as well a
 
 ## Data models
 
-This project uses the [Image](/docs/DataModels/Image/ data model.
+This project uses the _[Image](https://github.com/CommuniCityProject/communicity_toolbox/tree/master/docs/DataModels/Image)_ data model.
 
 ## Configuration
 

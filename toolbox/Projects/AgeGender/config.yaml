@@ -9,15 +9,6 @@ age_gender:
 
 face_detector:
   face_box_scale: 1.2
-  # model_name: face_detector_ultraface
-  # params:
-  #   model_path: ../../../data/models/face_detector_ultraface/version-RFB-320.onnx
-  #   input_size: [320, 240] # [640, 480] # [320, 240]
-  #   use_cuda: True
-  # model_name: face_detector_mtcnn
-  # params:
-  #   model_path: ../../../data/models/face_detector_mtcnn/mtcnn.pb
-  #   use_cuda: True
   model_name: face_detector_retinaface
   params:
     weights_path: ../../../data/models/face_detector_retinaface/Resnet50_Final.pth
@@ -25,7 +16,7 @@ face_detector:
     confidence_threshold: 0.7
     landmarks: False
     nms_threshold: 0.4
-    use_cuda: True
+    use_cuda: False
 
 context_broker:
   host: 192.168.0.100

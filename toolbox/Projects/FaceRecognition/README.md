@@ -12,7 +12,7 @@ The process of features extraction and face recognition can be done separately o
 
 ## Data models
 
-This project uses the [Face](/docs/DataModels/Face/) data model.
+This project uses the _[Face](https://github.com/CommuniCityProject/communicity_toolbox/tree/master/docs/DataModels/Face)_ data model.
 
 ## Configuration
 
@@ -62,10 +62,14 @@ face_recognition:
   domain: Celeb
 
 face_detector:
-  model_name: face_detector_mtcnn
+  model_name: face_detector_retinaface
   params:
-    model_path: ../../../data/models/face_detector_mtcnn/mtcnn.pb
-    use_cuda: True
+    weights_path: ../../../data/models/face_detector_retinaface/Resnet50_Final.pth
+    model_name: resnet50
+    confidence_threshold: 0.7
+    landmarks: False
+    nms_threshold: 0.4
+    use_cuda: False
 
 context_broker:
   host: 192.168.0.100

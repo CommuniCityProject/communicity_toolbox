@@ -4,14 +4,18 @@ face_emotions:
   model_name: emotions_hse
   params:
     model_path: !ENV ${TOOLBOX_DATA}/models/emotions_hse/mobilenet_7.h5
-    use_cuda: False
+    use_cuda: !ENV ${USE_CUDA}
 
 face_detector:
   face_box_scale: 1.2
-  model_name: face_detector_mtcnn
+  model_name: face_detector_retinaface
   params:
-    model_path: !ENV ${TOOLBOX_DATA}/models/face_detector_mtcnn/mtcnn.pb
-    use_cuda: True
+    weights_path: !ENV ${TOOLBOX_DATA}/models/face_detector_retinaface/Resnet50_Final.pth
+    model_name: resnet50
+    confidence_threshold: 0.7
+    landmarks: False
+    nms_threshold: 0.4
+    use_cuda: !ENV ${USE_CUDA}
 
 api:
   # Create a new Face entity in the context broker with the predicted emotion

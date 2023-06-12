@@ -6,7 +6,7 @@ This Project aims to detect body keypoints in images. Keypoints are the location
 
 ## Data models
 
-This project uses the [PersonKeyPoints](/docs/DataModels/PersonKeyPoints/) data model.
+This project uses the _[PersonKeyPoints](https://github.com/CommuniCityProject/communicity_toolbox/tree/master/docs/DataModels/PersonKeyPoints)_ data model.
 
 ## Configuration
 

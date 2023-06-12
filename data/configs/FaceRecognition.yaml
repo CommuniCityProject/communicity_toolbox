@@ -5,16 +5,20 @@ face_recognition:
   params:
     distance_threshold: 0.75
     model_path: !ENV ${TOOLBOX_DATA}/models/face_recognition_facenet/squeezenet_VGGFace2/model-20180204-160909.ckpt-266000
-    use_cuda: False
+    use_cuda: !ENV ${USE_CUDA}
   dataset_path: !ENV ${TOOLBOX_DATA}/samples/face_recognition_datasets/facenet_celeb_single.pkl
   unknown_label: "<unk>"
   domain: Celeb
 
 face_detector:
-  model_name: face_detector_mtcnn
+  model_name: face_detector_retinaface
   params:
-    model_path: !ENV ${TOOLBOX_DATA}/models/face_detector_mtcnn/mtcnn.pb
-    use_cuda: True
+    weights_path: !ENV ${TOOLBOX_DATA}/models/face_detector_retinaface/Resnet50_Final.pth
+    model_name: resnet50
+    confidence_threshold: 0.7
+    landmarks: False
+    nms_threshold: 0.4
+    use_cuda: !ENV ${USE_CUDA}
 
 context_broker:
   notification_uri: !ENV http://${HOST}:${PORT}/ngsi-ld/v1/notify

@@ -6,7 +6,7 @@ instance_segmentation:
     model_config: !ENV ${TOOLBOX_DATA}/models/detectron2/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/mask_rcnn_R_50_FPN_3x.yaml
     model_weights: !ENV ${TOOLBOX_DATA}/models/detectron2/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/model_final_f10217.pkl
     confidence_threshold: 0.5
-    use_cuda: False
+    use_cuda: !ENV ${USE_CUDA}
 
 context_broker:
   notification_uri: http://${HOST}:8080/ngsi-ld/v1/notify

@@ -20,25 +20,6 @@ class File:
 
 class Storage:
     """Manage a local file storage and update its state in a context broker.
-
-    Methods:
-        initialize()
-        check_dir_limits()
-        check_files_time()
-        add_file(...)
-        delete_file()
-        delete_all()
-        keys()
-        get_file_path(...)
-    
-    Properties (read-only):
-        path
-        total_size
-    
-    Overloaded operators:
-        __getitem__
-        __len__
-        __contains__
     """
 
     def __init__(self, config: dict, data_model_cls: Type[BaseModel]):
