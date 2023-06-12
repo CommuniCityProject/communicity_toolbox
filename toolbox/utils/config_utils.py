@@ -64,7 +64,18 @@ def read_yaml_env(path: Union[str, Path], tag: str = '!ENV') -> dict:
                 full_value = full_value.replace(
                     f'${{{g}}}', os.environ.get(g, g)
                 )
-            return full_value
+            try:
+                if full_value.isdigit():
+                    if "." in full_value:
+                        return float(full_value)
+                    return int(full_value)
+                if full_value.lower() == "true":
+                    return True
+                if full_value.lower() == "false":
+                    return False
+                return full_value
+            except:
+                return full_value
         return value
 
     loader.add_constructor(tag, constructor_env_variables)
