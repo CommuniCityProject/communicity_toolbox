@@ -20,17 +20,8 @@ class Image(BaseModel):
         url (str)
         source (str)
         purpose (str)
-
-    Methods:
-        pretty()
-
-    Properties (read-only):
-        rel_attrs (Set[str])
-        context (Set[str])
-    
-    Static methods:
-        get_type()
     """
+    
     __rel_attrs__ = set()
     __context__ = set()
 

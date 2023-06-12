@@ -11,9 +11,6 @@ logger = get_logger("toolbox.FaceDetection")
 
 class FaceDetection:
     """Detect faces on images.
-    
-    Methods:
-        predict(image) -> List[DataModels.Face]
     """
 
     def __init__(self, config: dict):
@@ -32,7 +29,7 @@ class FaceDetection:
         """Predicts the position of faces on an image.
 
         Args:
-            image (Image): An Image object.
+            image (toolbox.Structures.Image): An Image object.
 
         Returns:
             List[DataModels.Face]: A list of Face data models.

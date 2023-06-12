@@ -22,17 +22,8 @@ class BaseModel(PydanticBaseModel):
         id (str): Unique identifier of the entity.
         dateObserved (datetime): Entity creation time.
         type (str): Name of the entity type.
-
-    Methods:
-        pretty()
-
-    Properties (read-only):
-        rel_attrs (Set[str])
-        context (Set[str])
-    
-    Static methods:
-        get_type()
     """
+    
     __rel_attrs__ = set()
     __context__ = set()
 

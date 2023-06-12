@@ -1,14 +1,12 @@
-from typing import Optional, List
 from pathlib import Path
+from typing import List, Optional
+
 import numpy as np
-
 from detectron2.config import get_cfg
-from detectron2.engine.defaults import DefaultPredictor
 from detectron2.data import MetadataCatalog
-
+from detectron2.engine.defaults import DefaultPredictor
 from toolbox.Structures import BoundingBox, Instance, SegmentationMask
 from toolbox.Structures.Keypoints import COCOKeypoints
-
 
 
 class Detectron2:
@@ -19,8 +17,8 @@ class Detectron2:
     """
 
     def __init__(self, model_config: Path,
-        model_weights: Optional[str] = None,
-        confidence_threshold: Optional[float] = 0.5, use_cuda: bool = False):
+                 model_weights: Optional[str] = None,
+                 confidence_threshold: Optional[float] = 0.5, use_cuda: bool = False):
         """Create and load a detectron2 model.
 
         Args:
@@ -41,7 +39,8 @@ class Detectron2:
             if len(self.cfg.DATASETS.TEST)
             else "__unused"
         )
-        self.dataset_classes = self._dataset_metadata.get("thing_classes", None)
+        self.dataset_classes = self._dataset_metadata.get(
+            "thing_classes", None)
 
     def predict(self, image: np.ndarray) -> List[Instance]:
         """Predict an image.
@@ -58,9 +57,9 @@ class Detectron2:
                 bounding_box (BoundingBox): A bounding box of the object.
                 mask (SegmentationMask): A segmentation mask of the object.
                 keypoints (COCOKeypoints): Person keypoints.
-        """        
+        """
         predictions = self._predictor(image)
-        
+
         boxes = None
         scores = None
         labels_id = None
@@ -68,9 +67,9 @@ class Detectron2:
         keypoints = None
         masks = None
         ret_instances = []
-        
+
         if "instances" in predictions:
-            
+
             # Convert tensors to numpy arrays
             det_instances = predictions["instances"]
             if det_instances.has("scores"):
@@ -88,13 +87,13 @@ class Detectron2:
             # Parse the detection results
             for i in range(len(det_instances)):
                 ins = Instance()
-                
+
                 # Confidence
                 if scores is not None:
                     if scores[i] < self._conf_thr:
                         continue
                     ins.set("confidence", scores[i])
-                
+
                 # Classification
                 if labels_id is not None:
                     ins.set("label_id", labels_id[i])
@@ -125,11 +124,11 @@ class Detectron2:
                         image.shape[1],
                         image.shape[0]
                     ))
-                
+
                 ret_instances.append(ins)
 
         return ret_instances
-    
+
     def _create_text_labels(self, classes: List[int]) -> List[str]:
         """Converts a list of class IDs to a list of class names using the
         dataset metadata. If the class names are not available, a string of the
@@ -147,7 +146,7 @@ class Detectron2:
             return [str(i) for i in classes]
 
     def _setup_cfg(self, config_path: Path,
-        model_weights: Optional[str] = None, use_cuda: bool = False):
+                   model_weights: Optional[str] = None, use_cuda: bool = False):
         """Create the model cfg.
 
         Args:

@@ -24,37 +24,6 @@ class ContextCli:
         notification_uri (str): The uri used for notifications.
         subscription_name (str): The name used in subscriptions.
         headers (dict): The headers used in requests.
-
-    Methods:
-        subscribe(subscription, **kwargs) -> Union[str, None]
-        get_subscription(subscription_id) -> Union[Subscription, None]
-        get_subscriptions_page(limit, offset) -> List[Subscription]
-        iterate_subscriptions(limit) -> Iterator[Subscription]
-        get_all_subscriptions() -> List[Subscription]
-        get_conflicting_subscriptions(subscription) -> List[Subscription]
-        unsubscribe(subscription_id) -> bool
-        unsubscribe_all() -> bool
-        get_entity(entity_id, as_dict) -> Union[Type[BaseModel], dict, None]
-        get_entities_page(entity_type, attrs, entity_id, id_pattern, query,
-                          limit, offset, as_dict
-                          ) -> List[Union[Type[BaseModel], dict]]
-        iterate_entities(entity_id, entity_type, id_pattern, attrs, query,
-                         limit, as_dict
-                         ) -> Iterator[List[Union[Type[BaseModel], dict]]]
-        get_all_entities(entity_id, entity_type, id_pattern, attrs, query,
-                         as_dict) -> List[Union[Type[BaseModel], dict]]
-        get_data_model(entity_id) -> Type[BaseModel]
-        parse_data_model(entity) -> Type[BaseModel]
-        post_entity_json(entity)
-        update_entity_json(entity, create) -> dict
-        post_data_model(data_model) -> dict
-        update_data_model(data_model, create) -> dict
-        delete_entity(entity_id) -> bool
-        get_types() -> List[str]
-
-    Properties (read-only):
-        subscription_ids (List[str]): List of ids of the created subscriptions.
-        broker_url (str): The url of the context broker.
     """
 
     def __init__(

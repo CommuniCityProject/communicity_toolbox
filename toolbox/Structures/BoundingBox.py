@@ -8,24 +8,6 @@ import numpy as np
 class BoundingBox:
     """Structure to store a bounding box.
 
-    Static methods:
-        from_absolute(xmin, ymin, xmax, ymax, image_width, image_height) -> BoundingBox
-        from_xywh(x, y, w, h, absolute, image_width, image_height) -> BoundingBox
-        deserialize(value) -> BoundingBox
-
-    Methods:
-        get_width(absolute, image_width) -> Union[float, int]
-        get_height(absolute, image_height) -> Union[float, int]
-        get_center_x(absolute, image_width) -> Union[float, int]
-        get_center_y(absolute, image_height) -> Union[float, int]
-        get_area(absolute, image_width, image_height) -> Union[float, int]
-        get_xyxy(absolute, image_width, image_height) -> np.ndarray
-        get_xywh(absolute, image_width, image_height) -> np.ndarray
-        crop_image(image) -> np.ndarray
-        scale(factor) -> BoundingBox
-        is_empty() -> bool
-        serialize() -> Dict[str, float]
-
     Attributes:
         xmin (float): Minimum relative x coordinate.
         ymin (float): Minimum relative y coordinate.

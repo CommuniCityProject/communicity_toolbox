@@ -15,21 +15,6 @@ class BaseKeypoints:
             where x and y are the relative image coordinates.
         confidence_threshold (float): Minimum keypoints confidence.
 
-    Properties (read-only):
-        named_keypoints (Dict[str, Tuple[float, float, float]]): A dict of
-            keypoints by their names.
-        visible_keypoints (Dict[str, Tuple[float, float, float]]) A dict with
-            the visible keypoints by their names
-            (those with confidence >= confidence_threshold).
-
-    Methods:
-        serialize() -> dict
-
-    Static methods:
-        from_named_keypoints(named_keypoints, **kwargs) -> BaseKeypoints
-        from_absolute_keypoints(keypoints, image_width, image_height, **kwargs) -> Type[BaseKeypoints]
-        deserialize(keypoints_dict) -> BaseKeypoints
-
     Overloaded operators:
         __len__
         __eq__

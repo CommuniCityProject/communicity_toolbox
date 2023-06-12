@@ -1,14 +1,13 @@
-from typing import List
 from pathlib import Path
-import numpy as np
+from typing import List
 
-from toolbox.Models import model_catalog
+import numpy as np
 from toolbox import DataModels
+from toolbox.Models import model_catalog
 from toolbox.Structures import Image
 from toolbox.utils.utils import get_logger
 
 logger = get_logger("toolbox.FaceRecognition")
-
 
 
 class FaceRecognition:
@@ -17,22 +16,10 @@ class FaceRecognition:
     Attributes:
         domain (str): Name of the group of people to recognize.
         unknown_label (str): Name to set when a face is not recognized.
-    
-    Methods:
-        update_face(image, face) -> DataModels.Face
-        predict(image) -> List[DataModels.Face]
-        recognize(face) -> DataModels.Face
-        register_features(face, name)
-        save_dataset(path)
-        load_dataset(path)
-    
-    Properties (read-only):
-        do_extraction (bool)
-        do_recognition (bool)
     """
 
     def __init__(self, config: dict, do_extraction: bool = False,
-        do_recognition: bool = False):
+                 do_recognition: bool = False):
         """Initialize the models.
 
         Args:
@@ -46,7 +33,7 @@ class FaceRecognition:
         rec_params = config["face_recognition"]["params"]
         logger.debug(f"Face recognition params {config['face_recognition']}")
         self._face_recognition = model_catalog[rec_model](**rec_params)
-        
+
         self._do_extraction = do_extraction
         self._do_recognition = do_recognition
 
@@ -59,18 +46,20 @@ class FaceRecognition:
             logger.info(f"Loading face detector model: {face_model}")
             logger.debug(f"Face detector params {face_params}")
             self._face_detector = model_catalog[face_model](**face_params)
-            
+
         if do_recognition:
             self.load_dataset(Path(config["face_recognition"]["dataset_path"]))
 
         self.domain = config["face_recognition"].get("domain", "")
-        self.unknown_label = config["face_recognition"].get("unknown_label", "")
+        self.unknown_label = config["face_recognition"].get(
+            "unknown_label", "")
 
     def update_face(self, image: Image, face: DataModels.Face
-        ) -> DataModels.Face:
+                    ) -> DataModels.Face:
         """Extract and update the features attributes of a face data model.
 
         Args:
+            image (toolbox.Structures.Image): An Image object.
             face (DataModels.Face): A DataModels.Face object.
 
         Returns:
@@ -85,14 +74,14 @@ class FaceRecognition:
         face.features = features.tolist()
         face.features_algorithm = self._face_recognition.algorithm_name
         return face
-    
+
     def predict(self, image: Image
-        ) -> List[DataModels.Face]:
+                ) -> List[DataModels.Face]:
         """Extract features from an image, but do not recognize it.
 
         Args:
-            image (Image): An Image object.
-        
+            image (toolbox.Structures.Image): An Image object.
+
         Returns:
             List[DataModels.Face]: A list of Face objects.
         """
@@ -119,7 +108,7 @@ class FaceRecognition:
 
         Args:
             data_model (DataModels.Face): A Face object.
-        
+
         Returns:
             DataModels.Face: A copy of the Face data model with the
                 recognition data updated.
@@ -135,7 +124,7 @@ class FaceRecognition:
         return face
 
     def register_features(self, face: DataModels.Face,
-        name: str):
+                          name: str):
         """Register the features of a Face DataModels to the given
         name.
 
@@ -145,7 +134,7 @@ class FaceRecognition:
             name (str): The name to which assign the given features.
         """
         self._face_recognition.add_features(name, face.features)
-    
+
     def save_dataset(self, path: Path):
         """Save the current face features dataset to a file.
 

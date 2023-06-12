@@ -11,9 +11,6 @@ logger = get_logger("toolbox.Keypoints")
 
 class Keypoints:
     """Predict person keypoints from images.
-    
-    Methods:
-        predict(image) -> List[PersonKeyPoints]
     """
 
     def __init__(self, config: dict):
@@ -33,7 +30,7 @@ class Keypoints:
         """Predict person keypoints from an image.
 
         Args:
-            image (Image): An Image object.
+            image (toolbox.Structures.Image): An Image object.
         
         Returns:
             List[PersonKeyPoints]: A list of PersonKeyPoints objects.

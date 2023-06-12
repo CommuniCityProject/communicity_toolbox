@@ -6,11 +6,6 @@ from typing import Any, List, Optional
 class Instance:
     """Structure used to store the output of a machine learning model.
 
-    Methods:
-        set(name, value) -> Instance
-        has(name) -> bool
-        remove(name)
-
     Overloaded operators:
         __getattr__
         __getitem__
@@ -18,9 +13,6 @@ class Instance:
         __eq__
         __iter__
         __str__
-
-    Properties (read-only):
-        fields (List[str]): List of names of the attributes set.
 
     Example:
         instance = Instance().set("label", "dog").set("confidence", 0.8)

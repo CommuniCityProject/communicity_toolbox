@@ -11,10 +11,6 @@ logger = get_logger("toolbox.FaceEmotions")
 
 class FaceEmotions:
     """Detect faces on images and predict its emotion.
-    
-    Methods:
-        update_face(image, face) -> DataModels.Face
-        predict(image) -> List[DataModels.Face]
     """
 
     def __init__(self, config: dict):

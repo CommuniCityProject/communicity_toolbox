@@ -16,21 +16,9 @@ class FaceRecognition:
     """Perform face recognition. Extract features from face images and compare
     them with a local dataset.
 
-    Methods:
-        load_model()
-        predict_features(image) -> np.ndarray
-        load_features(features_path)
-        add_features(name, features)
-        save_features(path)
-        recognize_features(features) -> List[Instance]
-        recognize_image(image) -> List[Instance]
-
-    Attributes:
+        Attributes:
         distance_threshold (float): Maximum distance between two
             features vector to consider them from the same person.
-    
-    Properties (read-only):
-        algorithm_name (str): Name of the face recognition algorithm.
     """
 
     __algorithm_name__ = "FaceNet"

@@ -7,15 +7,11 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.compat.v1.keras.backend import set_session
 from tensorflow.keras.models import load_model
-
 from toolbox.Structures import Emotion, Instance
 
 
 class EmotionsClassifier:
     """Perform a classification of emotions on face images.
-
-    Methods:
-        predict(images) -> List[Instance]
     """
 
     def __init__(self, model_path: Path, use_cuda: bool = False):

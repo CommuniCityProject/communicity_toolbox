@@ -5,7 +5,6 @@ import cv2
 import numpy as np
 import torch
 import torch.nn as nn
-
 from toolbox.Structures import BoundingBox, Instance
 
 from .box_utils import decode, decode_landm
@@ -16,6 +15,8 @@ from .retinaface import RetinaFace
 
 
 class FaceDetector:
+    """RetinaFace face detector.
+    """
 
     def __init__(
         self,

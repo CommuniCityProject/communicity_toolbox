@@ -22,12 +22,6 @@ class DemoBase:
     Methods to be implemented:
         _load_model(config, task)
         _process_image(image)
-
-    Raises:
-        NotImplementedError
-
-    Methods:
-        run()
     """
 
     def __init__(self):

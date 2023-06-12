@@ -37,14 +37,8 @@ class ApiBase:
         config (dict): The config of the API.
         base_dm (Optional[Type[BaseModel]]): Data model class that will be send.
 
-    Raises:
-        NotImplementedError
-
-    Methods to override:
+    Methods to be implemented:
         _predict_entity(data_model, post_to_broker) -> List[Type[BaseModel]]
-
-    Methods:
-        run()
     """
 
     VERSION = get_version()

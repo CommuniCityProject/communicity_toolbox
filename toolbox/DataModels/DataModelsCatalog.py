@@ -1,6 +1,6 @@
 from typing import Dict, Type
-from toolbox.DataModels import BaseModel
 
+from toolbox.DataModels import BaseModel
 
 data_models_catalog: Dict[str, Type[BaseModel]] = {}
 

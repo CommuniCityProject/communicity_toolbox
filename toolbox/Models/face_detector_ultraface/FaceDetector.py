@@ -11,10 +11,7 @@ ort.set_default_logger_severity(3)
 
 
 class FaceDetector:
-    """Fast-lightweight face predictor (bounding box), executed on CPU or GPU.
-
-    Methods:
-        predict(...)
+    """UltraFace face detector.
     """
 
     def __init__(self, model_path: Path, input_size: Tuple[int, int],

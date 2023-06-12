@@ -1,7 +1,6 @@
 from typing import Optional
 
 from pydantic import Field
-
 from toolbox.Structures import BoundingBox, Emotion, Gender
 
 from .BaseModel import BaseModel
@@ -32,17 +31,8 @@ class Face(BaseModel):
         recognized_person (str)
         features_algorithm (str)
         recognized_distance (float)
-
-    Methods:
-        pretty()
-    
-    Properties (read-only):
-        rel_attrs (Set[str])
-        context (Set[str])
-    
-    Static methods:
-        get_type()
     """
+
     __rel_attrs__ = {"image"}
     __context__ = set()
 
@@ -87,7 +77,7 @@ class Face(BaseModel):
     features: Optional[list] = Field(
         None,
         description="Facial features extracted with a computer vision "
-            "algorithm used for face recognition tasks",
+        "algorithm used for face recognition tasks",
     )
     features_algorithm: Optional[str] = Field(
         None,
@@ -97,7 +87,7 @@ class Face(BaseModel):
     recognition_domain: Optional[str] = Field(
         None,
         description="The face recognition domain. I.e. name of the group of "
-            "people to recognize",
+        "people to recognize",
         alias="recognitionDomain"
     )
     recognized: Optional[bool] = Field(
@@ -120,7 +110,7 @@ class Face(BaseModel):
     class Config:
         schema_extra = {
             "description": "This entity stores information about a face, such "
-                "as its estimated age, gender or identity. It is intended to "
-                "be used with computer vision algorithms to infer common "
-                "properties from a facial image"
+            "as its estimated age, gender or identity. It is intended to "
+            "be used with computer vision algorithms to infer common "
+            "properties from a facial image"
         }

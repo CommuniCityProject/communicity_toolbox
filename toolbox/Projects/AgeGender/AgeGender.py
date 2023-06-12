@@ -11,10 +11,6 @@ logger = get_logger("toolbox.AgeGender")
 
 class AgeGender:
     """Detect faces on images and predict its age and gender.
-    
-    Methods:
-        update_face(image, face) -> DataModels.Face
-        predict_image(image) -> List[DataModels.Face]
     """
 
     def __init__(self, config: dict):
@@ -67,7 +63,7 @@ class AgeGender:
         """Predicts the position, age and gender of faces on an image.
 
         Args:
-            image (Image): An Image object.
+            image (toolbox.Structures.Image): An Image object.
 
         Returns:
             List[DataModels.Face]: A list of Face data models.

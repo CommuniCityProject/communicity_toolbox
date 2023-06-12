@@ -32,6 +32,9 @@ class ImageStorageCli:
         self.url = urljoin(f"http://{self.host}:{self.port}", self.url_path)
         logger.info(f"Using the image storage {self.url}")
 
+    # TODO: def upload_file
+    # TODO: def upload_image
+
     def upload_bytes(
         self,
         image_bytes: bytes,

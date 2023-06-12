@@ -24,17 +24,8 @@ class InstanceSegmentation(BaseModel):
         label (str)
         label_id (int)
         confidence (float)
-
-    Methods:
-        pretty()
-
-    Properties (read-only):
-        rel_attrs (Set[str])
-        context (Set[str])
-
-    Static methods:
-        get_type()
     """
+    
     __rel_attrs__ = {"image"}
     __context__ = set()
 

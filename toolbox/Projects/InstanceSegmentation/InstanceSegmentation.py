@@ -11,9 +11,6 @@ logger = get_logger("toolbox.InstanceSegmentation")
 
 class InstanceSegmentation:
     """Perform instance segmentation on images.
-
-    Methods:
-        predict(image) -> List[DataModels.InstanceSegmentation]
     """
 
     def __init__(self, config: dict):
@@ -33,7 +30,7 @@ class InstanceSegmentation:
         """Perform instance segmentation on an image.
 
         Args:
-            image (Image): An Image object.
+            image (toolbox.Structures.Image): An Image object.
         
         Returns:
             List[DataModels.InstanceSegmentation]: A list of

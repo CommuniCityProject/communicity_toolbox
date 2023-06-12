@@ -4,17 +4,11 @@ from typing import List, Optional, Tuple, Union
 import cv2
 import numpy as np
 from scipy.special import softmax
-
 from toolbox.Structures import Gender, Instance
 
 
 class AgeGenderPredictor:
     """Predict the age and gender of a face image.
-
-    Methods:
-        predict_age(images) -> List[Instance]
-        predict_gender(images) -> List[Instance]
-        predict(images) -> List[Instance]
     """
 
     def __init__(self, age_model_path: Optional[Path] = None,
@@ -181,14 +175,14 @@ class AgeGenderPredictor:
         """
         input_blob = self._preprocess_image(images)
         instances = [Instance() for _ in range(len(input_blob))]
-        
+
         if self._do_age:
             ages = self._predict_age(input_blob)
             [ins.set("age", age) for ins, age in zip(instances, ages)]
-        
+
         if self._do_gender:
             genders, confidences = self._predict_gender(input_blob)
             [ins.set("gender", gender).set("gender_confidence", conf)
              for ins, gender, conf in zip(instances, genders, confidences)]
-        
+
         return instances

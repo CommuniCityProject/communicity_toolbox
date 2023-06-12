@@ -13,19 +13,6 @@ class SegmentationMask:
     Attributes:
         mask (np.ndarray): Binary mask of shape (H, W).
 
-    Attributes (read-only):
-        rle (dict): The rle-encoded mask.
-        area (float): The area of the mask.
-        width (int): Width of the mask.
-        height (int): Height of the mask.
-
-    Methods:
-        resize(width, height) -> SegmentationMask
-        serialize() -> dict
-
-    Static methods:
-        deserialize(hex_rle) -> SegmentationMask
-
     Overloaded operators:
         __str__
         __repr__

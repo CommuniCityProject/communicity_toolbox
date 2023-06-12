@@ -25,12 +25,6 @@ class Subscription:
         expires
         throttling
 
-    Properties:
-        json (dict): The subscription as a JSON object.
-
-    Static methods:
-        from_json(json) -> Subscription
-
     Overloaded operators:
         __eq__
         __str__

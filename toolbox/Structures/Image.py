@@ -18,19 +18,6 @@ class Image:
         path (Union[str, Path]): Path or URL to an image.
         id (str): Id of a ngsi-ld image entity.
 
-    Properties (read-only):
-        image (np.ndarray): The image as a numpy array.
-        height (int): The height of the image.
-        width (int) The width of the image.
-
-    Methods:
-        serialize() -> Dict[str, int]
-
-    Static methods:
-        from_url(url) -> Image
-        from_path(path) -> Image
-        deserialize(value) -> Image
-
     Overloaded operators:
         __str__
         __eq__
