@@ -5,7 +5,7 @@ x-common-env: &common-env
   BROKER_HOST: 158.109.9.60
   BROKER_PORT: 1026
   TOOLBOX_DATA: /etc/communicity_toolbox
-  USE_CUDA: True
+  USE_CUDA: False
 
 services:
   image_storage:
