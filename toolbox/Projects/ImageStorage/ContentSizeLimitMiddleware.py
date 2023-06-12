@@ -1,6 +1,5 @@
 # Modified from https://github.com/steinnes/content-size-limit-asgi
-from fastapi import status, HTTPException
-
+from fastapi import HTTPException, status
 
 
 class ContentSizeLimitMiddleware:
@@ -18,18 +17,19 @@ class ContentSizeLimitMiddleware:
 
     def receive_wrapper(self, receive):
         received = 0
+
         async def inner():
             nonlocal received
             message = await receive()
             if message["type"] != "http.request" \
-                or self.max_content_size is None:
+                    or self.max_content_size is None:
                 return message
             body_len = len(message.get("body", b""))
             received += body_len
             if received > self.max_content_size:
                 raise HTTPException(
                     status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                    f"Maximum content size limit ({self.max_content_size})" \
+                    f"Maximum content size limit ({self.max_content_size})"
                     f" exceeded ({received} bytes read)"
                 )
             return message

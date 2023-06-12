@@ -1,7 +1,6 @@
 from typing import Optional, List
 from pathlib import Path
 import numpy as np
-import cv2
 
 from detectron2.config import get_cfg
 from detectron2.engine.defaults import DefaultPredictor
@@ -15,9 +14,6 @@ from toolbox.Structures.Keypoints import COCOKeypoints
 class Detectron2:
     """Predict images using detectron2 models.
 
-    Methods:
-        predict(image) -> List[Instance]
-    
     Attributes:
         dataset_classes (List[str]): List of class labels.
     """

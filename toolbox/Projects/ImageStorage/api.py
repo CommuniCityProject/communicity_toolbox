@@ -14,7 +14,6 @@ from fastapi import (BackgroundTasks, Body, FastAPI, File, HTTPException,
 from fastapi.responses import FileResponse
 from fastapi_utils.tasks import repeat_every
 from starlette.middleware.cors import CORSMiddleware
-from Storage import Storage
 
 from toolbox import DataModels, Structures
 from toolbox.Context import ContextCli
@@ -24,6 +23,8 @@ from toolbox.utils.config_utils import parse_config
 from toolbox.utils.utils import (float_or_none, get_logger, get_version,
                                  hash_str, urljoin)
 from toolbox.Visualization import DataModelVisualizer
+
+from .Storage import Storage
 
 logger = get_logger("toolbox.ImageStorage")
 
@@ -341,7 +342,7 @@ def main():
     args = ap.parse_args()
     logger.setLevel(args.log_level)
     config = parse_config(args.config)
-    api = ImageStorage(config)
+    ImageStorage(config)
 
 
 if __name__ == "__main__":
