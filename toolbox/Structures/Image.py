@@ -31,7 +31,7 @@ class Image:
                  height: Optional[int] = None,
                  id: str = ""):
         """Create an Image object.
-        
+
         Args:
             path (Union[str, Path], optional): Path or URL to an image.
                 Defaults to "".
@@ -77,6 +77,26 @@ class Image:
         if self._width is None:
             self._load_image()
         return self._width
+
+    def load_image(self):
+        """Manually load the image into memory.
+        """
+        if self._image is None:
+            self._load_image()
+
+    def save_image(self, path: Optional[Union[str, Path]] = None):
+        """Save the image to a file.
+
+        Args:
+            path (Optional[Union[str, Path]]): Optional output file path.
+                If None, the ``self.path`` will be used
+        """
+        path = self.path if path is None else path
+        path = Path(path)
+        try:        
+            cv2.imwrite(str(path), self.image)
+        except Exception as e:
+            raise OSError(f"Can not write image to {path}") from e
 
     def _parse_path(self, path: Union[str, Path]) -> Union[str, Path]:
         """Return a Path object if the path is a local file or a string if
