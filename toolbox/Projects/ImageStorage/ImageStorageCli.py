@@ -1,6 +1,11 @@
-from typing import List
+from typing import List, Union
+from pathlib import Path
+import mimetypes
+import tempfile
 
 import requests
+import numpy as np
+import cv2
 
 from toolbox.Structures import Image
 from toolbox.utils.utils import get_logger, urljoin
@@ -32,8 +37,65 @@ class ImageStorageCli:
         self.url = urljoin(f"http://{self.host}:{self.port}", self.url_path)
         logger.info(f"Using the image storage {self.url}")
 
-    # TODO: def upload_file
-    # TODO: def upload_image
+    def upload_file(
+        self,
+        path: Union[str, Path],
+        source: str = "",
+        purpose: str = "",
+    ) -> str:
+        """Upload an image file to the image storage.
+
+        Args:
+            path (Union[str, Path]): Path to an image file.
+            source (str, optional): Optional source of the image.
+                Defaults to "".
+            purpose (str, optional): Optional purpose of the image.
+                Defaults to "".
+
+        Returns:
+            str: The ID of the uploaded image.
+        """
+        path = Path(path)
+        mime = mimetypes.guess_type(path)[0]
+        with open(path, "rb") as f:
+            data = f.read()
+        return self.upload_bytes(
+            image_bytes=data,
+            name=path.name,
+            file_type=mime,
+            source=source,
+            purpose=purpose
+        )
+
+    def upload_image(
+        self,
+        image: np.ndarray,
+        file_name: str = "image.png",
+        source: str = "",
+        purpose: str = "",
+    ) -> str:
+        """Upload a numpy image to the image storage.
+
+        Args:
+            image (np.ndarray): The numpy image to upload.
+            file_name (str, optional): File name of the image that will be
+                created. Defaults to "image.png".
+            source (str, optional): Optional source of the image.
+                Defaults to "".
+            purpose (str, optional): Optional purpose of the image.
+                Defaults to "".
+
+        Returns:
+            str: The ID of the uploaded image.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            image_path = Path(tmp) / file_name
+            cv2.imwrite(str(image_path), image)
+            return self.upload_file(
+                path=image_path,
+                source=source,
+                purpose=purpose
+            )
 
     def upload_bytes(
         self,
