@@ -1,8 +1,8 @@
 version: "3.9"
 
 x-common-env: &common-env
-  HOST: 158.109.9.60
-  BROKER_HOST: 158.109.9.60
+  HOST: 192.168.0.100
+  BROKER_HOST: 192.168.0.100
   BROKER_PORT: 1026
   TOOLBOX_DATA: /etc/communicity_toolbox
   USE_CUDA: False
