@@ -22,7 +22,7 @@ class BoundingBox:
     """
 
     def __init__(self, xmin: float, ymin: float, xmax: float, ymax: float):
-        """Create a bounding box object with the coordinates relative to the
+        """Create a bounding box object with the relative coordinates to the
         image size of the top-left and bottom-right corners.
 
         Args:
@@ -202,7 +202,7 @@ class BoundingBox:
 
     @classmethod
     def from_absolute(cls, xmin: int, ymin: int, xmax: int, ymax: int,
-        image_width: int, image_height: int) -> BoundingBox:
+                      image_width: int, image_height: int) -> BoundingBox:
         """Create a bounding box object from the absolute image coordinates of
         the top-left and bottom-right corners.
 
@@ -226,9 +226,9 @@ class BoundingBox:
 
     @ staticmethod
     def from_xywh(x: Union[float, int], y: Union[float, int],
-        w: Union[float, int], h: Union[float, int], absolute: bool = False,
-        image_width: Optional[int] = None, image_height: Optional[int] = None
-        ) -> BoundingBox:
+                  w: Union[float, int], h: Union[float, int],
+                  absolute: bool = False, image_width: Optional[int] = None,
+                  image_height: Optional[int] = None) -> BoundingBox:
         """Create a bounding box object from the center coordinates and the
         width and height of a box.
 

@@ -30,7 +30,8 @@ class Image:
                  width: Optional[int] = None,
                  height: Optional[int] = None,
                  id: str = ""):
-        """
+        """Create an Image object.
+        
         Args:
             path (Union[str, Path], optional): Path or URL to an image.
                 Defaults to "".
