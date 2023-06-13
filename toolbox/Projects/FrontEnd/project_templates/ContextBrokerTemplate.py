@@ -208,7 +208,7 @@ class ContextBrokerTemplate(BaseTemplate):
 
     def _get_entity_types(self):
         st.session_state.entity_types = self.context_cli.get_types()
-    
+
     def _get_entities(self):
         if not st.session_state.selected_types:
             st.session_state.entities = []
@@ -226,7 +226,7 @@ class ContextBrokerTemplate(BaseTemplate):
         # Get the entity types
         if st.session_state.entity_types is None:
             self._get_entity_types()
-        
+
         # Types selector
         st.multiselect(
             "Entity type",
@@ -235,7 +235,7 @@ class ContextBrokerTemplate(BaseTemplate):
             key="selected_types",
             on_change=self._get_entities
         )
-        
+
         # Get the entities from the selected types
         if st.session_state.entities is None:
             self._get_entities()

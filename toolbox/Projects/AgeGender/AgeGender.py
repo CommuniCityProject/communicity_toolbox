@@ -1,12 +1,11 @@
 from typing import List
 
-from toolbox.Models import model_catalog
 from toolbox import DataModels
-from toolbox.Structures import Image, BoundingBox
-from toolbox.utils.utils import get_logger, float_or_none
+from toolbox.Models import model_catalog
+from toolbox.Structures import BoundingBox, Image
+from toolbox.utils.utils import float_or_none, get_logger
 
 logger = get_logger("toolbox.AgeGender")
-
 
 
 class AgeGender:
@@ -33,11 +32,12 @@ class AgeGender:
         self._scale_bb = config["face_detector"]["face_box_scale"]
 
     def update_face(self, image: Image, face: DataModels.Face
-        ) -> DataModels.Face:
+                    ) -> DataModels.Face:
         """Predict the age and gender of a face data model.
 
         Args:
-            face (DataModels.Face): A DataModels.Face object.
+            image (toolbox.Structures.Image): An Image object.
+            face (DataModels.Face): A Face data model object.
 
         Returns:
             DataModels.Face: The same Face data model with the age and gender
@@ -60,7 +60,7 @@ class AgeGender:
         return face
 
     def predict(self, image: Image) -> List[DataModels.Face]:
-        """Predicts the position, age and gender of faces on an image.
+        """Predict the position, age and gender of faces in an image.
 
         Args:
             image (toolbox.Structures.Image): An Image object.
@@ -69,7 +69,7 @@ class AgeGender:
             List[DataModels.Face]: A list of Face data models.
         """
         face_instances = self._face_detector.predict(image.image)
-        
+
         data_models = []
         for face_instance in face_instances:
             bb: BoundingBox = face_instance.bounding_box

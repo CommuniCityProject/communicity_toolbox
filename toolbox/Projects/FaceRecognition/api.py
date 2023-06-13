@@ -1,7 +1,7 @@
-from typing import List, Any, Union
 import argparse
+from typing import Any, List, Union
 
-from fastapi import FastAPI, Body, HTTPException, status, Request
+from fastapi import Body, FastAPI, HTTPException, Request, status
 
 from toolbox import DataModels
 from toolbox.Projects.FaceRecognition import FaceRecognition
@@ -11,9 +11,8 @@ from toolbox.utils.utils import get_logger
 logger = get_logger("FaceRecognitionApi")
 
 
-
 class FaceRecognitionApi(ApiBase):
-    
+
     TITLE = "Face Recognition API"
 
     def __init__(self):
@@ -34,8 +33,8 @@ class FaceRecognitionApi(ApiBase):
         )
 
     def _predict_entity(self,
-        data_model: Union[DataModels.Image, DataModels.Face],
-        post_to_broker: bool) -> List[DataModels.Face]:
+                        data_model: Union[DataModels.Image, DataModels.Face],
+                        post_to_broker: bool) -> List[DataModels.Face]:
         """Predict a data model.
 
         Args:
@@ -76,10 +75,10 @@ class FaceRecognitionApi(ApiBase):
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
                 f"Unprocessable entity type: {type(data_model)}"
             )
-        
+
     def _extract_entity(self,
-        data_model: Union[DataModels.Image, DataModels.Face],
-        post_to_broker: bool) -> List[DataModels.Face]:
+                        data_model: Union[DataModels.Image, DataModels.Face],
+                        post_to_broker: bool) -> List[DataModels.Face]:
         """Extract features from a data model.
 
         Args:
@@ -166,9 +165,10 @@ class FaceRecognitionApi(ApiBase):
             )
             return self._return_data_model_for_accept(dms, accept)
         return app
-    
+
     def _recognize_entity(self,
-        data_model: DataModels.Face, post_to_broker: bool) -> DataModels.Face:
+                          data_model: DataModels.Face,
+                          post_to_broker: bool) -> DataModels.Face:
         """Recognize the face features of a Face data model.
 
         Args:
@@ -228,7 +228,7 @@ class FaceRecognitionApi(ApiBase):
             entity_id: str = Body(
                 description="Id of a Face entity"),
             post_to_broker: bool = Body(True,
-                description="Post the predicted entity to the context broker")
+                                        description="Post the predicted entity to the context broker")
         ) -> Union[self.base_dm, Any]:
             """Recognize the features of a Face entity.
             """
@@ -268,15 +268,16 @@ class FaceRecognitionApi(ApiBase):
         if self._do_extraction and self._do_recognition:
             app = self._set_route_post_predict(
                 app,
-                description="Extract features and recognize faces on an "\
-                    "Image or a Face entity"
+                description="Extract features and recognize faces on an "
+                "Image or a Face entity"
             )
         if self._do_recognition:
             app = self._set_route_post_recognize(app)
         if self._do_extraction:
             app = self._set_route_post_extract(app)
         return app
-    
+
+
 def main():
     api = FaceRecognitionApi()
     api.run()

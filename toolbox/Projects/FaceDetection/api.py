@@ -1,7 +1,7 @@
-from typing import List, Union
 import argparse
+from typing import List, Union
 
-from fastapi import status, HTTPException
+from fastapi import HTTPException, status
 
 from toolbox import DataModels
 from toolbox.Projects.FaceDetection import FaceDetection
@@ -11,9 +11,8 @@ from toolbox.utils.utils import get_logger
 logger = get_logger("toolbox.FaceDetectionApi")
 
 
-
 class FaceDetectionApi(ApiBase):
-    
+
     TITLE = "Face Detection API"
 
     def __init__(self):
@@ -24,10 +23,10 @@ class FaceDetectionApi(ApiBase):
         """
         super()._initialize(args)
         self._model = FaceDetection(self.config)
-    
+
     def _predict_entity(self,
-        data_model: Union[DataModels.Image, DataModels.Face],
-        post_to_broker: bool) -> List[DataModels.Face]:
+                        data_model: Union[DataModels.Image, DataModels.Face],
+                        post_to_broker: bool) -> List[DataModels.Face]:
         """Predict a data model.
 
         Args:
@@ -53,8 +52,8 @@ class FaceDetectionApi(ApiBase):
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
                 f"Unprocessable entity type: {type(data_model)}"
             )
-        
-        
+
+
 def main():
     api = FaceDetectionApi()
     api.run()

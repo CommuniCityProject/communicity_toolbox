@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List
 
 import numpy as np
+
 from toolbox import DataModels
 from toolbox.Models import model_catalog
 from toolbox.Structures import Image
@@ -56,7 +57,7 @@ class FaceRecognition:
 
     def update_face(self, image: Image, face: DataModels.Face
                     ) -> DataModels.Face:
-        """Extract and update the features attributes of a face data model.
+        """Extract and update the features attributes of a Face data model.
 
         Args:
             image (toolbox.Structures.Image): An Image object.
@@ -107,7 +108,7 @@ class FaceRecognition:
         """Recognize the features of a Face data model.
 
         Args:
-            data_model (DataModels.Face): A Face object.
+            face (DataModels.Face): A Face data model object.
 
         Returns:
             DataModels.Face: A copy of the Face data model with the
@@ -125,12 +126,11 @@ class FaceRecognition:
 
     def register_features(self, face: DataModels.Face,
                           name: str):
-        """Register the features of a Face DataModels to the given
+        """Register the features of a Face data model to the given
         name.
 
         Args:
-            face (DataModels.Face): A Face object
-                with the predicted features.
+            face (DataModels.Face): A Face object with the predicted features.
             name (str): The name to which assign the given features.
         """
         self._face_recognition.add_features(name, face.features)
@@ -144,10 +144,10 @@ class FaceRecognition:
         self._face_recognition.save_features(path)
 
     def load_dataset(self, path: Path):
-        """Load the dataset features from a pkl file.
+        """Load the dataset features from a pickle file.
 
         Args:
-            path (Path): Path to the dataset pkl file.
+            path (Path): Path to the dataset .pkl file.
         """
         self._face_recognition.load_features(path)
 

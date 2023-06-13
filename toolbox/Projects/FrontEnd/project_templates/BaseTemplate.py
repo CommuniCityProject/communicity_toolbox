@@ -42,7 +42,7 @@ class BaseTemplate:
         self.context_cli = context_cli
         self.image_storage_cli = image_storage_cli
         self.context_broker_links = context_broker_links
-        
+
         if description_path:
             with open(description_path, "r") as f:
                 self.description = f.read()

@@ -1,16 +1,15 @@
 from typing import List
 
-from toolbox.Models import model_catalog
 from toolbox import DataModels
-from toolbox.Structures import Image, BoundingBox
+from toolbox.Models import model_catalog
+from toolbox.Structures import BoundingBox, Image
 from toolbox.utils.utils import get_logger
 
 logger = get_logger("toolbox.FaceEmotions")
 
 
-
 class FaceEmotions:
-    """Detect faces on images and predict its emotion.
+    """Detect faces in images and predict their emotion.
     """
 
     def __init__(self, config: dict):
@@ -31,13 +30,14 @@ class FaceEmotions:
         logger.debug(f"Face detector params {face_params}")
         self._face_detector = model_catalog[face_model](**face_params)
         self._scale_bb = config["face_detector"]["face_box_scale"]
-    
+
     def update_face(self, image: Image, face: DataModels.Face
-        ) -> DataModels.Face:
-        """Predict the emotion of a face data model.
+                    ) -> DataModels.Face:
+        """Predict the emotion of a Face data model.
 
         Args:
-            face (DataModels.Face): A DataModels.Face object.
+            image (toolbox.Structures.Image): An Image object.
+            face (DataModels.Face): A Face data model object.
 
         Returns:
             DataModels.Face: The same Face data model with the emotions
@@ -65,7 +65,7 @@ class FaceEmotions:
             List[DataModels.Face]: A list of Face data models.
         """
         face_instances = self._face_detector.predict(image.image)
-        
+
         data_models = []
         for face_instance in face_instances:
             bb: BoundingBox = face_instance.bounding_box

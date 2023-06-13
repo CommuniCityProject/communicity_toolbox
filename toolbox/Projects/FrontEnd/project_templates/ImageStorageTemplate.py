@@ -1,7 +1,7 @@
 import streamlit as st
 
-from toolbox.utils.utils import urljoin
 from toolbox.Projects.FrontEnd.utils import utils
+from toolbox.utils.utils import urljoin
 
 from . import BaseTemplate
 

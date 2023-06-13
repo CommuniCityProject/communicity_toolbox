@@ -2,16 +2,15 @@ from typing import List
 
 from toolbox import DataModels
 from toolbox.Projects.FaceRecognition import FaceRecognition
-from toolbox.utils.DemoBase import DemoBase
 from toolbox.Structures import Image
-
+from toolbox.utils.DemoBase import DemoBase
 
 
 class Demo(DemoBase):
 
     def __init__(self):
         super().__init__()
-    
+
     def _load_model(self, config: dict, task: str):
         if task != "visualize":
             self.model = FaceRecognition(
@@ -25,9 +24,9 @@ class Demo(DemoBase):
         if self.model.do_recognition:
             [self.model.recognize(dm) for dm in data_models]
         return data_models
-    
+
     def _consume_data_model(self, data_model: DataModels.Face
-        ) -> List[DataModels.Face]:
+                            ) -> List[DataModels.Face]:
         if isinstance(data_model, DataModels.Face):
             # Extract
             if not isinstance(data_model.features, list):
@@ -55,6 +54,7 @@ class Demo(DemoBase):
 def main():
     demo = Demo()
     demo.run()
+
 
 if __name__ == "__main__":
     main()

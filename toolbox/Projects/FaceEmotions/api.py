@@ -1,7 +1,7 @@
-from typing import List, Union
 import argparse
+from typing import List, Union
 
-from fastapi import status, HTTPException
+from fastapi import HTTPException, status
 
 from toolbox import DataModels
 from toolbox.Projects.FaceEmotions import FaceEmotions
@@ -11,9 +11,8 @@ from toolbox.utils.utils import get_logger
 logger = get_logger("toolbox.FaceEmotionsApi")
 
 
-
 class FaceEmotionsApi(ApiBase):
-    
+
     TITLE = "Face Emotions API"
 
     def __init__(self):
@@ -26,10 +25,10 @@ class FaceEmotionsApi(ApiBase):
         self._post_new_entity = self.config["api"]["post_new_entity"]
         self._update_entity = self.config["api"]["update_entity"]
         self._model = FaceEmotions(self.config)
-    
+
     def _predict_entity(self,
-        data_model: Union[DataModels.Image, DataModels.Face],
-        post_to_broker: bool) -> List[DataModels.Face]:
+                        data_model: Union[DataModels.Image, DataModels.Face],
+                        post_to_broker: bool) -> List[DataModels.Face]:
         """Predict a data model.
 
         Args:
@@ -53,7 +52,7 @@ class FaceEmotionsApi(ApiBase):
         elif isinstance(data_model, DataModels.Face):
             # Ignore already predicted entities.
             if data_model.emotion is not None or \
-                data_model.emotion_confidence is not None:
+                    data_model.emotion_confidence is not None:
                 return [data_model]
             # Predict the image
             image = self._get_image_by_id(data_model.image)
@@ -70,8 +69,8 @@ class FaceEmotionsApi(ApiBase):
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
                 f"Unprocessable entity type: {type(data_model)}"
             )
-        
-        
+
+
 def main():
     api = FaceEmotionsApi()
     api.run()

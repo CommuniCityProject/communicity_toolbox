@@ -1,16 +1,15 @@
 from typing import List
 
-from toolbox.Models import model_catalog
 from toolbox import DataModels
-from toolbox.Structures import Image, BoundingBox
+from toolbox.Models import model_catalog
+from toolbox.Structures import BoundingBox, Image
 from toolbox.utils.utils import get_logger
 
 logger = get_logger("toolbox.FaceDetection")
 
 
-
 class FaceDetection:
-    """Detect faces on images.
+    """Detect faces in images.
     """
 
     def __init__(self, config: dict):
@@ -26,7 +25,7 @@ class FaceDetection:
         self._face_detector = model_catalog[model_name](**model_params)
 
     def predict(self, image: Image) -> List[DataModels.Face]:
-        """Predicts the position of faces on an image.
+        """Predict the position of faces on an image.
 
         Args:
             image (toolbox.Structures.Image): An Image object.
@@ -35,7 +34,7 @@ class FaceDetection:
             List[DataModels.Face]: A list of Face data models.
         """
         face_instances = self._face_detector.predict(image.image)
-        
+
         data_models = []
         for face_instance in face_instances:
             bb: BoundingBox = face_instance.bounding_box
