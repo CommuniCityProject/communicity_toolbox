@@ -4,6 +4,7 @@ from typing import List, Optional, Tuple, Union
 import cv2
 import numpy as np
 from scipy.special import softmax
+
 from toolbox.Structures import Gender, Instance
 
 
@@ -14,7 +15,7 @@ class AgeGenderPredictor:
     def __init__(self, age_model_path: Optional[Path] = None,
                  gender_model_path: Optional[Path] = None, do_age: bool = True,
                  do_gender: bool = True, use_cuda: bool = False):
-        """Create the age-gender predictor and load the models.
+        """Create and load the age and gender models.
 
         Args:
             age_model_path (Optional[Path], optional): Path to the onnx age
@@ -25,8 +26,8 @@ class AgeGenderPredictor:
                 Defaults to True.
             do_gender (bool, optional): Enable the age prediction.
                 Defaults to True.
-            use_cuda (bool, optional): If True, tries to execute the model on
-                the GPU. Defaults to False.
+            use_cuda (bool, optional): If True, execute the model on a CUDA
+                device. Defaults to False.
         """
         if not do_age and not do_gender:
             raise ValueError("``do_age`` or ``do_gender`` must be True")
@@ -44,7 +45,7 @@ class AgeGenderPredictor:
                 self._enable_cuda_model(self._gender_model)
 
     def _enable_cuda_model(self, model: cv2.dnn.Net):
-        """Set the model preferable execution device to cuda
+        """Set the model preferable execution device to cuda.
         """
         model.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
         model.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
@@ -54,7 +55,7 @@ class AgeGenderPredictor:
         """Preprocess the images for the model.
 
         Args:
-            images (Union[List[np.ndarray], np.ndarray]): A list of image or
+            images (Union[List[np.ndarray], np.ndarray]): A list of images or
                 a single image, BGR uint8 of shape (H, W, 3).
 
         Returns:
@@ -143,7 +144,7 @@ class AgeGenderPredictor:
 
         Returns:
             List[Instance]: A list of Instances with a "gender" field storing a
-                Gender enum and a "confidence" filed storing the gender
+                Gender enum and a "confidence" field storing the gender
                 classification confidence. 
         """
         if not self._do_gender:
@@ -168,9 +169,9 @@ class AgeGenderPredictor:
 
         Returns:
             List[Instance]: An Instance for each image with the following fields:
-                age (float): The age of the face (if ``do_age`` is True).
-                gender (Gender): A Gender enum (if ``do_gender`` is True).
-                gender_confidence (float) The gender confidence
+                - age (float): The age of the face (if ``do_age`` is True).
+                - gender (Gender): A Gender enum (if ``do_gender`` is True).
+                - gender_confidence (float) The gender confidence
                     (if ``do_gender`` is True).
         """
         input_blob = self._preprocess_image(images)

@@ -1,7 +1,7 @@
 import os
 import pickle
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
 
 import cv2
 import numpy as np
@@ -16,7 +16,7 @@ class FaceRecognition:
     """Perform face recognition. Extract features from face images and compare
     them with a local dataset.
 
-        Attributes:
+    Attributes:
         distance_threshold (float): Maximum distance between two
             features vector to consider them from the same person.
     """
@@ -33,7 +33,7 @@ class FaceRecognition:
                 Defaults to 0.75.
             model_path (Optional[Path], optional): Path to the model checkpoint.
                 (.ckpt-..., without the ".data-..."). Defaults to None.
-            use_cuda (bool, optional): Execute the model on a cuda device.
+            use_cuda (bool, optional): Execute the model on a   CUDA device.
                 Defaults to False.
         """
         self.distance_threshold = distance_threshold
@@ -47,9 +47,9 @@ class FaceRecognition:
         """
         if self._model_path is None:
             raise ValueError("Model path is not defined")
-        
+
         model_path = Path(self._model_path)
-        
+
         if not self._use_cuda:
             os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
@@ -78,10 +78,10 @@ class FaceRecognition:
         """Predict a face image and extract a features vector.
 
         Args:
-            image (np.ndarray): A BGR uint8 image of shape (H, W, 3) of a face.
+            image (np.ndarray): A BGR uint8 face image of shape (H, W, 3).
 
         Raises:
-            ValueError: If the model is not loaded (call 'load_model()').
+            ValueError: If the model is not loaded (call ``load_model()``).
 
         Returns:
             np.ndarray: The predicted features vector.
@@ -139,7 +139,7 @@ class FaceRecognition:
 
         Returns:
             Tuple[bool, float]: A bool indicating if both features are similar
-                and its euclidean distance.
+                and its Euclidean distance.
         """
         dist = np.sum(np.square(f1 - f2))
         return dist < self.distance_threshold, dist
@@ -151,11 +151,11 @@ class FaceRecognition:
             features (np.ndarray): The features of a face.
 
         Returns:
-            List[Instance]: A list of Instance sorted from most to least
+            List[Instance]: A list of Instances sorted from most to least
                 similar, with the following fields:
                 - name (str): The name of the recognized face.
-                - distance (float): The euclidean distance from the supplied
-                features to the recognized features.
+                - distance (float): The Euclidean distance from the supplied
+                features to the dataset features.
         """
         recognized = {}
         for name, c_features in self._face_features.items():
@@ -175,13 +175,13 @@ class FaceRecognition:
         """Recognize a face.
 
         Args:
-            image (np.ndarray): A BGR uint8 image of shape (H, W, 3) of a face.
+            image (np.ndarray): A BGR uint8 face image of shape (H, W, 3).
 
         Returns:
-            List[Instance]: A list of Instance sorted from most to least
+            List[Instance]: A list of Instances sorted from most to least
                 similar, with the following fields:
                 - name (str): The name of the recognized face.
-                - distance (float): The euclidean distance from the supplied
+                - distance (float): The Euclidean distance from the supplied
                 features to the recognized features.
         """
         features = self.predict_features(image)

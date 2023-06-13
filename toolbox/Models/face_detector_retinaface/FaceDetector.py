@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import torch
 import torch.nn as nn
+
 from toolbox.Structures import BoundingBox, Instance
 
 from .box_utils import decode, decode_landm
@@ -43,7 +44,7 @@ class FaceDetector:
                 to 0.4.
             max_input_size (Optional[int], optional): Maximum size of the
                 image larger side. If None it is ignored. Defaults to None. 
-            use_cuda (bool, optional): Run the model on a cuda device.
+            use_cuda (bool, optional): Run the model on a CUDA device.
                 Defaults to False.
 
         Raises:
@@ -116,12 +117,12 @@ class FaceDetector:
             image (np.ndarray): A BGR uint8 image of shape (H, W, 3).
 
         Returns:
-            List[Instance]: A list of Instance with the following fields:
-                bounding_box (BoundingBox): A BoundingBox object with the
+            List[Instance]: List of Instances with the following fields:
+                - bounding_box (BoundingBox): A BoundingBox object with the
                     position of the detected face.
-                confidence (float): The detection confidence.
-                landmarks (np.ndarray): Predicted face landmarks if
-                    ``landmarks`` is set to True.
+                - confidence (float): The detection confidence.
+                - landmarks (np.ndarray): Predicted face landmarks if
+                    ``self.landmarks`` is set to True.
         """
         image = self._scale_input_image(image)
         h, w, _ = image.shape
@@ -200,7 +201,7 @@ class FaceDetector:
         return instances
 
     def _remove_model_prefix(self, state_dict: dict, prefix: str) -> dict:
-        """Remove prefix from the state dict parameter names .
+        """Remove prefix from the state dict parameter names.
 
         Args:
             state_dict (dict): The state dict.
@@ -219,7 +220,7 @@ class FaceDetector:
         Args:
             model (nn.Module): The model.
             pretrained_path (Path): Path to the weights file.
-            use_cuda (bool, optional): Load the model on a cuda device.
+            use_cuda (bool, optional): Load the model on a CUDA device.
                 Defaults to False.
 
         Returns:

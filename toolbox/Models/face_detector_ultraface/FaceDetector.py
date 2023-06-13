@@ -24,8 +24,8 @@ class FaceDetector:
                 (320, 240).
             confidence_threshold (float, optional): Confidence threshold.
                 Defaults to 0.7.
-            use_cuda (bool, optional): If True, tries to execute the model on
-                the GPU. Defaults to False.
+            use_cuda (bool, optional): If True, execute the model on a CUDA
+                device. Defaults to False.
         """
         self._input_size = tuple(input_size)
         self._confidence_thr = confidence_threshold
@@ -111,8 +111,9 @@ class FaceDetector:
         return box_scores[picked, :]
 
     def _parse_boxes(self, width: int, height: int, confidences: np.ndarray,
-                     boxes: np.ndarray, prob_threshold: float, iou_threshold: float = 0.5,
-                     top_k: int = -1) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+                     boxes: np.ndarray, prob_threshold: float,
+                     iou_threshold: float = 0.5, top_k: int = -1
+                     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Select boxes that contain human faces.
 
         Args:
@@ -196,10 +197,10 @@ class FaceDetector:
             image (np.ndarray): A BGR uint8 image of shape (H, W, 3).
 
         Returns:
-            List[Instance]: A list of Instance with the following fields:
-                bounding_box (BoundingBox): A BoundingBox object with the
+            List[Instance]: A list of Instances with the following fields:
+                - bounding_box (BoundingBox): A BoundingBox object with the
                     position of the detected face
-                confidence (float): The detection confidence.
+                - confidence (float): The detection confidence.
         """
         instances = []
         input_image = self._preprocess_image(image)

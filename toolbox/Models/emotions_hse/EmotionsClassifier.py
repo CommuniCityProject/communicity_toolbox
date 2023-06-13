@@ -7,11 +7,12 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.compat.v1.keras.backend import set_session
 from tensorflow.keras.models import load_model
+
 from toolbox.Structures import Emotion, Instance
 
 
 class EmotionsClassifier:
-    """Perform a classification of emotions on face images.
+    """Perform classification of emotions on face images.
     """
 
     def __init__(self, model_path: Path, use_cuda: bool = False):
@@ -19,8 +20,8 @@ class EmotionsClassifier:
 
         Args:
             model_path (Path): Path to the .h5 model file.
-            use_cuda (bool, optional):  If True, tries to execute the model on
-                the GPU. Defaults to False.
+            use_cuda (bool, optional): If True, execute the model on
+                a CUDA device. Defaults to False.
         """
         if not use_cuda:
             os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
@@ -49,7 +50,7 @@ class EmotionsClassifier:
         """Preprocess the images for the model.
 
         Args:
-            images (Union[List[np.ndarray], np.ndarray]): A list of image or
+            images (Union[List[np.ndarray], np.ndarray]): A list of images or
                 a single image, BGR uint8 of shape (H, W, 3).
 
         Returns:
@@ -76,8 +77,8 @@ class EmotionsClassifier:
                 list of images of faces, BGR uint8 of shape (H, W, 3).
 
         Returns:
-            List[Instance]: A list of Instances with a "emotion" field storing
-                a Emotion enum and a "confidence" filed storing the
+            List[Instance]: List of Instances with an "emotion" field storing
+                a ``Emotion`` enum and a "confidence" field storing the
                 classification confidence. 
         """
         batch = self._preprocess_image(images)
