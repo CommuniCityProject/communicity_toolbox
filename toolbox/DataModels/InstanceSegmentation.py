@@ -10,7 +10,7 @@ from .DataModelsCatalog import register_data_model
 
 @register_data_model
 class InstanceSegmentation(BaseModel):
-    """This entity stores information about segmented objects on an image.
+    """This data model stores information about segmented objects on an image.
     It is intended to be used with instance segmentation algorithms to detect
     objects and infer a segmentation mask.
 
@@ -25,7 +25,7 @@ class InstanceSegmentation(BaseModel):
         label_id (int)
         confidence (float)
     """
-    
+
     __rel_attrs__ = {"image"}
     __context__ = set()
 
