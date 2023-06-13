@@ -4,14 +4,13 @@ from pathlib import Path
 from typing import List, Type
 
 import streamlit as st
+from project_templates import BaseTemplate, project_templates
 from streamlit_cookies_manager import CookieManager
 
 from toolbox.Context import ContextCli
 from toolbox.Projects.ImageStorage import ImageStorageCli
 from toolbox.utils.config_utils import parse_config
 from toolbox.utils.utils import get_logger
-
-from project_templates import BaseTemplate, project_templates
 
 logger = get_logger("toolbox.FrontEnd")
 

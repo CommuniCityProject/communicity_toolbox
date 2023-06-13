@@ -1,7 +1,7 @@
-from typing import List
 import argparse
+from typing import List
 
-from fastapi import status, HTTPException
+from fastapi import HTTPException, status
 
 from toolbox import DataModels
 from toolbox.Projects.InstanceSegmentation import InstanceSegmentation
@@ -11,9 +11,8 @@ from toolbox.utils.utils import get_logger
 logger = get_logger("toolbox.InstanceSegmentationApi")
 
 
-
 class InstanceSegmentationApi(ApiBase):
-    
+
     TITLE = "Instance Segmentation API"
 
     def __init__(self):
@@ -24,10 +23,10 @@ class InstanceSegmentationApi(ApiBase):
         """
         super()._initialize(args)
         self._model = InstanceSegmentation(self.config)
-    
+
     def _predict_entity(self,
-        data_model: DataModels.Image,
-        post_to_broker: bool) -> List[DataModels.Face]:
+                        data_model: DataModels.Image,
+                        post_to_broker: bool) -> List[DataModels.Face]:
         """Predict a data model.
 
         Args:
@@ -52,7 +51,7 @@ class InstanceSegmentationApi(ApiBase):
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
                 f"Unprocessable entity type: {type(data_model)}"
             )
-        
+
 
 def main():
     api = InstanceSegmentationApi()

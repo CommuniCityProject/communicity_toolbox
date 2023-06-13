@@ -1,14 +1,13 @@
-from typing import Dict, List, Type, Optional
-from pathlib import Path
-from collections import OrderedDict
 import time
+from collections import OrderedDict
+from pathlib import Path
+from typing import Dict, List, Optional, Type
 
-from toolbox.DataModels import BaseModel
 from toolbox.Context import ContextCli
+from toolbox.DataModels import BaseModel
 from toolbox.utils.utils import float_or_none, get_logger
 
 logger = get_logger("ImageStorage")
-
 
 
 class File:
@@ -22,14 +21,12 @@ class Storage:
     """Manage a local file storage and update its state in a context broker.
     """
 
-    def __init__(self, config: dict, data_model_cls: Type[BaseModel]):
-        """
+    def __init__(self, config: dict):
+        """Create a Storage object.
+
         Args:
             config (dict): Configuration dict.
-            data_model_cls (Type[BaseModel]): Base data model to upload to the
-                context broker.
         """
-        # Parse config
         self._path = Path(config["api"]["storage_path"])
         self._max_n_files = float_or_none(config["api"]["max_n_files"])
         self._max_dir_size = float_or_none(config["api"]["max_dir_size"])
@@ -42,7 +39,7 @@ class Storage:
         self._total_size: int = 0
 
         logger.info(f"Using storage path {self._path}")
-    
+
     def initialize(self):
         """Initialize the file record with the files already present on the
         storage path.
@@ -53,7 +50,7 @@ class Storage:
             for f in files:
                 entity_id = f.stem.replace(";", ":")
                 self.add_file(f, key=entity_id)
-    
+
     def check_dir_limits(self):
         """Check the limits of the storage dir.
         """
@@ -65,14 +62,14 @@ class Storage:
                 for i in range(int(n_files - self._max_n_files)):
                     logger.info(f"Maximum number of files reached ({n_files})")
                     self.delete_file(keys[i])
-        
+
         # Maximum dir size
         if self._max_dir_size is not None:
             if self.total_size > self._max_dir_size:
                 keys = self.keys()
                 for k in keys:
-                    logger.info(f"Maximum directory size reached " \
-                        f"({self.total_size})")
+                    logger.info(f"Maximum directory size reached "
+                                f"({self.total_size})")
                     self.delete_file(k)
                     if self.total_size <= self._max_dir_size:
                         break
@@ -83,15 +80,16 @@ class Storage:
         ct = time.time()
         for k, f in self._stored_files.items():
             if f.creation_time < ct - self._max_file_time:
-                logger.info(f"Maximum file time exceeded " \
-                    f"({self._max_file_time}s)")
+                logger.info(f"Maximum file time exceeded "
+                            f"({self._max_file_time}s)")
                 self.delete_file(k)
 
     def add_file(
         self,
         path: Path,
         data_model: Optional[Type[BaseModel]] = None,
-        key: Optional[str] = None):
+        key: Optional[str] = None
+    ):
         """Add an existing file.
 
         Args:
@@ -121,7 +119,7 @@ class Storage:
         self._total_size += self._stored_files[key].bytes
         if data_model is not None:
             self._context_cli.post_data_model(data_model)
-    
+
     def delete_file(self, key: str):
         """Delete a file permanently.
 
@@ -134,7 +132,7 @@ class Storage:
         self._total_size -= file.bytes
         if self._delete_from_broker:
             self._context_cli.delete_entity(key)
-    
+
     def delete_all(self):
         """Delete all the inserted file.
         """
@@ -175,12 +173,12 @@ class Storage:
         """Return the path of a file by its key.
         """
         return self._stored_files[key].path
-    
+
     def __len__(self):
         """Return the number of stored files.
         """
         return len(self._stored_files)
-    
+
     def __contains__(self, key: str) -> bool:
         """Return True if the key exists. 
         """

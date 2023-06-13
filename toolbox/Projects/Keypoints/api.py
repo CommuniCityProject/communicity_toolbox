@@ -1,7 +1,7 @@
-from typing import List, Type
 import argparse
+from typing import List, Type
 
-from fastapi import status, HTTPException
+from fastapi import HTTPException, status
 
 from toolbox import DataModels
 from toolbox.Projects.Keypoints import Keypoints
@@ -11,9 +11,8 @@ from toolbox.utils.utils import get_logger
 logger = get_logger("toolbox.KeypointsApi")
 
 
-
 class KeypointsApi(ApiBase):
-    
+
     TITLE = "Keypoints API"
 
     def __init__(self):
@@ -24,10 +23,10 @@ class KeypointsApi(ApiBase):
         """
         super()._initialize(args)
         self._model = Keypoints(self.config)
-    
+
     def _predict_entity(self,
-        data_model: DataModels.Image,
-        post_to_broker: bool) -> List[DataModels.Face]:
+                        data_model: DataModels.Image,
+                        post_to_broker: bool) -> List[DataModels.Face]:
         """Predict a data model.
 
         Args:

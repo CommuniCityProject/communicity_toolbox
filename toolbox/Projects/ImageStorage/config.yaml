@@ -22,8 +22,8 @@ api:
   # Maximum size of uploaded files in bytes. Set to null to disable.
   max_upload_size: 10e6
 
-  # Path where save the images. Files on this path may be deleted!!
-  storage_path: C:/Users/HE7/Desktop/img_strg # /home/user/toolbox/storage
+  # Path where save the images. Files on this path may be deleted.
+  storage_path: C:/Users/HE7/Desktop/img_storage
 
   # Whether the image entities should be deleted from the context broker when
   # they are deleted from disk.

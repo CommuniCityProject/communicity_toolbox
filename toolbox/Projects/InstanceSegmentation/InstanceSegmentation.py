@@ -1,12 +1,11 @@
 from typing import List
 
-from toolbox.Models import model_catalog
 from toolbox import DataModels
+from toolbox.Models import model_catalog
 from toolbox.Structures import Image
 from toolbox.utils.utils import get_logger
 
 logger = get_logger("toolbox.InstanceSegmentation")
-
 
 
 class InstanceSegmentation:
@@ -24,14 +23,14 @@ class InstanceSegmentation:
         logger.info(f"Loading Instance segmentation model: {model_name}")
         logger.debug(f"Instance segmentation params: {model_params}")
         self._predictor = model_catalog[model_name](**model_params)
-    
+
     def predict(self, image: Image
-        ) -> List[DataModels.InstanceSegmentation]:
+                ) -> List[DataModels.InstanceSegmentation]:
         """Perform instance segmentation on an image.
 
         Args:
             image (toolbox.Structures.Image): An Image object.
-        
+
         Returns:
             List[DataModels.InstanceSegmentation]: A list of
                 InstanceSegmentation objects.

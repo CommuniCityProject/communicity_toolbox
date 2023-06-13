@@ -14,6 +14,7 @@ from fastapi import (BackgroundTasks, Body, FastAPI, File, HTTPException,
 from fastapi.responses import FileResponse
 from fastapi_utils.tasks import repeat_every
 from starlette.middleware.cors import CORSMiddleware
+
 from toolbox import DataModels, Structures
 from toolbox.Context import ContextCli
 from toolbox.Projects.ImageStorage.ContentSizeLimitMiddleware import \
@@ -29,8 +30,8 @@ logger = get_logger("toolbox.ImageStorage")
 
 class ImageStorage:
     """API to upload and download images, keeping a reference to the file
-    in a context broker. It also allows to create images to visualize the
-    data models.
+    in a context broker. It also allows the creation of data models
+    visualization images.
     """
 
     VERSION = get_version()
@@ -59,7 +60,7 @@ class ImageStorage:
             config["api"]["max_entities_visualize"])
 
         # Create the storage object
-        self._storage = Storage(config, DataModels.Image)
+        self._storage = Storage(config)
         self._storage.initialize()
         self._storage.check_dir_limits()
 
@@ -327,7 +328,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument(
         "--config",
-        help="Path to the configuration yaml (default: 'config.yaml')",
+        help="Path to the configuration YAML (default: 'config.yaml')",
         type=Path,
         default="config.yaml"
     )

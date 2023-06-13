@@ -141,8 +141,8 @@ class SimplePredictTemplate(BaseTemplate):
         entities: List[dict],
         visualization_params: dict = {}
     ):
-        """Visualize a list of entities by its id. Call the image storage API
-        to generate the image, then download it.
+        """Visualize a list of entities by their IDs. Call the image storage
+        API to generate the image, then download it.
 
         Args:
             entities (List[dict]): List of entity dicts to visualize.
@@ -156,7 +156,7 @@ class SimplePredictTemplate(BaseTemplate):
         st.session_state.output_image = self.image_storage_cli.download(vis_id)
 
     def _upload_input_image(self) -> Union[str, None]:
-        """Uploads the input image to the image storage.
+        """Upload the input image to the image storage.
 
         Returns:
             Union[str, None]: The ID of the uploaded image on the image storage
@@ -186,7 +186,7 @@ class SimplePredictTemplate(BaseTemplate):
             entity_id (str): The ID of the input entity.
         """
         if st.session_state.input_entity is not None and \
-            st.session_state.input_entity.get("id", None) == entity_id:
+                st.session_state.input_entity.get("id", None) == entity_id:
             return
         st.session_state.input_entity = self.context_cli.get_entity(
             entity_id,
@@ -223,7 +223,7 @@ class SimplePredictTemplate(BaseTemplate):
 
         # Image already set
         if (st.session_state.input_image is not None and
-            st.session_state.input_image.id == image_id):
+                st.session_state.input_image.id == image_id):
             return
 
         # Download the image
@@ -254,7 +254,7 @@ class SimplePredictTemplate(BaseTemplate):
         else:
             self._st_input_image.empty()
             self._st_preview_image_id.empty()
-    
+
     def _show_output(self):
         """Show the output image and JSON.
         """
@@ -347,7 +347,7 @@ class SimplePredictTemplate(BaseTemplate):
                 self._set_input_entity_by_id(image_id)
 
         self._get_image_from_input()
-        
+
         # Set the predict button
         self._st_button_predict.button(
             "Predict",
