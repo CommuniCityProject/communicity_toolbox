@@ -6,7 +6,7 @@ from typing import List, Optional, Union
 
 
 class Subscription:
-    """Class that represent a context broker subscription to one or more
+    """Class that represents a context broker subscription to one or more
     entities.
 
     Attributes:
@@ -67,7 +67,7 @@ class Subscription:
                 subscribed. If used, `entity_id_pattern` must be None.
                 Defaults to None.
             entity_id_pattern (Optional[Union[str, List[str]]], optional):
-                A regular expression which denotes a pattern that shall be
+                A regular expression that denotes a pattern that shall be
                 matched by the provided or subscribed Entities. A single or a
                 list of expressions. If used, `entity_id` must be None.
                 Defaults to None.
@@ -229,7 +229,7 @@ class Subscription:
         # Check type
         if json.get("type", None) != "Subscription":
             raise ValueError("The provided JSON object is not a subscription")
-        
+
         # Get ID
         subscription_id = json.get("id", None)
 
@@ -255,10 +255,10 @@ class Subscription:
             entity_type = None
             entity_id = None
             entity_id_pattern = None
-            
+
         # Get watched_attributes
         watched_attributes = json.get("watchedAttributes", None)
-        
+
         # Get query
         query = json.get("q", None)
 
@@ -293,7 +293,7 @@ class Subscription:
         )
 
     def __eq__(self, other: Subscription) -> bool:
-        """Compares if two subscriptions are virtually equal.
+        """Compare if two subscriptions are virtually equal.
         """
         if not isinstance(other, Subscription):
             return False
@@ -316,11 +316,11 @@ class Subscription:
                 return False
             if set(self.entity_type) != set(other.entity_type):
                 return False
-        
+
         if self.entity_id is not None:
             if set(self.entity_id) != set(other.entity_id):
                 return False
-        
+
         if self.entity_id_pattern is not None:
             if set(self.entity_id_pattern) != set(other.entity_id_pattern):
                 return False
@@ -344,7 +344,6 @@ class Subscription:
         return True
 
     def __str__(self) -> str:
-        """Returns the subscription as a JSON string.
+        """Return the subscription as a JSON string.
         """
         return Json.dumps(self.json, indent=4)
-    

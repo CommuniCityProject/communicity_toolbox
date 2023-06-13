@@ -37,12 +37,12 @@ class ContextCli:
         """Initialize the ContextCli.
 
         Args:
-            host (str): Host address of the context broker.
+            host (str): Address of the context broker.
             port (int): Port of the context broker.
             base_path (str, optional): URL path to the context broker.
                 Defaults to "".
-            notification_uri (str, optional): The uri used for the
-                subscriptions notifications. Defaults to None.
+            notification_uri (str, optional): The URI used for the
+                subscription notifications. Defaults to None.
             check_subscription_conflicts (bool, optional): If True, the
                 subscription will be checked for conflicts before being
                 created. Defaults to False.
@@ -100,9 +100,9 @@ class ContextCli:
 
     def _build_subscription(self, **kwargs) -> Subscription:
         """Create a Subscription object from the given kwargs.
-        If "notification_uri" is not provided, the `notification_uri` attribute
-        will be used. If "name" is not provided, the `subscription_name`
-        attribute will be used.
+        If ``notification_uri`` is not provided, the ``notification_uri`` from
+        the ``ContextCli`` will be used. If ``name`` is not provided, the
+        ``subscription_name`` from the ``ContextCli`` will be used.
 
         Returns:
             Subscription: The Subscription object.
@@ -128,7 +128,7 @@ class ContextCli:
                 Defaults to None.
             kwargs: The subscription data as keyword arguments (see 
                 :class:`Subscription` for the list of valid arguments). If
-                subscription is not None, the kwargs will be ignored.
+                the subscription is not None, the kwargs will be ignored.
                 Defaults to None.
 
         Raises:
@@ -179,7 +179,7 @@ class ContextCli:
         """Get a subscription from the context broker by its id.
 
         Args:
-            subscription_id (str): Subscription id.
+            subscription_id (str): The subscription id.
 
         Raises:
             requests.exceptions.HTTPError: If there was an error getting the
@@ -276,14 +276,14 @@ class ContextCli:
         the same as the given subscription.
 
         Args:
-            subscription (dict): A subscription object.
+            subscription (Subscription): A subscription object.
 
         Raises:
             requests.exceptions.HTTPError: If the subscriptions could not be
                 retrieved successfully.
 
         Returns:
-            List[Subscription]: A list with the conflicting subscriptions.
+            List[Subscription]: A list with conflicting subscriptions.
         """
         return [s for s in self.get_all_subscriptions() if s == subscription]
 
@@ -291,15 +291,14 @@ class ContextCli:
         """Delete a subscription from the context broker.
 
         Args:
-            subscription_id (Optional[str]): The id of the subscription to
-                delete.
+            subscription_id (str): The id of the subscription to delete.
 
         Raises:
             requests.exceptions.HTTPError: If there was an error deleting the
                 subscription.
 
         Returns:
-            bool: True if success.
+            bool: True if successful.
         """
         if subscription_id in self._subscription_ids:
             self._subscription_ids.remove(subscription_id)
@@ -382,7 +381,7 @@ class ContextCli:
         offset: int = 0,
         order_by: Optional[str] = None,
         as_dict: bool = False
-    ) -> List[Union[Type[BaseModel], dict]]:
+    ) -> Union[List[Type[BaseModel]], List[dict]]:
         """Get a list of entities from the context broker.
 
         Args:
@@ -392,12 +391,12 @@ class ContextCli:
                 list of attributes to return. Defaults to None.
             entity_id (Optional[Union[List[str], str]], optional): A single or 
                 a list of entity IDs. Defaults to None.
-            id_pattern (Optional[str], optional): A pattern to match entity
+            id_pattern (Optional[str], optional): A pattern to match the entity
                 IDs. Defaults to None.
             query (Optional[str], optional): A query to filter entities.
                 Defaults to None.
             limit (int, optional): Maximum number of entities to return.
-                Maximum value is 1000. Defaults to 100.
+                The maximum value is 1000. Defaults to 100.
             offset (int, optional): Pagination offset. Defaults to 0.
             order_by (Optional[str], optional): Order entities by an attribute.
                 Comma-separated list of attributes can be used to order by the
@@ -415,8 +414,8 @@ class ContextCli:
                 False.
 
         Returns:
-            List[Union[Type[BaseModel], dict]]: A list of data model objects or
-                dictionaries.
+            Union[List[Type[BaseModel]], List[dict]]: A list of data model
+                objects or dictionaries.
         """
         params = {"limit": limit, "offset": offset}
         if entity_id:
@@ -463,7 +462,7 @@ class ContextCli:
         limit: int = 100,
         order_by: Optional[str] = None,
         as_dict: bool = False
-    ) -> Iterator[List[Union[Type[BaseModel], dict]]]:
+    ) -> Iterator[Union[List[Type[BaseModel]], List[dict]]]:
         """Iterate through a list of entities from the context broker.
 
         Args:
@@ -473,12 +472,12 @@ class ContextCli:
                 list of attributes to return. Defaults to None.
             entity_id (Optional[Union[List[str], str]], optional): A single or 
                 a list of entity IDs. Defaults to None.
-            id_pattern (Optional[str], optional): A pattern to match entity
+            id_pattern (Optional[str], optional): A pattern to match the entity
                 IDs. Defaults to None.
             query (Optional[str], optional): A query to filter entities.
                 Defaults to None.
             limit (int, optional): Maximum number of entities to return.
-                Maximum value is 1000. Defaults to 100.
+                The maximum value is 1000. Defaults to 100.
             order_by (Optional[str], optional): Order entities by an attribute.
                 Comma-separated list of attributes can be used to order by the
                 first attribute and on tie ones ordered by the subsequent
@@ -495,8 +494,8 @@ class ContextCli:
                 False.
 
         Returns:
-            Iterator[List[Union[Type[BaseModel], dict]]]: An iterator of data
-                model objects or dictionaries.
+            Iterator[Union[List[Type[BaseModel]], List[dict]]]: An iterator of
+                data model objects or dictionaries.
         """
         offset = 0
         while True:
@@ -525,7 +524,7 @@ class ContextCli:
         query: Optional[str] = None,
         order_by: Optional[str] = None,
         as_dict: bool = False
-    ) -> List[Union[Type[BaseModel], dict]]:
+    ) -> Union[List[Type[BaseModel]], List[dict]]:
         """Get all entities from the context broker.
 
         Args:
@@ -535,7 +534,7 @@ class ContextCli:
                 list of attributes to return. Defaults to None.
             entity_id (Optional[Union[List[str], str]], optional): A single or 
                 a list of entity IDs. Defaults to None.
-            id_pattern (Optional[str], optional): A pattern to match entity
+            id_pattern (Optional[str], optional): A pattern to match the entity
                 IDs. Defaults to None.
             query (Optional[str], optional): A query to filter entities.
                 Defaults to None.
@@ -555,8 +554,8 @@ class ContextCli:
                 False.
 
         Returns:
-            List[Union[Type[BaseModel], dict]]: A list of data model objects or
-                dictionaries.
+            Union[List[Type[BaseModel]], List[dict]]: A list of data model
+                objects or dictionaries.
         """
         return list(
             itertools.chain.from_iterable(
@@ -701,7 +700,7 @@ class ContextCli:
                 the entity.
 
         Returns:
-            bool: True if success.
+            bool: True if successful.
         """
         response = requests.delete(urljoin(self._entities_uri, entity_id))
         if response.ok:

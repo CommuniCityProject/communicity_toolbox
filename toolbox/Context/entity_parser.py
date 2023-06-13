@@ -24,7 +24,7 @@ def create_random_id(
     Args:
         entity_type (str, optional): The type of the entity. Defaults to "".
         prefix (str, optional): Optional prefix to include at the start of the
-            id. Defaults to urn:ngsi-ld".
+            id. Defaults to "urn:ngsi-ld".
         uuid4 (bool, optional): If UUID4 should be used instead of UUID1.
             Defaults to False.
         shortener (bool, optional): Use a shorter version of the UUID. Defaults
@@ -103,7 +103,7 @@ def data_model_to_json(data_model: Type[BaseModel]) -> dict:
 
 
 def get_entity_field(field: any, field_type: any) -> any:
-    """Cast a field from an entity to its data type.
+    """Convert a field from an entity to its data type.
 
     Args:
         field (any): The field value.
@@ -141,7 +141,7 @@ def get_entity_field(field: any, field_type: any) -> any:
 
 def parse_entity(entity: dict, data_model_type: Type[BaseModel]
                  ) -> Type[BaseModel]:
-    """Parses a NGSI-LD JSON entity and convert it to a toolbox data model.
+    """Parse an NGSI-LD JSON entity and convert it to a toolbox data model.
 
     Args:
         entity (dict): The entity dictionary to be parsed.
