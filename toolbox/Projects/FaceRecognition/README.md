@@ -1,18 +1,12 @@
 # Face Recognition
 
-This Project aims to perform face recognition in images. This process can be split in two main tasks:
-The first one uses a machine learning model to extract face features from images, which are vectors that represent faces in a high dimensional space.
-The second one uses this features to compare them with a previously created dataset of known faces and find the most similar one.
-
-This project allows to detect faces, extract its features, recognize people and also to create a dataset from a set of images of known people.
-
-The process of features extraction and face recognition can be done separately on different process/machines.
+This project aims to recognize faces in images, that is, detect the position of a face and tell who it is. The process can be split into two main tasks: The first one uses a machine learning model to extract face features from images, which are vectors that represent faces in a high-dimensional space. The second one uses these features to compare them with a previously created dataset of known faces and find the most similar one. These steps can be done together or separately on different processes/machines.
 
 ![face recognition](../../../docs/res/face_recognition.jpg)
 
 ## Data models
 
-This project uses the _[Face](https://github.com/CommuniCityProject/communicity_toolbox/tree/master/docs/DataModels/Face)_ data model.
+This project uses the _[Face](../../../docs/data-models.md#Face)_ data model.
 
 ## Configuration
 

@@ -23,14 +23,14 @@ The following table lists the currently provided Projects:
 
 ## API REST
 
-Projects are intended to be used by the final users or applications through their own APIs. They are developed using the [FastApi](https://fastapi.tiangolo.com/) Python framework which has some key features such as:
+Projects are intended to be used by the final users or applications through their APIs. They are developed using the [FastApi](https://fastapi.tiangolo.com/) Python framework which has some key features such as:
 - Automatic documentation generation.
 - Automatic type validation using Pydantic.
 - Based on open standards like OpenAPI and JSON Schema.
 - Asynchronous calls.
 - Production-ready with Uvicorn server.
 
-They work in conjunction with a context broker, which acts as a mediator between the Projects and the data sources. The input data is received from the context broker, which is then processed to generate an output that is posted back to the context broker. The generated data uses the [NGSI-LD](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_cim009v010601p.pdf) format and follows the [data models](DataModels/README.md) defined by the Toolbox. This approach enables an efficient way of retrieving and publishing data, utilizing a well-known standard and unifying the output of each component on a single common endpoint.
+They work in conjunction with a context broker, which acts as a mediator between the Projects and the data sources. The input data is received from the context broker, which is then processed to generate an output that is posted back to the context broker. The generated data uses the [NGSI-LD](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_cim009v010601p.pdf) format and follows the [data models](data-mdels.md) defined by the Toolbox. This approach enables an efficient way of retrieving and publishing data, utilizing a well-known standard and unifying the output of each component on a single common endpoint.
 
 <!-- 
 To launch an API we can call the ``api.py`` file located on the Project's directory. To see the accepted parameters we can use the `--help` option:
@@ -54,7 +54,7 @@ python api.py
 
 The API will be available on the port specified on the configuration YAML. -->
 
-The API supports automatic and interactive documentation generation with [swagger-ui](https://github.com/swagger-api/swagger-ui) and [redoc](https://github.com/Redocly/redoc). They are available by default on  http://127.0.0.1:8080/docs and http://127.0.0.1:8080/redoc respectively.
+The API supports automatic and interactive documentation generation with [swagger-ui](https://github.com/swagger-api/swagger-ui) and [redoc](https://github.com/Redocly/redoc). They are available by default on ``http://127.0.0.1:8080/docs`` and ``http://127.0.0.1:8080/redo``c respectively.
 
 <details>
   <summary>Screenshots</summary>
@@ -78,7 +78,7 @@ The APIs related to image processing usually implements the following routes:
 
 Projects use a configuration YAML file to define their parameters. On each Project folder is a ``config.yaml`` file with the default values.
 
-The configuration system allow overriding other configuration YAMLs with the field ``__BASE__``. It also allows inserting values from the environment variables, using the keyword ``!ENV`` before the value and encapsulating the variable name in ``${...}``. (e.g. ``notification_uri: !ENV http://${HOST}:${PORT}/ngsi-ld/v1/notify``)
+The configuration system allows the overriding of other configuration YAMLs with the field ``__BASE__`` followed by the path to the YAML file. It also allows inserting values from the environment variables, using the keyword ``!ENV`` before the value and encapsulating the variable name in ``${...}``. (e.g. ``notification_uri: !ENV http://${HOST}:${PORT}/ngsi-ld/v1/notify``)
 
 <!-- 
 
