@@ -6,7 +6,7 @@ The developed data models are listed here:
 
 | Name | Description | Specification | Python class |
 |------|-------------|---------------|--------------|
-| Face | Store information about some inferred attributes about a Face | [schema.json](./DataModels/Face/schema.json) | [Face.py](../toolbox/DataModels/Face.py)
-| InstanceSegmentation | Store information about a segmented object in an image | [schema.json](./DataModels/InstanceSegmentation/schema.json) | [InstanceSegmentation.py](../toolbox/DataModels/InstanceSegmentation.py)
-| PersonKeyPoints | Store the position of different body parts within an image | [schema.json](./DataModels/PersonKeyPoints/schema.json) | [PersonKeyPoints.py](../toolbox/DataModels/PersonKeyPoints.py)
-| Image | Stores information about an uploaded image | [schema.json](./DataModels/Image/schema.json) | [Image.py](../toolbox/DataModels/Image.py)
+| Face | Store information about some inferred attributes about a Face | [schema.json](./DataModels/Face/schema.json) | [Face.py](https://communicity-docs.readthedocs.io/en/latest/docs/toolbox/DataModels.html#module-DataModels.Face)
+| InstanceSegmentation | Store information about a segmented object in an image | [schema.json](./DataModels/InstanceSegmentation/schema.json) | [InstanceSegmentation.py](https://communicity-docs.readthedocs.io/en/latest/docs/toolbox/DataModels.html#module-DataModels.InstanceSegmentation)
+| PersonKeyPoints | Store the position of different body parts within an image | [schema.json](./DataModels/PersonKeyPoints/schema.json) | [PersonKeyPoints.py](https://communicity-docs.readthedocs.io/en/latest/docs/toolbox/DataModels.html#module-DataModels.PersonKeyPoints)
+| Image | Stores information about an uploaded image | [schema.json](./DataModels/Image/schema.json) | [Image.py](https://communicity-docs.readthedocs.io/en/latest/docs/toolbox/DataModels.html#module-DataModels.Image)

@@ -4,7 +4,7 @@ The Toolbox Structures are a set of Python Classes used to represent the output 
 
 The following Structures are implemented:
 
-## [Instance](https://github.com/CommuniCityProject/communicity_toolbox/blob/master/toolbox/Structures/Instance.py)
+## [Instance](https://communicity-docs.readthedocs.io/en/latest/docs/toolbox/Structures.html#module-Structures.Instance)
 
 Structure similar to a Python ``dict``, used to aggregate the different outputs of a machine learning algorithm for each instance.
 e.g. A face detector algorithm will produce an ``Instance`` object for each detected face, storing inside it the bounding box and the detection confidence.
@@ -20,7 +20,7 @@ print(dict(instance))
 # > {'label': 'Car', 'confidence': 0.99}
 ```
 
-## [BoundingBox](https://github.com/CommuniCityProject/communicity_toolbox/blob/master/toolbox/Structures/BoundingBox.py)
+## [BoundingBox](https://communicity-docs.readthedocs.io/en/latest/docs/toolbox/Structures.html#module-Structures.BoundingBox)
 
 Used to store the coordinates of a bounding box, that is a set of two points delimiting a rectangular area that encloses an object in an image. By default it uses the minimum and maximum x and y coordinates, which represents the top-left and bottom-right corner of the object inside the image. The coordinates of the bounding box are relative to the image size, ranging from ``0.`` to ``1.``.
 
@@ -31,7 +31,7 @@ print(box, box.get_width(), box.get_height(), box.get_area())
 # > BoundingBox(0.1,0.2,0.5,0.8) 0.4 0.6 0.24
 ```
 
-## [Emotion](https://github.com/CommuniCityProject/communicity_toolbox/blob/master/toolbox/Structures/Emotion.py)
+## [Emotion](https://communicity-docs.readthedocs.io/en/latest/docs/toolbox/Structures.html#module-Structures.Emotion)
 
 ``Enum`` class used to define the expression of a face.
 
@@ -43,7 +43,7 @@ print(Emotion.HAPPINESS)
 # > HAPPINESS
 ```
 
-## [Gender](https://github.com/CommuniCityProject/communicity_toolbox/blob/master/toolbox/Structures/Gender.py)
+## [Gender](https://communicity-docs.readthedocs.io/en/latest/docs/toolbox/Structures.html#module-Structures.Gender)
 
 ``Enum`` class used to define the gender of a person.
 
@@ -55,7 +55,7 @@ print(Gender.FEMALE)
 # > FEMALE
 ```
 
-## [Image](https://github.com/CommuniCityProject/communicity_toolbox/blob/master/toolbox/Structures/Image.py)
+## [Image](https://communicity-docs.readthedocs.io/en/latest/docs/toolbox/Structures.html#module-Structures.Image)
 
 Structure to store an image, allowing to load it from a local file or an URL.
 
@@ -70,7 +70,7 @@ print(image.image.shape)
 # > (360, 640, 3)
 ```
 
-## [Keypoints](https://github.com/CommuniCityProject/communicity_toolbox/blob/master/toolbox/Structures/Keypoints.py)
+## [Keypoints](https://communicity-docs.readthedocs.io/en/latest/docs/toolbox/Structures.html#module-Structures.Keypoints)
 
 Store a set of keypoints that represents the position of some body parts in an image. The coordinates are relative to the image size.
 
@@ -99,7 +99,7 @@ print(keypoints.visible_keypoints)
 #  'right_ankle': [0.7277946288755803, 0.90788956211731, 0.4920530598870443]}
 ```
 
-## [SegmentationMask](https://github.com/CommuniCityProject/communicity_toolbox/blob/master/toolbox/Structures/SegmentationMask.py)
+## [SegmentationMask](https://communicity-docs.readthedocs.io/en/latest/docs/toolbox/Structures.html#module-Structures.SegmentationMask)
 
 Represents a segmentation mask, that is a binary image defining the region occupied by an object in an image.
 
