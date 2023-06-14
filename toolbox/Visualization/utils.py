@@ -270,8 +270,8 @@ def draw_coco_keypoints(
             Mapping between keypoint names and its color. Defaults to None.
         keypoint_radius (Optional[int], optional): Radius of the keypoints.
             Defaults to 5.
-        connection_rules (Optional[List[Tuple[str, str, Tuple[int, int, int]]]],
-            optional): List of connections rules
+        connection_rules (Optional[List[Tuple[str, str, Tuple[int, int, int]]]], optional):
+            List of connections rules
             (keypoints_name_a, keypoints_name_b, (B, G, R)) Defaults to None.
         line_thickness (int, optional): Keypoints line thickness. Defaults to 3.
         show_names (bool, optional): Show the names of the keypoints.

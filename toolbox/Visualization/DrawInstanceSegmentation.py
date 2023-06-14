@@ -16,14 +16,12 @@ def draw(
     ],
     config: dict
 ) -> np.ndarray:
-    """Draw data from one or more InstanceSegmentation data models on an
-    image.
+    """Draw data from one or more InstanceSegmentation data models on an image.
 
     Args:
         image (np.ndarray): The image where draw the data.
-        dms (Union[List[DataModels.InstanceSegmentation],
-            DataModels.InstanceSegmentation]): A list or a single
-            InstanceSegmentation data model.
+        dms (Union[List[DataModels.InstanceSegmentation], DataModels.InstanceSegmentation]):
+            A list or a single InstanceSegmentation data model.
         config (dict): A configuration dict.
 
     Returns:

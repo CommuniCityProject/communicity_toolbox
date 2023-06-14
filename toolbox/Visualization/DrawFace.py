@@ -18,8 +18,8 @@ def draw(
 
     Args:
         image (np.ndarray): The image where draw the data.
-        data_models (Union[List[DataModels.Face],
-            DataModels.Face]): A list or a single Face data model.
+        data_models (Union[List[DataModels.Face], DataModels.Face]): A list or
+            a single Face data model.
         config (dict): A configuration dict.
 
     Returns:

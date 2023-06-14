@@ -13,15 +13,6 @@ class PersonKeyPoints(BaseModel):
     """This data model stores information about a set of body-keypoints of an
     image of a person. It is intended to be used with computer vision algorithms
     to infer the position of different parts of the body from an image.
-
-    Attributes:
-        id (str)
-        dateObserved (datetime)
-        type (str)
-        image (str)
-        bounding_box (BoundingBox)
-        confidence (float)
-        keypoints (Keypoints.COCOKeypoints)
     """
 
     __rel_attrs__ = {"image"}

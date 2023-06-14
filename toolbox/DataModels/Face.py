@@ -13,25 +13,6 @@ class Face(BaseModel):
     """This data model stores information about a face, such as its estimated
     age, gender or identity. It is intended to be used with computer vision
     algorithms to infer common properties from a facial image.
-
-    Attributes:
-        id (str)
-        dateObserved (datetime)
-        type (str)
-        image (str)
-        bounding_box (BoundingBox)
-        detection_confidence (float)
-        age (float)
-        gender (Gender)
-        gender_confidence (float)
-        emotion (Emotion)
-        emotion_confidence (float)
-        features (list)
-        recognition_domain (str)
-        recognized (bool)
-        recognized_person (str)
-        features_algorithm (str)
-        recognized_distance (float)
     """
 
     __rel_attrs__ = {"image"}

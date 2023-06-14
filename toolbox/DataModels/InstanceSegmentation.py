@@ -13,17 +13,6 @@ class InstanceSegmentation(BaseModel):
     """This data model stores information about segmented objects on an image.
     It is intended to be used with instance segmentation algorithms to detect
     objects and infer a segmentation mask.
-
-    Attributes:
-        id (str)
-        dateObserved (datetime)
-        type (str)
-        image (str)
-        mask (SegmentationMask)
-        bounding_box (BoundingBox)
-        label (str)
-        label_id (int)
-        confidence (float)
     """
 
     __rel_attrs__ = {"image"}

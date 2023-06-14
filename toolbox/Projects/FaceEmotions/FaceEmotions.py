@@ -59,7 +59,7 @@ class FaceEmotions:
         """Predicts the position and the emotion of faces on an image.
 
         Args:
-            image (Image): An Image object.
+            image (toolbox.Structures.Image): An Image object.
 
         Returns:
             List[DataModels.Face]: A list of Face data models.

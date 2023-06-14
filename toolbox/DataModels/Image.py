@@ -9,17 +9,6 @@ class Image(BaseModel):
     """This data model stores information about an image file that is uploaded
     to a server from a camera or any other source, and that is available to
     other services.
-
-    Attributes:
-        id (str)
-        dateObserved (datetime)
-        type (str)
-        width (int)
-        height (int)
-        path (str)
-        url (str)
-        source (str)
-        purpose (str)
     """
 
     __rel_attrs__ = set()

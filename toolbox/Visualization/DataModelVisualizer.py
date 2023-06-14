@@ -3,7 +3,6 @@ from typing import List, Optional, Union
 
 import cv2
 import numpy as np
-
 from toolbox import DataModels
 from toolbox.utils.config_utils import update_dict
 from toolbox.Visualization import (DrawFace, DrawInstanceSegmentation,
@@ -18,11 +17,11 @@ DATA_MODEL_DRAWERS = {
 
 class DataModelVisualizer:
     """Class to visualize the data models.
-
     """
 
     def __init__(self, config: dict = {}):
-        """
+        """Create a data model visualizer object.
+
         Args:
             config (dict): Configuration dict with the optional visualization
                 parameters.
@@ -39,8 +38,8 @@ class DataModelVisualizer:
 
         Args:
             image (np.ndarray): Image where draw the data models.
-            data_models (Union[List[DataModels.BaseModel],
-                DataModels.BaseModel]): A single or a list of any data model.
+            data_models (Union[List[DataModels.BaseModel], DataModels.BaseModel]):
+                A single or a list of any data model.
             config (Optional[dict]): Optional configuration dict that will
                 override the base config. Defaults to None.
 

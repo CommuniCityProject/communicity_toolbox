@@ -22,9 +22,8 @@ def draw(
 
     Args:
         image (np.ndarray): The image where draw the data.
-        data_models (Union[List[DataModels.PersonKeyPoints],
-            DataModels.PersonKeyPoints]): A list or a single PersonKeyPoints
-            data model.
+        data_models (Union[List[DataModels.PersonKeyPoints], DataModels.PersonKeyPoints]):
+            A list or a single PersonKeyPoints data model.
         config (dict): A configuration dict.
 
     Returns:

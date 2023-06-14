@@ -8,13 +8,6 @@ import numpy as np
 class BaseKeypoints:
     """Store keypoints data.
 
-    Attributes:
-        labels (List[str]): List with the name of the keypoints.
-        keypoints (np.ndarray): Array of shape (K, 3), where K is the number of
-            keypoints and the last dimension corresponds to (x, y, confidence),
-            where x and y are the relative image coordinates.
-        confidence_threshold (float): Minimum keypoints confidence.
-
     Overloaded operators:
         __len__
         __eq__
@@ -23,7 +16,7 @@ class BaseKeypoints:
         __iter__
     """
 
-    labels: List[str] = []
+    labels: List[str] = [] # List with the name of the keypoints
 
     def __init__(self, keypoints: np.ndarray,
                  confidence_threshold: float = 0.05):
@@ -162,14 +155,6 @@ class BaseKeypoints:
 class COCOKeypoints(BaseKeypoints):
     """Store keypoints data of a person with the COCO format (17 keypoints).
 
-    Attributes:
-        labels (List[str]): List with the name of the keypoints.
-        keypoints (np.ndarray): Array of shape (K, 3), where K is the number of
-            keypoints (17) and the last dimension corresponds to
-            (x, y, confidence), where x and y are the relative image
-            coordinates.
-        confidence_threshold (float): Minimum keypoints confidence.
-
     Overloaded operators:
         __len__
         __eq__
@@ -177,6 +162,7 @@ class COCOKeypoints(BaseKeypoints):
         __iter__
     """
 
+    # List with the name of the keypoints.
     labels = [
         "nose",
         "left_eye",

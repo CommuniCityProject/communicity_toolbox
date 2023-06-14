@@ -6,12 +6,6 @@ from pydantic import BaseModel, Field
 
 class Notification(BaseModel):
     """Data model for the context broker subscription notifications.
-
-    Attributes:
-        id (str)
-        type (Literal["Notification"])
-        notifiedAt (datetime)
-        data (List[dict])
     """
 
     id: str = Field(description="Notification identifier")
