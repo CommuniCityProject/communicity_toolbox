@@ -6,7 +6,7 @@ This Project aims to detect and segment objects in images.
 
 ## Data models
 
-This project uses the _[InstanceSegmentation](https://github.com/CommuniCityProject/communicity_toolbox/tree/master/docs/DataModels/InstanceSegmentation)_ data model.
+This project uses the _[InstanceSegmentation](../../../docs/data-models.md)_ data model.
 
 ## Configuration
 

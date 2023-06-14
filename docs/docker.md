@@ -18,7 +18,7 @@ First of all, download the Toolbox repository and the required data:
     cd communicity_toolbox
     ```
 
-2. Download the Toolbox's data from the repository [releases](https://github.com/CommuniCityProject/communicity_toolbox/releases), which includes machine learning models and additional resources. Download and extract it manually or run the following script:
+2. Download the Toolbox's data from the repository [releases](https://github.com/CommuniCityProject/communicity_toolbox/releases), which includes machine learning models and additional resources. Download and extract it manually inside ``communicity_toolbox/`` or run the following script:
     
     ```
     python download_data.py
@@ -52,23 +52,28 @@ docker run -it -v <path_to_the_toolbox>/data:/home/user/communicity_toolbox/data
 ```
 This will create a Docker container, named ``test_toolbox``, from the image named ``toolbox`` and will launch a bash shell. The image name may vary if you pulled the image from the docker hub.
 
-It will also mount a volume on the ``/home/user/communicity_toolbox/data`` path, that will be bound to the host's ``toolbox/data`` path. This allow the Toolbox components to access the machine learning models and configurations on the host machine.
+It will also mount a volume on the ``/home/user/communicity_toolbox/data`` path, which will be bound to the host's ``toolbox/data`` path. This allows the Toolbox components to access the machine learning models and configurations on the host machine.
 
 To enable GPU support, add the argument: ``--gpus all``
 
 ## Use Docker Compose
 
-A [Docker Compose file](../docker-compose.yaml) is provided to run all the Toolbox Project APIs.
+A [Docker Compose file](../docker-compose.yaml) is provided to run all the Toolbox Project APIs on different ports.
 
-It also includes an Orion-LD context broker instance, required by the Toolbox services. If you want to use your own context broker, remove the ``orion`` and ``mongo-db`` services and the ``mongo-db`` volume. Then change the fields ``x-common-env: BROKER_HOST`` and ``x-common-env: BROKER_PORT`` to point to your context broker.
+- Prerequisites:
 
-The ``x-common-env: HOST`` field should be changed to the address of the machine where the services will run.
+    The Toolbox components require access to a context broker. The recommended one is [Orion-LD](https://github.com/FIWARE/context.Orion-LD). It can be launched using the provided Docker compose file ([docker/orion-ld.yaml](../docker/orion-ld.yaml)):
+    ```
+    docker compose -f docker/orion-ld.yaml up -d
+    ```
 
-In the ``volumes`` section are defined the file system volumes that will be mounted on each container. Most services have a volume bound to the ``data`` host directory, so configuration files and machine learning models can be shared among services and the host. Also, another volume is created to share the uploaded images to the ImageStorage service. This allows other services to access images directly from the disk.
+1. Edit the ``docker-compose.yaml`` file. Change the ``x-common-env: HOST`` field to the address of the machine where the services will run. This address will be used by the context broker to send notifications to the APIs. If needed, also change the fields ``x-common-env: BROKER_HOST`` and ``x-common-env: BROKER_PORT`` to point to your context broker. The field ``USE_CUDA`` can be used to enable GPU usage by the machine learning models.
 
-The default configuration files used by the Projects are located in the ``data/configs/`` directory. You can modify these files to edit the parameters of each service.
+    The ``volumes`` section defines the file system volumes that will be mounted on each container. Most services have a volume bound to the ``data`` host directory, so configuration files and machine learning models can be shared among services and the host machine. Also, another volume is created to share the uploaded images to the ImageStorage service. This allows other services to access images directly from the disk.
 
-- To set up Docker Compose, run in the Toolbox root directory:
+    The default configuration files used by the Projects are located in the ``data/configs/`` directory. You can modify these files to edit each service's parameters.
+
+2. Set up Docker Compose by running on the repository root directory:
     ```
     docker compose up
     ```

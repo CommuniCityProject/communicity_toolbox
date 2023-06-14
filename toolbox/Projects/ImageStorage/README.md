@@ -18,7 +18,7 @@ This API also allows limiting the type and size of the uploaded images as well a
 
 ## Data models
 
-This project uses the _[Image](https://github.com/CommuniCityProject/communicity_toolbox/tree/master/docs/DataModels/Image)_ data model.
+This project uses the _[Image](../../../docs/data-models.md)_ data model.
 
 ## Configuration
 

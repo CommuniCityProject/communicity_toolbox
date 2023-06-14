@@ -1,0 +1,134 @@
+version: "3.9"
+
+x-common-env: &common-env
+  HOST: 192.168.0.100
+  BROKER_HOST: 192.168.0.100
+  BROKER_PORT: 1026
+  TOOLBOX_DATA: /etc/communicity_toolbox
+  USE_CUDA: False
+
+services:
+  image_storage:
+    build: egracia/toolbox:v0.2.0-cuda11.2.0-devel-ubuntu18.04
+    restart: always
+    environment:
+      <<: *common-env
+      PORT: 9001
+      IMG_STORAGE_PATH: /var/communicity_toolbox/image_storage
+    ports:
+      - "9001:8080"
+    command: python ./toolbox/Projects/ImageStorage/api.py --config /etc/communicity_toolbox/configs/ImageStorage.yaml
+    volumes:
+      - image_storage:/var/communicity_toolbox/image_storage
+      - ./data:/etc/communicity_toolbox/:ro
+  
+  face_recognition_dataset_creation:
+    build: egracia/toolbox:v0.2.0-cuda11.2.0-devel-ubuntu18.04
+    environment:
+      <<: *common-env
+    command: sudo -E python ./toolbox/Projects/FaceRecognition/dataset_creator.py --config /etc/communicity_toolbox/configs/FaceRecognition.yaml -i /etc/communicity_toolbox/samples/images/faces/celeb_single -o /etc/communicity_toolbox/samples/face_recognition_datasets/facenet_celeb_single.pkl
+    volumes:
+      - ./data:/etc/communicity_toolbox/:rw
+
+  face_recognition:
+    build: egracia/toolbox:v0.2.0-cuda11.2.0-devel-ubuntu18.04
+    restart: always
+    depends_on:
+      face_recognition_dataset_creation:
+        condition: service_completed_successfully
+    environment:
+      <<: *common-env
+      PORT: 9002
+    ports:
+      - "9002:8080"
+    command: python ./toolbox/Projects/FaceRecognition/api.py --config /etc/communicity_toolbox/configs/FaceRecognition.yaml
+    volumes:
+      - image_storage:/var/communicity_toolbox/image_storage
+      - ./data:/etc/communicity_toolbox/:ro
+  
+  age_gender:
+    build: egracia/toolbox:v0.2.0-cuda11.2.0-devel-ubuntu18.04
+    restart: always
+    environment:
+      <<: *common-env
+      PORT: 9003
+    ports:
+      - "9003:8080"
+    command: python ./toolbox/Projects/AgeGender/api.py --config /etc/communicity_toolbox/configs/AgeGender.yaml
+    volumes:
+      - image_storage:/var/communicity_toolbox/image_storage
+      - ./data:/etc/communicity_toolbox/:ro
+  
+  face_emotions:
+    build: egracia/toolbox:v0.2.0-cuda11.2.0-devel-ubuntu18.04
+    restart: always
+    environment:
+      <<: *common-env
+      PORT: 9004
+    ports:
+      - "9004:8080"
+    command: python ./toolbox/Projects/FaceEmotions/api.py --config /etc/communicity_toolbox/configs/FaceEmotions.yaml
+    volumes:
+      - image_storage:/var/communicity_toolbox/image_storage
+      - ./data:/etc/communicity_toolbox/:ro
+  
+  instance_segmentation:
+    build: egracia/toolbox:v0.2.0-cuda11.2.0-devel-ubuntu18.04
+    restart: always
+    environment:
+      <<: *common-env
+      PORT: 9005
+    ports:
+      - "9005:8080"
+    command: python ./toolbox/Projects/InstanceSegmentation/api.py --config /etc/communicity_toolbox/configs/InstanceSegmentation.yaml
+    volumes:
+      - image_storage:/var/communicity_toolbox/image_storage
+      - ./data:/etc/communicity_toolbox/:ro
+  
+  keypoints:
+    build: egracia/toolbox:v0.2.0-cuda11.2.0-devel-ubuntu18.04
+    restart: always
+    environment:
+      <<: *common-env
+      PORT: 9006
+    ports:
+      - "9006:8080"
+    command: python ./toolbox/Projects/Keypoints/api.py --config /etc/communicity_toolbox/configs/Keypoints.yaml
+    volumes:
+      - image_storage:/var/communicity_toolbox/image_storage
+      - ./data:/etc/communicity_toolbox/:ro
+
+  face_detection:
+    build: egracia/toolbox:v0.2.0-cuda11.2.0-devel-ubuntu18.04
+    restart: always
+    environment:
+      <<: *common-env
+      PORT: 9007
+    ports:
+      - "9007:8080"
+    command: python ./toolbox/Projects/FaceDetection/api.py --config /etc/communicity_toolbox/configs/FaceDetection.yaml
+    volumes:
+      - image_storage:/var/communicity_toolbox/image_storage
+      - ./data:/etc/communicity_toolbox/:ro
+
+  front_end:
+    build: egracia/toolbox:v0.2.0-cuda11.2.0-devel-ubuntu18.04
+    restart: always
+    environment:
+      <<: *common-env
+      PORT: 9000
+      IMAGE_STORAGE_PORT: 9001
+      FACE_DETECTION_PORT: 9007
+      FACE_RECOGNITION_PORT: 9002
+      FACE_EMOTIONS_PORT: 9004
+      AGE_GENDER_PORT: 9003
+      INSTANCE_SEGMENTATION_PORT: 9005
+      KEYPOINTS_PORT: 9006
+    ports:
+      - "9000:8080"
+    command: python -m streamlit run --server.headless true --runner.magicEnabled false  --server.port 8080 ./toolbox/Projects/FrontEnd/app.py -- --config /etc/communicity_toolbox/configs/FrontEnd.yaml
+    volumes:
+      - ./data:/etc/communicity_toolbox/:ro
+
+volumes:
+  image_storage:

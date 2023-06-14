@@ -6,7 +6,7 @@ This Project aims to detect faces in images.
 
 ## Data models
 
-This project uses the _[Face](https://github.com/CommuniCityProject/communicity_toolbox/tree/master/docs/DataModels/Face)_ data model.
+This project uses the _[Face](../../../docs/data-models.md)_ data model.
 
 ## Configuration
 

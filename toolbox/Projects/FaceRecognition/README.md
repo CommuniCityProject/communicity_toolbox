@@ -6,7 +6,7 @@ This project aims to recognize faces in images, that is, detect the position of 
 
 ## Data models
 
-This project uses the _[Face](../../../docs/data-models.md#Face)_ data model.
+This project uses the _[Face](../../../docs/data-models.md)_ data model.
 
 ## Configuration
 
@@ -95,29 +95,29 @@ subscriptions:
 
 ## Dataset creation
 
-This Project allows to create a dataset of face features from a set of images of known people. 
+This project allows the creation of a dataset of face features from images of known people.
 
 - Preparation:
     
-    The images must be stored in a folder, with one image per person and the name of the file must be the name (or id) of the person. It is possible to set an NGSI URN as the filename by replacing the ``:`` with ``;``. In each image only one face must be visible.
+    The images must be stored in a folder, with one image per person and the name of the file must be the name (or ID) of the person. It is possible to set an NGSI URN as the filename by replacing the ``:`` with ``;``. In each image only one face must be visible.
 
 - Dataset creation:
 
-    The dataset can be created using the ``dataset_creator.py`` script. The ``--help`` option can be used to get the list of accepted arguments:
+    The dataset can be created using the ``dataset_creator.py`` script. The ``--help`` option can be used to get a list of accepted arguments:
     ```
     python .\dataset_creator.py --help
     ```
     ```
     usage: dataset_creator.py [-h] [-c CONFIG] -i IMAGES [-d DATASET] -o OUTPUT
 
-    Create a face recognition dataset with a set of images. There should be one image for each person. The filename will be used as its name or id (';' are replaced with ':'). Images must contain only one face.
+    Create a face recognition dataset with a set of images. There should be one image for each person. The filename will be used as its name or ID (';' are replaced with ':'). Images must contain only one face.
 
     optional arguments:
       -h, --help            show this help message and exit
       -c CONFIG, --config CONFIG
                             Path to the configuration yaml (default 'config.yaml')
       -i IMAGES, --images IMAGES
-                            Path to an image or images folder. The filename of each image will be its name or id. ';' are replaced with ':'
+                            Path to an image or images folder. The filename of each image will be its name or ID. ';' are replaced with ':'
       -d DATASET, --dataset DATASET
                             Path to a dataset pickle file, to load and combine with the current images
       -o OUTPUT, --output OUTPUT
@@ -129,9 +129,9 @@ This Project allows to create a dataset of face features from a set of images of
     python .\dataset_creator.py -i /path/to/the/images/ -o /output/dataset/file.pkl
     ```
 
-    A pickle file will be created with the dataset. It will contain the features associated with each name/id. The images are not stored in the dataset.
+    A pickle file will be created with the dataset. It will contain the features associated with each name/ID. The images are not stored in the dataset.
 
-    With the ``--dataset`` option we can load a previous dataset and combine it with the new images. This is useful to add new people to an existing dataset.
+    With the ``--dataset`` option we can load a previous dataset and combine it with new images. This is useful for adding new people to an existing dataset.
 
 - Usage:
 

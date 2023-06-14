@@ -14,7 +14,7 @@ def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(
         description="Create a face recognition dataset from a set of images. "
         "There should be one image for each person. The filename will be used "
-        "as its name or id (';' are replaced with ':'). Images must contain "
+        "as its name or ID (';' are replaced with ':'). Images must contain "
         "only one face."
     )
     ap.add_argument(
@@ -28,7 +28,7 @@ def parse_args() -> argparse.Namespace:
         "-i",
         "--images",
         help="Path to an image or images folder. The filename of each image "
-        "will be its name or id. ';' are replaced with ':'",
+        "will be its name or ID. ';' are replaced with ':'",
         required=True,
         type=Path
     )
