@@ -1,6 +1,6 @@
 # Toolbox Data Models
 
-The publication and consumption of NGSI entities is done following the data models defined in the Toolbox. To facilitate the management of this data, a set of Python classes is provided as well.
+The publication and consumption of NGSI entities are done following the data models defined in the Toolbox. Their specifications can be found [here](https://github.com/CommuniCityProject/communicity_toolbox/tree/master/docs/DataModels). To facilitate the management of this data, a set of Python classes is provided as well.
 
 The developed data models are listed here:
 

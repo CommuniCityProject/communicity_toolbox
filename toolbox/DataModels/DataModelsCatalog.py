@@ -2,6 +2,8 @@ from typing import Dict, Type
 
 from toolbox.DataModels import BaseModel
 
+#: Dict storing the class responsible of each
+#: data model. The key is a string of the data model type.
 data_models_catalog: Dict[str, Type[BaseModel]] = {}
 
 

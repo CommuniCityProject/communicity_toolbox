@@ -18,36 +18,49 @@ class InstanceSegmentation(BaseModel):
     __rel_attrs__ = {"image"}
     __context__ = set()
 
+    #: The data model type ("InstanceSegmentation"). Should not be changed.
     type: str = Field("InstanceSegmentation")
 
+    #: Id of the source image
     image: Optional[str] = Field(
         None,
         description="Id of the source image"
     )
+
+    #: Segmentation mask of the detected instance
     mask: Optional[SegmentationMask] = Field(
         None,
         description="Segmentation mask of the detected instance",
     )
+
+    #: Bounding box of the detected instance
     bounding_box: Optional[BoundingBox] = Field(
         None,
         description="Bounding box of the detected instance",
         alias="boundingBox"
     )
+
+    #: Name of the predicted class
     label: Optional[str] = Field(
         None,
         description="Name of the predicted class"
     )
+
+    #: Id of the label
     label_id: Optional[int] = Field(
         None,
         description="Id of the label",
         alias="labelId"
     )
+
+    #: Confidence of the detection
     confidence: Optional[float] = Field(
         None,
         description="Confidence of the detection",
     )
 
     class Config:
+        """Pydantic configuration"""
         schema_extra = {
             "description": "This entity stores information about segmented "
             "objects on an image. It is intended to be used with instance "

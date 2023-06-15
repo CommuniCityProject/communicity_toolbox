@@ -7,7 +7,7 @@ Requirements:
 - Docker
 - Optional GPU support: CUDA >=10.1 
 
-## Clone the repository
+## 1. Clone the repository
 
 First of all, download the Toolbox repository and the required data:
 
@@ -24,7 +24,7 @@ First of all, download the Toolbox repository and the required data:
     python download_data.py
     ```
 
-## Get the Toolbox Docker image
+## 2. Get the Toolbox Docker image
 
 We provide a Docker image with the Toolbox and all its requirements already installed. This image can be downloaded from the [docker hub](https://hub.docker.com/r/egracia/toolbox) or built from the source code:
 
@@ -43,7 +43,7 @@ Inside the Toolbox repository, run:
 docker build -t toolbox .
 ```
 
-## Run the toolbox on a Docker container
+## 3a. Run the toolbox on a Docker container
 
 To use the Toolbox in a development environment or execute it with command lines, create a Docker container from the existing Toolbox image.
 
@@ -56,7 +56,7 @@ It will also mount a volume on the ``/home/user/communicity_toolbox/data`` path,
 
 To enable GPU support, add the argument: ``--gpus all``
 
-## Use Docker Compose
+## 3b. Use Docker Compose
 
 A [Docker Compose file](../docker-compose.yaml) is provided to run all the Toolbox Project APIs on different ports.
 

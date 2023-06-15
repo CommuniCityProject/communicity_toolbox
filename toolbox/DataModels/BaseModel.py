@@ -14,24 +14,30 @@ class BaseModel(PydanticBaseModel):
     """Base class for the toolbox data models.
 
     Attributes to override:
-        __rel_attrs__ (set): Set of attributes names that are relationships.
-        __context__ (set): Set of context URIs.
-        type (Field): Data model type name.
+        __rel_attrs__ (set):
+            Set of attributes names that are relationships.
+        __context__ (set):
+            Set of context URIs.
+        type (Field):
+            Data model type name.
     """
 
     __rel_attrs__ = set()
     __context__ = set()
 
+    #: Unique identifier of the entity
     id: Optional[str] = Field(
         None,
         description="Unique identifier of the entity"
     )
 
+    #: Entity creation time
     dateObserved: datetime = Field(
         default_factory=lambda: datetime.now(),
         description="Entity creation time"
     )
 
+    #: Name of the entity type
     type: str = Field(
         "BaseModel",
         const=True,
@@ -39,7 +45,7 @@ class BaseModel(PydanticBaseModel):
     )
 
     class Config:
-        # Pydantic configuration
+        """Pydantic configuration"""
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
