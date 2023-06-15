@@ -105,7 +105,7 @@ This project allows the creation of a dataset of face features from images of kn
 
     The dataset can be created using the ``dataset_creator.py`` script. The ``--help`` option can be used to get a list of accepted arguments:
     ```
-    python .\dataset_creator.py --help
+    python dataset_creator.py --help
     ```
     ```
     usage: dataset_creator.py [-h] [-c CONFIG] -i IMAGES [-d DATASET] -o OUTPUT
@@ -126,7 +126,7 @@ This project allows the creation of a dataset of face features from images of kn
     
     We can create the dataset with the following command:
     ```
-    python .\dataset_creator.py -i /path/to/the/images/ -o /output/dataset/file.pkl
+    python dataset_creator.py -i /path/to/the/images/ -o /output/dataset/file.pkl
     ```
 
     A pickle file will be created with the dataset. It will contain the features associated with each name/ID. The images are not stored in the dataset.
@@ -142,6 +142,19 @@ This project allows the creation of a dataset of face features from images of kn
 
 The API allows the Project to be executed as a service. It has automatic and interactive documentation generated with [swagger-ui](https://github.com/swagger-api/swagger-ui) on ``/docs`` and [redoc](https://github.com/Redocly/redoc) on ``/redoc``.
 
+It can be executed with ``api.py``. The ``--help`` option can be used to get a list of accepted arguments:
+```
+python api.py --help
+```
+```
+usage: api.py [-h] [--config CONFIG] [--log-level {DEBUG,INFO,WARN,ERROR,CRITICAL}]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to the configuration yaml (default: 'config.yaml')
+  --log-level {DEBUG,INFO,WARN,ERROR,CRITICAL}
+                        Log level (default: INFO)
+```
 
 ### Endpoints
 
@@ -167,7 +180,7 @@ The API allows the Project to be executed as a service. It has automatic and int
     
     If an image entity is provided, it predicts the position (bounding box) of faces in the image and recognize them. If a _Face_ entity is provided, it uses the existing bounding box to get an image of the face and recognize it.
 
-    This route is only available if ``do_feature_extraction`` and ``do_feature_recognition`` are set to ``true``.
+    This route is only available if ``do_feature_extraction`` and ``do_feature_recognition`` are set to ``true`` in the configuration file.
     
     It returns a list of data models for each detection. The response type can be specified with the ``accept`` header (``application/json`` or ``application/ld+json``).
 

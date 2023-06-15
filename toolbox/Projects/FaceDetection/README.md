@@ -68,6 +68,20 @@ subscriptions:
 
 The API allows the Project to be executed as a service. It has automatic and interactive documentation generated with [swagger-ui](https://github.com/swagger-api/swagger-ui) on ``/docs`` and [redoc](https://github.com/Redocly/redoc) on ``/redoc``.
 
+It can be executed with ``api.py``. The ``--help`` option can be used to get a list of accepted arguments:
+```
+python api.py --help
+```
+```
+usage: api.py [-h] [--config CONFIG] [--log-level {DEBUG,INFO,WARN,ERROR,CRITICAL}]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to the configuration yaml (default: 'config.yaml')
+  --log-level {DEBUG,INFO,WARN,ERROR,CRITICAL}
+                        Log level (default: INFO)
+```
+
 ### Endpoints
 
 - **``GET``** _/_

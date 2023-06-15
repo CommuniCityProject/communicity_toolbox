@@ -84,7 +84,21 @@ api:
 
 ## API
 
-The [swagger-ui](https://github.com/swagger-api/swagger-ui) documentation is available on ``/docs`` and the [redoc](https://github.com/Redocly/redoc) version on ``/redoc``.
+The [swagger-ui](https://github.com/swagger-api/swagger-ui) documentation is available in ``/docs`` and the [redoc](https://github.com/Redocly/redoc) version in ``/redoc``.
+
+Execute it with ``api.py``. The ``--help`` option can be used to get a list of accepted arguments:
+```
+python api.py --help
+```
+```
+usage: api.py [-h] [--config CONFIG] [--log-level {DEBUG,INFO,WARN,ERROR,CRITICAL}]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to the configuration yaml (default: 'config.yaml')
+  --log-level {DEBUG,INFO,WARN,ERROR,CRITICAL}
+                        Log level (default: INFO)
+```
 
 ### Endpoints
 

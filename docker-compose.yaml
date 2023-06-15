@@ -126,7 +126,7 @@ services:
       KEYPOINTS_PORT: 9006
     ports:
       - "9000:8080"
-    command: python -m streamlit run --server.headless true --runner.magicEnabled false  --server.port 8080 ./toolbox/Projects/FrontEnd/app.py -- --config /etc/communicity_toolbox/configs/FrontEnd.yaml
+    command: python -m streamlit run --server.headless true --runner.magicEnabled false --server.port 8080 ./toolbox/Projects/FrontEnd/app.py -- --config /etc/communicity_toolbox/configs/FrontEnd.yaml
     volumes:
       - ./data:/etc/communicity_toolbox/:ro
 

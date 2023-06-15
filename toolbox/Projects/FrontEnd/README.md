@@ -100,3 +100,16 @@ projects:
 ```
 
 </details>
+
+## Execution
+
+Run the front end with:
+```
+./run.sh
+```
+
+To see the accepted arguments run:
+
+```
+python -m streamlit run app.py -- --help
+```
