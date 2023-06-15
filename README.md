@@ -2,6 +2,8 @@
 
 The CommuniCity Toolbox is a set of open-source components, services and implementations based on the [MIMs](#oasc-mims), developed as part of the [CommuniCity Project](https://communicity-project.eu/). 
 
+The project's documentation can be found here: [https://communicity-docs.readthedocs.io/](https://communicity-docs.readthedocs.io/en/latest/)
+
 ## Content
 - [Overview](#overview)
     - [OASC MIMs](#oasc-mims)
