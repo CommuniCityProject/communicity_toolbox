@@ -438,7 +438,7 @@ class TestContextCli(unittest.TestCase):
             self.assertEqual(e_id, e["id"])
 
         # Get by attrs
-        entities = cc.get_entities_page(attrs=[prop1], limit=11, offset=0, as_dict=True)
+        entities = cc.get_entities_page(attrs=prop1, limit=11, offset=0, as_dict=True)
         self.assertEqual(len(entities), 11)
         for e_id, e in zip(ids, entities):
             self.assertEqual(e_id, e["id"])

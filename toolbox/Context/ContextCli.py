@@ -19,11 +19,6 @@ logging.getLogger("ngsildclient").setLevel(logging.WARNING)
 
 class ContextCli:
     """A client for managing common operations on a context broker.
-
-    Attributes:
-        notification_uri (str): The uri used for notifications.
-        subscription_name (str): The name used in subscriptions.
-        headers (dict): The headers used in requests.
     """
 
     def __init__(
@@ -50,12 +45,17 @@ class ContextCli:
         self._broker_host = host
         self._broker_port = port
         self._base_path = base_path
-        self.notification_uri = notification_uri
+
+        self.notification_uri: str = notification_uri
         self._check_subscription_conflicts = check_subscription_conflicts
 
         self._subscription_ids: List[str] = []
-        self.subscription_name = str(uuid.uuid4())
-        self.headers = {
+
+        #: The name used in subscriptions
+        self.subscription_name: str = str(uuid.uuid4())
+
+        #: The headers used in requests.
+        self.headers: dict = {
             "Accept": "application/ld+json",
             "Content-Type": "application/ld+json"
         }
@@ -159,6 +159,7 @@ class ContextCli:
             try:
                 location = response.headers.get("Location")
                 sub_id = location.rsplit("/", 1)[-1]
+                subscription.subscription_id = sub_id
                 self._subscription_ids.append(sub_id)
                 logger.info(f"Subscription created with ID: {sub_id}")
                 return sub_id
@@ -431,7 +432,7 @@ class ContextCli:
         if attrs:
             if isinstance(attrs, (list, tuple)):
                 attrs = ",".join(attrs)
-            params["attrs"] = ",".join(attrs)
+            params["attrs"] = attrs
         if query:
             params["q"] = query
         if order_by:

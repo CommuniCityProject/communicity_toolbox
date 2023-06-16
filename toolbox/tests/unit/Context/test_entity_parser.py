@@ -5,9 +5,9 @@ import numpy as np
 from ngsildclient import Entity
 
 from toolbox import DataModels
-from toolbox.Context.entity_parser import (create_entity, create_random_id,
+from toolbox.Context.entity_parser import (create_random_id, data_model_to_json,
                                            get_entity_field, parse_entity,
-                                           set_entity_field)
+                                           set_entity_field, json_to_data_model)
 from toolbox.Structures import (BoundingBox, Emotion, Gender, Image, Keypoints,
                                 SegmentationMask)
 
@@ -74,7 +74,7 @@ class TestEntityParser(unittest.TestCase):
         self.assertEqual(entity["segmentation_mask"]["value"],
                          values["segmentation_mask"].serialize())
 
-    def test_create_entity(self):
+    def test_data_model_to_json(self):
         face = DataModels.Face(
             id="123",
             image="urn:ngsi-ld:Image:456",
@@ -92,9 +92,9 @@ class TestEntityParser(unittest.TestCase):
             recognizedDistance=0.8,
             # recognition_domain="test_domain"
         )
-        ent = create_entity(face)
+        ent = data_model_to_json(face)
         self.assertEqual(ent["id"], f"urn:ngsi-ld:Face:{face.id}")
-        self.assertEqual(ent.type, face.type)
+        self.assertEqual(ent["type"], face.type)
         self.assertEqual(ent["image"]["object"], face.image)
         self.assertEqual(ent["boundingBox"]["value"],
                          face.bounding_box.serialize())
@@ -124,10 +124,10 @@ class TestEntityParser(unittest.TestCase):
             label_id=1,
             confidence=0.8
         )
-        ent = create_entity(mask)
+        ent = data_model_to_json(mask)
         self.assertEqual(
             ent["id"], f"urn:ngsi-ld:InstanceSegmentation:{mask.id}")
-        self.assertEqual(ent.type, mask.type)
+        self.assertEqual(ent["type"], mask.type)
         self.assertEqual(ent["image"]["object"], mask.image)
         self.assertEqual(ent["mask"]["value"], mask.mask.serialize())
         self.assertEqual(ent["boundingBox"]["value"],
@@ -143,10 +143,10 @@ class TestEntityParser(unittest.TestCase):
             confidence=0.8,
             keypoints=Keypoints.COCOKeypoints(np.ones((17, 3)))
         )
-        ent = create_entity(kp)
+        ent = data_model_to_json(kp)
         self.assertEqual(
             ent["id"], f"urn:ngsi-ld:PersonKeyPoints:{kp.id}")
-        self.assertEqual(ent.type, kp.type)
+        self.assertEqual(ent["type"], kp.type)
         self.assertEqual(ent["image"]["object"], kp.image)
         self.assertEqual(ent["boundingBox"]["value"],
                          kp.bounding_box.serialize())
@@ -211,7 +211,7 @@ class TestEntityParser(unittest.TestCase):
         self.assertIsInstance(get_image, Image)
         self.assertIsInstance(get_np, np.ndarray)
 
-    def test_parse_entity(self):
+    def test_parse_entity_json_to_data_model(self):
         face = DataModels.Face(
             image="urn:ngsi-ld:Image:456",
             bounding_box=BoundingBox(.1, .2, .3, .4),
@@ -228,12 +228,15 @@ class TestEntityParser(unittest.TestCase):
             features_algorithm="test_algorithm",
             recognized_distance=0.9
         )
+        ent = data_model_to_json(face)
+        parsed_face_0 = parse_entity(ent, DataModels.Face)
+        parsed_face_1 = json_to_data_model(ent)
         face.dateObserved = face.dateObserved.replace(microsecond=0)
-        ent = create_entity(face)
-        parsed_face = parse_entity(ent, DataModels.Face)
 
-        self.assertIsInstance(parsed_face, DataModels.Face)
-        self.assertEqual(parsed_face, face)
+        self.assertIsInstance(parsed_face_0, DataModels.Face)
+        self.assertIsInstance(parsed_face_1, DataModels.Face)
+        self.assertEqual(parsed_face_0, face)
+        self.assertEqual(parsed_face_1, face)
 
         mask = DataModels.InstanceSegmentation(
             image="urn:ngsi-ld:Image:456",
@@ -244,10 +247,13 @@ class TestEntityParser(unittest.TestCase):
             confidence=0.8
         )
         mask.dateObserved = mask.dateObserved.replace(microsecond=0)
-        ent = create_entity(mask)
-        parsed_mask = parse_entity(ent, DataModels.InstanceSegmentation)
-        self.assertIsInstance(parsed_mask, DataModels.InstanceSegmentation)
-        self.assertEqual(parsed_mask, mask)
+        ent = data_model_to_json(mask)
+        parsed_mask_0 = parse_entity(ent, DataModels.InstanceSegmentation)
+        parsed_mask_1 = json_to_data_model(ent)
+        self.assertIsInstance(parsed_mask_0, DataModels.InstanceSegmentation)
+        self.assertIsInstance(parsed_mask_1, DataModels.InstanceSegmentation)
+        self.assertEqual(parsed_mask_0, mask)
+        self.assertEqual(parsed_mask_1, mask)
 
         kp = DataModels.PersonKeyPoints(
             image="urn:ngsi-ld:Image:456",
@@ -256,10 +262,13 @@ class TestEntityParser(unittest.TestCase):
             keypoints=Keypoints.COCOKeypoints(np.ones((17, 3)))
         )
         kp.dateObserved = kp.dateObserved.replace(microsecond=0)
-        ent = create_entity(kp)
-        parsed_kp = parse_entity(ent, DataModels.PersonKeyPoints)
-        self.assertIsInstance(parsed_kp, DataModels.PersonKeyPoints)
-        self.assertEqual(parsed_kp, kp)
+        ent = data_model_to_json(kp)
+        parsed_kp_0 = parse_entity(ent, DataModels.PersonKeyPoints)
+        parsed_kp_1 = json_to_data_model(ent)
+        self.assertIsInstance(parsed_kp_0, DataModels.PersonKeyPoints)
+        self.assertIsInstance(parsed_kp_1, DataModels.PersonKeyPoints)
+        self.assertEqual(parsed_kp_0, kp)
+        self.assertEqual(parsed_kp_1, kp)
 
         self.assertRaises(
             TypeError, lambda: parse_entity(ent, DataModels.Face))

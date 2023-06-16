@@ -1,1 +1,1 @@
-python3.9 -m unittest discover -s . -v
+python -m unittest discover -s . -v

@@ -41,15 +41,16 @@ class TestImage(unittest.TestCase):
         self.assertIsInstance(img.path, str)
 
     def test_init_image_path(self):
-        with tempfile.NamedTemporaryFile(mode="wb", suffix=".png") as f:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            img_path = Path(tmp_dir) / "image.png"
             np_img = np.random.randint(0, 255, (100, 200, 3), dtype=np.uint8)
-            cv2.imwrite(f.name, np_img)
-            img = Image(path=f.name, id="urn:ngsi-ld:Image:001")
+            cv2.imwrite(str(img_path), np_img)
+            img = Image(path=img_path, id="urn:ngsi-ld:Image:001")
             self.assertEqual(img.height, 100)
             self.assertEqual(img.width, 200)
             self.assertTrue(np.array_equal(img.image, np_img))
             self.assertEqual(img.id, "urn:ngsi-ld:Image:001")
-            self.assertEqual(img.path, Path(f.name))
+            self.assertEqual(img.path, img_path)
             self.assertIsInstance(img.path, Path)
 
     def test_init_numpy(self):
@@ -87,15 +88,16 @@ class TestImage(unittest.TestCase):
             Path("/path/to/image.jpg")))
 
     def test_from_path(self):
-        with tempfile.NamedTemporaryFile(mode="wb", suffix=".png") as f:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            img_path = Path(tmp_dir) / "image.png"
             np_img = np.random.randint(0, 255, (100, 200, 3), dtype=np.uint8)
-            cv2.imwrite(f.name, np_img)
-            img = Image.from_path(f.name)
+            cv2.imwrite(str(img_path), np_img)
+            img = Image.from_path(img_path)
             self.assertEqual(img.height, 100)
             self.assertEqual(img.width, 200)
             self.assertTrue(np.array_equal(img.image, np_img))
             self.assertEqual(img.id, "")
-            self.assertEqual(img.path, Path(f.name))
+            self.assertEqual(img.path, img_path)
             self.assertIsInstance(img.path, Path)
 
         # Test from a URL

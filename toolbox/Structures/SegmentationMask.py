@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Optional
 
 import cv2
@@ -100,8 +101,9 @@ class SegmentationMask:
         Returns:
             SegmentationMask
         """
-        hex_rle["counts"] = bytes.fromhex(hex_rle["counts"])
-        return SegmentationMask(rle=hex_rle)
+        rle = deepcopy(hex_rle)
+        rle["counts"] = bytes.fromhex(rle["counts"])
+        return SegmentationMask(rle=rle)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SegmentationMask):
