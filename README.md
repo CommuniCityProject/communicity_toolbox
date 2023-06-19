@@ -82,6 +82,7 @@ More details about Projects can be found [here](docs/projects.md).
 ### Machine learning models
 
 The Toolbox provides a collection of machine learning models spanning various domains and performance levels. These models are used by the Toolbox Projects but can also be used out of the box as Python modules.
+They are interchangeable, implementing the same methods and data formats so different models of the same domain can be used depending on the hardware or performance needs.
 
 A complete list of the currently implemented models can be found [here](docs/machine-learning-models.md).
 
@@ -97,7 +98,7 @@ The overall Toolbox architecture is depicted in the following diagram:
 
 ![architecture](./docs/res/Toolbox_arch.png)
 
-Here, multiple Projects are executed on individual containers, each one mainly formed by a machine learning model, a base class and a REST API. The API communicates with users/apps to execute the Project and at the same time, it posts and retrieves data models from a context broker as the input and output data of the service. The users/apps will receive the output data directly from the API or by querying the context broker. A special service called _ImageStorage_ is developed to serve as temporary storage for the input and output images. The context broker is the chosen component to manage the data used by Toolbox but it is not intended to store large files. For this reason, the _ImageStorage_ is used by users/apps and other Toolbox Projects to store and retrieve images, but its use is not mandatory.
+Here, multiple Projects are executed on individual containers, each one mainly formed by a machine learning model, a base class and a REST API. The API communicates with users/apps to execute the Project and at the same time, it posts and retrieves data models from a context broker as the input and output data of the service. The users/apps will receive the output data directly from the API or by querying the context broker. A special service called _ImageStorage_ is developed to serve as temporary storage for the input and output images. The context broker is the chosen component to manage the data used by Toolbox but it is not intended to store large files. For this reason, the _ImageStorage_ is used by users/apps and other Toolbox Projects to store and retrieve images, but its use is not mandatory and images from another sources can be used as well.
 
 ## Installation
 
@@ -109,7 +110,7 @@ The Toolbox can be installed manually as a Python package or it can be used with
 
 ## Usage
 
-Check the [quick start]() guide for more information on how to use the Toolbox.
+Check the [quick start](./docs/quick-start.md) guide for more information on how to use the Toolbox.
 
 ## Contributing
 
