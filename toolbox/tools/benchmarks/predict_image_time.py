@@ -1,12 +1,11 @@
-from typing import List, Optional
 import argparse
 import time
 from pathlib import Path
+from typing import List, Optional
 
-import numpy as np
 import cv2
+import numpy as np
 from tqdm import tqdm
-from mean_average_precision import MetricBuilder
 
 from toolbox.Models import model_catalog
 from toolbox.utils.config_utils import parse_config
@@ -86,7 +85,7 @@ def parse_args() -> argparse.Namespace:
         "-k",
         "--model-key",
         help="Optional key on the configuration YAML containing the model's "
-            "parameters",
+        "parameters",
     )
     args = ap.parse_args()
     return args
