@@ -11,6 +11,7 @@ The project's documentation can be found here: [https://communicity-docs.readthe
     - [Projects](#projects)
     - [Machine learning models](#machine-learning-models)
     - [Data models](#data-models)
+- [Architecture overview](#architecture-overview)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
@@ -89,6 +90,14 @@ A complete list of the currently implemented models can be found [here](docs/mac
 The Toolbox provides a set of standardized data models that define the structure and content of the data generated and consumed by the Toolbox components. Also, components to interact with the context broker and parse its data are provided.
 
 The data model specifications can be found [here](./docs/data-models.md).
+
+## Architecture overview
+
+The overall Toolbox architecture is depicted in the following diagram:
+
+![architecture](./docs/res/Toolbox_arch.png)
+
+Here, multiple Projects are executed on individual containers, each one mainly formed by a machine learning model, a base class and a REST API. The API communicates with users/apps to execute the Project and at the same time, it posts and retrieves data models from a context broker as the input and output data of the service. The users/apps will receive the output data directly from the API or by querying the context broker. A special service called _ImageStorage_ is developed to serve as temporary storage for the input and output images. The context broker is the chosen component to manage the data used by Toolbox but it is not intended to store large files. For this reason, the _ImageStorage_ is used by users/apps and other Toolbox Projects to store and retrieve images, but its use is not mandatory.
 
 ## Installation
 
