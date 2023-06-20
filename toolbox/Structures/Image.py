@@ -157,7 +157,7 @@ class Image:
             ValueError
         """
         try:
-            with urllib.request.urlopen(url) as req:
+            with urllib.request.urlopen(url, timeout=10) as req:
                 arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
                 self._image = cv2.imdecode(arr, cv2.IMREAD_COLOR)
                 if self._image is None:

@@ -5,7 +5,7 @@ context_broker:
 api:
   host: 0.0.0.0
   port: 8081
-  external_url: http://192.168.0.100:8080/
+  external_url: http://192.168.0.100:8081/
   ngsild_urn: "urn:ngsi-ld:Image:{}"
   
   # List of origins that should be permitted to make cross-origin requests.

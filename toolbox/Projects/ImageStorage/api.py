@@ -110,7 +110,8 @@ class ImageStorage:
         async def get(image_id: str = fastapi.Path(description="Image id")):
             """Get an image by its id.
             """
-            if image_id not in self._storage:
+            if (image_id not in self._storage or
+                not self._storage[image_id].exists()):
                 raise HTTPException(
                     status.HTTP_404_NOT_FOUND,
                     f"File not found",
@@ -180,7 +181,6 @@ class ImageStorage:
                 return entity_id
 
         if self._allow_visualize:
-            # TODO: also use image url (check is not from the same api)
             @app.post(
                 "/visualize",
                 response_description="The generated image and its token",
@@ -276,12 +276,16 @@ class ImageStorage:
                     )
                 try:
                     image = Structures.Image.from_path(Path(image_dm.path))
-                except FileNotFoundError as e:
+                except Exception as e:
                     logger.error(e, exc_info=True)
-                    raise HTTPException(
-                        status.HTTP_404_NOT_FOUND,
-                        f"Image not found: {image_id}"
-                    )
+                    try:
+                        image = Structures.Image.from_url(image_dm.url)
+                    except Exception as e:
+                        logger.error(e, exc_info=True)
+                        raise HTTPException(
+                            status.HTTP_404_NOT_FOUND,
+                            f"Image not found: {image_id}"
+                        )
 
                 # Visualize the data models
                 vis_image = self._visualizer.visualize_data_models(
