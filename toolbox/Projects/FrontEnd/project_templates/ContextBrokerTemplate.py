@@ -311,7 +311,7 @@ class ContextBrokerTemplate(BaseTemplate):
         title_info = st.empty()
         if self.description:
             description = self.description + \
-                f" The context broker is available on: " +\
+                f" The context broker can be found at: " +\
                 f'<a href="{self.url}">{self.url}</a>'
             utils.write_title_info_toggle(
                 self.name,

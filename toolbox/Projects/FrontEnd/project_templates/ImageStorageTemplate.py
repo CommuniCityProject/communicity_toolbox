@@ -232,7 +232,7 @@ class ImageStorageTemplate(BaseTemplate):
         title_info = st.empty()
         if self.description:
             description = self.description + \
-                f" The docs of the API can be found here: " +\
+                f" The API documentation can be found at: " +\
                 f'<a href="{self.docs_url}">{self.docs_url}</a>'
             utils.write_title_info_toggle(
                 self.name,

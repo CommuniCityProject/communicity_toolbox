@@ -14,7 +14,7 @@ class FaceRecognitionTemplate(SimplePredictTemplate):
         title_info = st.empty()
         if self.description:
             description = self.description + \
-                f" The docs of the API can be found here: " +\
+                f" The API documentation can be found at: " +\
                 f'<a href="{self.docs_url}">{self.docs_url}</a>'
             utils.write_title_info_toggle(
                 self.name,
@@ -146,7 +146,7 @@ class FaceRecognitionTemplate(SimplePredictTemplate):
 
         # Set the predict button
         self._st_button_predict.button(
-            "Extract features & Recognize",
+            "Extract features & recognize",
             type="primary",
             use_container_width=True,
             on_click=self._on_predict,
