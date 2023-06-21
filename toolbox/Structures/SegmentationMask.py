@@ -15,10 +15,10 @@ class SegmentationMask:
         mask (np.ndarray): Binary mask of shape (H, W).
 
     Overloaded operators:
-        __str__
-        __repr__
-        __eq__
-        __iter__
+        - __str__
+        - __repr__
+        - __eq__
+        - __iter__
     """
 
     def __init__(self, mask: Optional[np.ndarray] = None,

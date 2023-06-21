@@ -20,8 +20,8 @@ class DemoBase:
     """Base class to implement a demo application for the toolbox projects.
 
     Methods to be implemented:
-        _load_model(config, task)
-        _process_image(image)
+        - _load_model(config, task)
+        - _process_image(image)
     """
 
     def __init__(self):

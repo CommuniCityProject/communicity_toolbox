@@ -15,10 +15,10 @@ class BoundingBox:
         ymax (float): Maximum relative y coordinate.
 
     Overloaded operators:
-        __repr__
-        __eq__
-        __bool__
-        __iter__
+        - __repr__
+        - __eq__
+        - __bool__
+        - __iter__
     """
 
     def __init__(self, xmin: float, ymin: float, xmax: float, ymax: float):

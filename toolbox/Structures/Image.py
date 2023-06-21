@@ -19,10 +19,10 @@ class Image:
         id (str): Id of a ngsi-ld image entity.
 
     Overloaded operators:
-        __str__
-        __eq__
-        __repr__
-        __iter__
+        - __str__
+        - __eq__
+        - __repr__
+        - __iter__
     """
 
     def __init__(self, path: Union[str, Path] = "",

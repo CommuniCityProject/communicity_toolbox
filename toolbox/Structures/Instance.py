@@ -7,14 +7,17 @@ class Instance:
     """Structure used to store the output of a machine learning model.
 
     Overloaded operators:
-        __getattr__
-        __getitem__
-        __setattr__
-        __eq__
-        __iter__
-        __str__
+        - __getattr__
+        - __getitem__
+        - __setattr__
+        - __eq__
+        - __iter__
+        - __str__
 
     Example:
+    
+    .. code-block:: python
+
         instance = Instance().set("label", "dog").set("confidence", 0.8)
         confidence = instance.confidence
     """

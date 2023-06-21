@@ -23,8 +23,8 @@ class ApiBase:
     """Base class to implement an API for the toolbox projects.
 
     Attributes to override:
-        VERSION (str): The version of the API.
-        TITLE (str): The title of the API.
+        - VERSION (str): The version of the API.
+        - TITLE (str): The title of the API.
 
     Attributes:
         host (str): The bind host.
@@ -35,10 +35,10 @@ class ApiBase:
             be accessed by their path.
         context_cli (ContextCli): The ContextCli.
         config (dict): The config of the API.
-        base_dm (Optional[Type[BaseModel]]): Data model class that will be send.
+        base_dm (Optional[Type[BaseModel]]): Data model class that will be sent.
 
     Methods to be implemented:
-        _predict_entity(data_model, post_to_broker) -> List[Type[BaseModel]]
+        - _predict_entity(data_model, post_to_broker) -> List[Type[BaseModel]]
     """
 
     VERSION = get_version()
@@ -49,7 +49,7 @@ class ApiBase:
 
         Args:
             base_dm (Optional[Type, optional): Data model class that will
-                be send. Defaults to None.
+                be sent. Defaults to None.
         """
         self.host: str
         self.port: int
