@@ -9,11 +9,11 @@ class BaseKeypoints:
     """Store keypoints data.
 
     Overloaded operators:
-        __len__
-        __eq__
-        __str__
-        __repr__
-        __iter__
+        - __len__
+        - __eq__
+        - __str__
+        - __repr__
+        - __iter__
     """
 
     labels: List[str] = [] # List with the name of the keypoints
@@ -156,10 +156,10 @@ class COCOKeypoints(BaseKeypoints):
     """Store keypoints data of a person with the COCO format (17 keypoints).
 
     Overloaded operators:
-        __len__
-        __eq__
-        __str__
-        __iter__
+        - __len__
+        - __eq__
+        - __str__
+        - __iter__
     """
 
     # List with the name of the keypoints.

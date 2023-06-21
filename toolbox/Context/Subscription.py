@@ -26,8 +26,8 @@ class Subscription:
         throttling
 
     Overloaded operators:
-        __eq__
-        __str__
+        - __eq__
+        - __str__
     """
 
     def __init__(

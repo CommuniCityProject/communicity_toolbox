@@ -14,12 +14,9 @@ class BaseModel(PydanticBaseModel):
     """Base class for the toolbox data models.
 
     Attributes to override:
-        __rel_attrs__ (set):
-            Set of attributes names that are relationships.
-        __context__ (set):
-            Set of context URIs.
-        type (Field):
-            Data model type name.
+        - __rel_attrs__ (set): Set of attributes names that are relationships.
+        - __context__ (set): Set of context URIs.
+        - type (Field): Data model type name.
     """
 
     __rel_attrs__ = set()
