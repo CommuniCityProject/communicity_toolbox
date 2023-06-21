@@ -448,7 +448,14 @@ class ContextCli:
             entity_dicts = response.json()
             if as_dict:
                 return entity_dicts
-            return [json_to_data_model(e) for e in entity_dicts]
+            dm_list = []
+            for e in entity_dicts:
+                try:
+                    dm_list.append(json_to_data_model(e))
+                except Exception as e:
+                    logger.error(f"Error parsing entity: {e}")
+                    logger.error(e, exc_info=True)
+            return dm_list
         logger.error(f"Error getting entities from {response.url}: "
                      f"{response.status_code} {response.text}")
         response.raise_for_status()
