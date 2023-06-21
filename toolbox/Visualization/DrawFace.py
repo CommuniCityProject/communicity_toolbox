@@ -84,6 +84,7 @@ def draw(
             text_line_space=config["text_line_space"],
             text_box_position=utils.TextPosition[str(
                 config["box_text_position"])],
-            text_direction=utils.TextPosition[str(config["text_direction"])]
+            text_direction=utils.TextPosition[str(config["text_direction"])],
+            text_margin=config["text_margin"],
         )
     return image

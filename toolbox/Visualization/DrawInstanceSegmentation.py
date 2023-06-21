@@ -75,5 +75,6 @@ def draw(
                     str(config["text_direction"])],
                 text_box_position=utils.TextPosition[
                     str(config["box_text_position"])],
+                text_margin=config["text_margin"],
             )
     return image

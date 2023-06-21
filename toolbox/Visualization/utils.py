@@ -30,7 +30,8 @@ def draw_text(
     bg_color: Tuple[int, int, int] = (0, 0, 255),
     bg_alpha: Optional[float] = 0.5,
     line_space: int = 15,
-    direction: TextPosition = TextPosition.BOTTOM_RIGHT
+    direction: TextPosition = TextPosition.BOTTOM_RIGHT,
+    margin: int = 10
 ) -> np.ndarray:
     """Draw text on an image.
 
@@ -52,6 +53,7 @@ def draw_text(
         line_space (int, optional): Spacing between lines. Defaults to 15.
         direction (TextPosition, optional): Text position relative to the
             text origin. Defaults to TextPosition.BOTTOM_RIGHT.
+        margin (int): Text margin. Defaults to 10.
 
     Returns:
         np.ndarray: The image with the text inserted.
@@ -63,20 +65,30 @@ def draw_text(
     lines = text.splitlines()
     max_text = max(lines, key=lambda x: len(x))
     (text_w, text_h), _ = cv2.getTextSize(max_text, font, scale, thickness)
+    box_h = text_h + ((text_h + scale * line_space) *
+                      (len(lines) - 1)) + (margin * 2)
 
-    if direction is TextPosition.BOTTOM_RIGHT:
-        x, y = position
+    x, y = position
+    if direction is TextPosition.TOP_RIGHT:
+        pass
+    elif direction is TextPosition.TOP_LEFT:
+        x -= text_w + (margin*2)
+    elif direction is TextPosition.BOTTOM_RIGHT:
+        y += box_h
+    elif direction is TextPosition.BOTTOM_LEFT:
+        x -= text_w + (margin*2)
+        y += box_h
     else:
-        raise NotImplementedError
+        raise NotImplementedError(str(direction))
+
+    x = min(max(x, 0), image.shape[1] - 1)
+    y = min(max(y, 0), image.shape[0] - 1)
 
     if background:
-        box_h = (text_h + (scale * line_space)) * (len(lines)-1)
-
-        margin = 10
         xmin = max(x, 0)
-        ymin = max(y - text_h - margin, 0)
-        xmax = min(x + text_w, image.shape[1])
-        ymax = min(y + box_h + margin, image.shape[0])
+        ymin = max(y - box_h, 0)
+        xmax = min(x + text_w + (margin * 2), image.shape[1])
+        ymax = min(y, image.shape[0])
 
         if bg_alpha:
             rect = np.full((ymax-ymin, xmax-xmin, 3), bg_color, dtype="uint8")
@@ -96,10 +108,11 @@ def draw_text(
                 -1
             )
 
-    for i, line in enumerate(lines):
+    for i, line in enumerate(reversed(lines)):
         dy = i * (text_h + scale * line_space)
         cv2.putText(
-            image, line, (x, y+dy), font, scale, color, thickness, cv2.LINE_AA)
+            image, line, (x + margin, y - margin - dy), font, scale, color,
+            thickness, cv2.LINE_AA)
     return image
 
 
@@ -117,7 +130,8 @@ def draw_bounding_box(
     text_bg_alpha: Optional[float] = None,
     text_line_space: int = 15,
     text_box_position: TextPosition = TextPosition.TOP_LEFT,
-    text_direction: TextPosition = TextPosition.BOTTOM_RIGHT
+    text_direction: TextPosition = TextPosition.BOTTOM_RIGHT,
+    text_margin: int = 10
 ) -> np.ndarray:
     """Draw a bounding box and optional text on an image.
 
@@ -147,6 +161,7 @@ def draw_bounding_box(
             to the bounding box. Defaults to TextPosition.TOP_LEFT.
         text_direction (TextPosition, optional): Direction of the text.
             Defaults to TextPosition.BOTTOM_RIGHT.
+        margin (int): Text margin. Defaults to 10.
 
     Returns:
         np.ndarray: The created image.
@@ -170,8 +185,14 @@ def draw_bounding_box(
     if text:
         if text_box_position is TextPosition.TOP_LEFT:
             x, y = xmin, ymin
+        elif text_box_position is TextPosition.TOP_RIGHT:
+            x, y = xmax, ymin
+        elif text_box_position is TextPosition.BOTTOM_LEFT:
+            x, y = xmin, ymax
+        elif text_box_position is TextPosition.BOTTOM_RIGHT:
+            x, y = xmax, ymax
         else:
-            raise NotImplementedError
+            raise NotImplementedError(str(text_box_position))
 
         text_bg_color = color if text_bg_color is None else text_bg_color
 
@@ -186,7 +207,8 @@ def draw_bounding_box(
             bg_color=text_bg_color,
             bg_alpha=text_bg_alpha,
             line_space=text_line_space,
-            direction=text_direction
+            direction=text_direction,
+            margin=text_margin
         )
     return image
 

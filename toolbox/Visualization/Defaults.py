@@ -62,7 +62,8 @@ class Defaults:
     text_bg_color = (224, 56, 84)
     text_bg_alpha = 0.75
     text_line_space = 15
-    text_direction = utils.TextPosition.BOTTOM_RIGHT
+    text_direction = utils.TextPosition.TOP_RIGHT
+    text_margin: int = 10
     # BoundingBox
     box_thickness = 2
     box_color = (224, 56, 84)
