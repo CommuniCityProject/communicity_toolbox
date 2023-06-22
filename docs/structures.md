@@ -7,7 +7,7 @@ The following Structures are implemented:
 ## [Instance](https://communicity-docs.readthedocs.io/en/latest/docs/toolbox/Structures.html#module-Structures.Instance)
 
 Structure similar to a Python ``dict``, used to aggregate the different outputs of a machine learning algorithm for each instance.
-e.g. A face detector algorithm will produce an ``Instance`` object for each detected face, storing inside it the bounding box and the detection confidence.
+E.g. A face detector algorithm will produce an ``Instance`` object for each detected face, storing inside it the bounding box and the detection confidence.
 
 ```Python
 from toolbox.Structures import Instance
@@ -22,7 +22,7 @@ print(dict(instance))
 
 ## [BoundingBox](https://communicity-docs.readthedocs.io/en/latest/docs/toolbox/Structures.html#module-Structures.BoundingBox)
 
-Used to store the coordinates of a bounding box, that is a set of two points delimiting a rectangular area that encloses an object in an image. By default it uses the minimum and maximum x and y coordinates, which represents the top-left and bottom-right corner of the object inside the image. The coordinates of the bounding box are relative to the image size, ranging from ``0.`` to ``1.``.
+Used to store the coordinates of a bounding box, that is a set of two points delimiting a rectangular area that encloses an object in an image. By default it uses the minimum and maximum x and y coordinates, which represent the top-left and bottom-right corner of the object inside the image. The coordinates of the bounding box are relative to the image size, ranging from ``0.`` to ``1.``.
 
 ```Python
 from toolbox.Structures import BoundingBox

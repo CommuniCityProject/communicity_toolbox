@@ -7,7 +7,7 @@ The project's documentation can be found here: [https://communicity-docs.readthe
 ## Content
 - [Overview](#overview)
     - [OASC MIMs](#oasc-mims)
-- [Toolbox Components](#toolbox-components)
+- [Toolbox components](#toolbox-components)
     - [Projects](#projects)
     - [Machine learning models](#machine-learning-models)
     - [Data models](#data-models)
@@ -19,24 +19,24 @@ The project's documentation can be found here: [https://communicity-docs.readthe
 
 ## Overview
 
-The Toolbox project aims to provide a set of software components, services and approaches to support the design and development of innovative solutions inside the [CommuniCity Project](https://communicity-project.eu/). The main objective of the toolbox is, on one hand, to enable developers to speed up and simplify the implementation of city solutions, and on the other hand, to provide tools that enable the interoperability between existing systems and developers' solutions and ensure the replicability of the developed applications.
+The Toolbox project aims to provide a set of software components, services and approaches to support the design and development of innovative solutions inside the [CommuniCity Project](https://communicity-project.eu/). The main objective of the toolbox is, on the one hand, to enable developers to speed up and simplify the implementation of city solutions, and on the other hand, to provide tools that enable the interoperability between existing systems and developers' solutions and ensure the replicability of the developed applications.
 
-More precisely, the main features that the Toolbox offers are:
-- A set of ready-to-use AI solutions that uses an NGSI-LD context broker to get and post data based on well-defined data models.
-- Specifications of the used data models.
-- Full support of the first three MIMs.
+More precisely, the Toolbox offers the following main features:
+- A set of ready-to-use AI solutions that use an NGSI-LD context broker to get and post data based on well-defined data models.
+- Specifications of the data models used.
+- Full support for the first three MIMs.
 - A collection of machine learning models spanning various domains.
-- A collection of tools and implementations that helps developers build MIM-based solutions.
+- A collection of tools and implementations that help developers build MIM-based solutions.
 
 ### OASC MIMs
 
 [Minimal Interoperability Mechanisms](https://mims.oascities.org/basics/oasc-mims-introduction) (MIMs) are universal tools for achieving interoperability of data, systems, and services between cities and suppliers around the world. MIMs are based on a set of baseline specifications and references related to the different cities and communities that are part of the [OASC network](https://oascities.org/).
 
-The current version of the Toolbox supports the following reference implementation of the first three MIMs. Future improvements of the Toolbox will offer availability of more reference implementations and support for new MIMs:
+The current version of the Toolbox supports the following reference implementations of the first three MIMs. Future improvements of the Toolbox will offer availability of more reference implementations and support for new MIMs:
 
 #### MIM1 - Context Information Management
 
-Context information contains comprehensive status information about real-world entities defined in a structured way with a formal definition. The Toolbox components are designed to produce context data based on the [NGSI-LD](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_cim009v010601p.pdf) standard which can be then published to a context broker, making it available to any application. This approach enables an efficient way of retrieving and publishing data, utilizing a well-known standard and unifying the output of each component on a single common endpoint.
+Context information contains comprehensive status information about real-world entities defined in a structured way with a formal definition. The Toolbox components are designed to produce context data based on the [NGSI-LD](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_cim009v010601p.pdf) standard which can then be published to a context broker, making it available to any application. This approach enables an efficient way of retrieving and publishing data, utilizing a well-known standard and unifying the output of each component on a single common endpoint.
 
 The proposed implementation is [Orion-LD Context Broker](https://github.com/FIWARE/context.Orion-LD), a Context Broker for context data management that supports both the NGSI-LD and the NGSI-v2.
 
@@ -44,7 +44,7 @@ The proposed implementation is [Orion-LD Context Broker](https://github.com/FIWA
 
 Each of the Toolbox components generates its own entities with a specific structure and data types for the task it is performing. To formally define the component's output a set of data models is created. These models capture the purpose of each task and describe the attributes that it must hold.  
 
-The [Smart Data Models initiative](https://smartdatamodels.org/) is the baseline repository for common data models to be used in CommuniCity. In addition, [new data models](./docs/data-models.md) are created to fit the requirements of the Toolbox. 
+The [Smart Data Models initiative](https://smartdatamodels.org/) is the baseline repository for common data models to be used in CommuniCity. In addition, [new data models](./docs/data-models.md) are created to fit the Toolbox requirements.
 
 #### MIM3 - Ecosystem Transaction Management  
 
@@ -52,11 +52,11 @@ A standardized data marketplace is used to expose the data generated by the Tool
 
 The implementation used in this project is the [Business API Ecosystem](https://github.com/FIWARE-TMForum/Business-API-Ecosystem). It provides capabilities for managing, publishing, and generating revenue from different kinds of assets (both digital and physical) across the whole service life cycle.
 
-## Toolbox Components
+## Toolbox components
 
 ### Projects
 
-The Toolbox Projects are concrete implementations of some of the Toolbox components that are designed to be used by the end users or applications.
+The Toolbox Projects are concrete implementations of some of the Toolbox components that are designed to be used by end users or applications.
 They also serve as a showcase of the functionalities of the Toolbox and provide practical examples of how to use the components to build real-world applications.
 
 Projects work in conjunction with a context broker, which acts as a mediator between the Projects and the data sources. The input data is received from the context broker, which is then processed to generate an output that is posted back to the context broker.
@@ -68,10 +68,10 @@ The following table contains the currently provided Projects:
 
 | Name                                                           | Description   |
 |----------------------------------------------------------------|---------------|
-| [FaceDetection](toolbox/Projects/FaceDetection/README.md)              | Detect faces on images |
+| [FaceDetection](toolbox/Projects/FaceDetection/README.md)              | Detect faces in images |
 | [FaceRecognition](toolbox/Projects/FaceRecognition/README.md)           | Detect and extract features of faces, create a facial dataset and recognize faces |
-| [AgeGender](toolbox/Projects/AgeGender/README.md)                       | Detect faces, predicts their gender and estimate their age |
-| [InstanceSegmentation](toolbox/Projects/InstanceSegmentation/README.md) | Performs instance segmentation on images |
+| [AgeGender](toolbox/Projects/AgeGender/README.md)                       | Detect faces, predict their gender and estimate their age |
+| [InstanceSegmentation](toolbox/Projects/InstanceSegmentation/README.md) | Perform instance segmentation on images |
 | [Keypoints](toolbox/Projects/Keypoints/README.md)                       | Predicts the position of body key points |
 | [FaceEmotions](toolbox/Projects/FaceEmotions/README.md)                 | Classify different types of face expressions |
 | [ImageStorage](toolbox/Projects/ImageStorage/README.md)                 | API to upload and download images and visualize the data generated by the Toolbox |
@@ -98,7 +98,7 @@ The overall Toolbox architecture is depicted in the following diagram:
 
 ![architecture](./docs/res/Toolbox_arch.png)
 
-Here, multiple Projects are executed on individual containers, each one mainly formed by a machine learning model, a base class and a REST API. The API communicates with users/apps to execute the Project and at the same time, it posts and retrieves data models from a context broker as the input and output data of the service. The users/apps will receive the output data directly from the API or by querying the context broker. A special service called _ImageStorage_ is developed to serve as temporary storage for the input and output images. The context broker is the chosen component to manage the data used by Toolbox but it is not intended to store large files. For this reason, the _ImageStorage_ is used by users/apps and other Toolbox Projects to store and retrieve images, but its use is not mandatory and images from another sources can be used as well.
+Here, multiple Projects are executed on individual containers, each one mainly formed by a machine learning model, a base class and a REST API. The API communicates with users/apps to execute the Project and at the same time, it posts and retrieves data models from a context broker as the input and output data of the service. The users/apps will receive the output data directly from the API or by querying the context broker. A special service called _ImageStorage_ is developed to serve as temporary storage for the input and output images. The context broker is the chosen component to manage the data used by Toolbox but it is not intended to store large files. For this reason, the _ImageStorage_ is used by users/apps and other Toolbox Projects to store and retrieve images, but its use is not mandatory and images from other sources can be used as well.
 
 ## Installation
 
@@ -107,10 +107,6 @@ The Toolbox can be installed manually as a Python package or it can be used with
 - To install the Toolbox as a Python package, refer to the [installation guide](docs/installation.md).
 
 - To use the Toolbox with Docker see the [Docker guide](docs/docker.md).
-
-## Usage
-
-Check the [quick start](./docs/quick-start.md) guide for more information on how to use the Toolbox.
 
 ## Contributing
 

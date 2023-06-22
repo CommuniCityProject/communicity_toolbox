@@ -2,7 +2,7 @@
 
 The Toolbox can be used in three different ways:
 - As a web page, using the provided front-end that allows any user to quickly try the main functionalities.
-- As a set of APIs that can be deployed with docker composes.
+- As a set of APIs that can be deployed with Docker composes.
 - As a Python library.
 
 To start using the APIs and the front end, refer to the [Docker guide](./docker.md) and set up the provided Docker compose.
