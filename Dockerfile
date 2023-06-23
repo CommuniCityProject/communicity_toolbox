@@ -1,5 +1,5 @@
-# Ubuntu 18.04 | cuda 11.2 | cudnn 8 | Python 3.9 | tensorflow 2.7.0 | torch 1.8.1 | detectron2
-FROM nvidia/cuda:11.2.0-cudnn8-devel-ubuntu18.04
+# Ubuntu 20.04 | cuda 11.2 | cudnn 8 | Python 3.9 | tensorflow 2.7.0 | torch 1.8.1 | detectron2
+FROM nvidia/cuda:11.2.0-cudnn8-devel-ubuntu20.04
 
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get install -y curl git wget ninja-build nano sudo ca-certificates build-essential zip
