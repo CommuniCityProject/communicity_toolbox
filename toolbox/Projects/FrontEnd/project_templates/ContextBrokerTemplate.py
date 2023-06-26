@@ -24,7 +24,7 @@ class ContextBrokerTemplate(BaseTemplate):
         self._metrics = {
             "subscriptions_count": 0,
             "entities_count": 0,
-            "entity_types": [],
+            "entity_types": 0,
             "entity_type_count": {},
         }
         self._metrics_deltas = {
@@ -54,19 +54,21 @@ class ContextBrokerTemplate(BaseTemplate):
         """
         # Get types
         types = self.context_cli.get_types()
+        
         # Get count per type
+        type_count = {}
         for t in types:
             entities = self.context_cli.get_all_entities(
                 entity_type=t,
                 as_dict=True
             )
-            if t not in self._metrics["entity_type_count"]:
-                self._metrics["entity_type_count"][t] = 0
-            self._metrics["entity_type_count"][t] = len(entities)
+            type_count[t] = len(entities)
+        
         # Get total count
         entities_count = sum(
-            self._metrics["entity_type_count"].values()
+            type_count.values()
         )
+        
         # Get subscriptions count
         subscriptions_count = len(
             self.context_cli.get_all_subscriptions()
@@ -80,11 +82,12 @@ class ContextBrokerTemplate(BaseTemplate):
             subscriptions_count - self._metrics["subscriptions_count"]
         )
         self._metrics_deltas["entity_types"] = (
-            len(types) - len(self._metrics["entity_types"])
+            len(types) - self._metrics["entity_types"]
         )
 
         # Set metrics
-        self._metrics["entity_types"] = types
+        self._metrics["entity_type_count"] = type_count
+        self._metrics["entity_types"] = len(types)
         self._metrics["subscriptions_count"] = subscriptions_count
         self._metrics["entities_count"] = entities_count
 
@@ -113,7 +116,7 @@ class ContextBrokerTemplate(BaseTemplate):
         with cols[2]:
             st.metric(
                 "Entity types",
-                len(self._metrics["entity_types"]),
+                self._metrics["entity_types"],
                 self._metrics_deltas["entity_types"]
             )
         st.divider()
@@ -210,6 +213,7 @@ class ContextBrokerTemplate(BaseTemplate):
         st.session_state.entity_types = self.context_cli.get_types()
 
     def _get_entities(self):
+        self._get_entity_types()
         if not st.session_state.selected_types:
             st.session_state.entities = []
         else:
