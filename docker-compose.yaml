@@ -1,8 +1,8 @@
 version: "3.9"
 
 x-common-env: &common-env
-  HOST: 192.168.0.100
-  BROKER_HOST: 192.168.0.100
+  HOST: http://192.168.0.100
+  BROKER_HOST: http://192.168.0.100
   BROKER_PORT: 1026
   TOOLBOX_DATA: /etc/communicity_toolbox
   USE_CUDA: False
@@ -127,7 +127,6 @@ services:
     ports:
       - "9000:8080"
     command: python -m streamlit run --server.headless true --runner.magicEnabled false --server.port 8080 ./toolbox/Projects/FrontEnd/app.py -- --config /etc/communicity_toolbox/configs/FrontEnd.yaml
-    # command: python -m streamlit run --server.sslCertFile /etc/communicity_toolbox/ssl/fe.crt --server.sslKeyFile /etc/communicity_toolbox/ssl/fe.key --server.headless true --runner.magicEnabled false --server.port 8080 ./toolbox/Projects/FrontEnd/app.py -- --config /etc/communicity_toolbox/configs/FrontEnd.yaml
     volumes:
       - ./data:/etc/communicity_toolbox/:ro
 

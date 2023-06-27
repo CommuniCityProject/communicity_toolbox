@@ -15,7 +15,7 @@ from toolbox.utils.utils import urljoin
 p = pathlib.Path(__file__).parent.resolve()
 config = parse_config(p/"config.yaml")["context_broker"]
 _context_broker_uri = urljoin(
-    f"http://{config['host']}:{config['port']}", config["base_path"])
+    f"{config['host']}:{config['port']}", config["base_path"])
 _entities_uri = urljoin(_context_broker_uri, "/ngsi-ld/v1/entities")
 _subscriptions_uri = urljoin(_context_broker_uri, "/ngsi-ld/v1/subscriptions")
 

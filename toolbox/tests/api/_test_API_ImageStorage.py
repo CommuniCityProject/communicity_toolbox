@@ -7,8 +7,8 @@ from pathlib import Path
 
 import config
 
-API_URL = f"http://{config.HOST}:{config.IMAGE_STORAGE_API_PORT}/"
-BROKER_URL = f"http://{config.HOST}:{config.CONTEXT_BROKER_PORT}/ngsi-ld/v1/entities/"
+API_URL = f"{config.HOST}:{config.IMAGE_STORAGE_API_PORT}/"
+BROKER_URL = f"{config.HOST}:{config.CONTEXT_BROKER_PORT}/ngsi-ld/v1/entities/"
 
 
 class TestImageStorage(unittest.TestCase):

@@ -61,7 +61,7 @@ class ContextCli:
         }
 
         self._broker_url = urljoin(
-            f"http://{self._broker_host}:{self._broker_port}",
+            f"{self._broker_host}:{self._broker_port}",
             base_path
         )
         self._subscriptions_uri = urljoin(
