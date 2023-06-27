@@ -20,9 +20,6 @@ face_detector:
     nms_threshold: 0.4
     use_cuda: !ENV ${USE_CUDA}
 
-context_broker:
-  notification_uri: !ENV http://${HOST}:${PORT}/ngsi-ld/v1/notify
-
 api:
   # Wether the api should extract features of faces
   do_feature_extraction: True

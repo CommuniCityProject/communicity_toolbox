@@ -1,7 +1,7 @@
 __BASE__: base.yaml
 
 api:
-  external_url: !ENV http://${HOST}:${PORT}/
+  external_url: !ENV ${EXTERNAL_BASE_URL}
   ngsild_urn: "urn:ngsi-ld:Image:{}"
   
   allowed_mime:
