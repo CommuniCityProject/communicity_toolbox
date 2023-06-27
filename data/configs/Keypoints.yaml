@@ -8,9 +8,6 @@ keypoints:
     confidence_threshold: 0.5
     use_cuda: !ENV ${USE_CUDA}
 
-context_broker:
-  notification_uri: http://${HOST}:8080/ngsi-ld/v1/notify
-
 subscriptions:
   - entity_type: Image
     watched_attributes: ["purpose"]

@@ -5,6 +5,8 @@ context_broker:
   # Check for conflicting subscriptions before creating a new one
   check_subscription_conflicts: True
 
+  notification_uri: !ENV ${HOST}:${PORT}/ngsi-ld/v1/notify
+
 api:
   host: 0.0.0.0
   port: 8080
