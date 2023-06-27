@@ -38,7 +38,7 @@ class BaseTemplate:
         self.host = host
         self.port = port
         self.url_path = url_path
-        self.url = urljoin(f"http://{self.host}:{self.port}", self.url_path)
+        self.url = urljoin(f"{self.host}:{self.port}", self.url_path)
         self.context_cli = context_cli
         self.image_storage_cli = image_storage_cli
         self.context_broker_links = context_broker_links
