@@ -90,23 +90,24 @@ def draw_text(
         xmax = min(x + text_w + (margin * 2), image.shape[1])
         ymax = min(y, image.shape[0])
 
-        if bg_alpha:
-            rect = np.full((ymax-ymin, xmax-xmin, 3), bg_color, dtype="uint8")
-            image[ymin:ymax, xmin:xmax, :] = cv2.addWeighted(
-                image[ymin:ymax, xmin:xmax, :],
-                1-bg_alpha,
-                rect,
-                bg_alpha,
-                0
-            )
-        else:
-            cv2.rectangle(
-                image,
-                (xmin, ymin),
-                (xmax, ymax),
-                bg_color,
-                -1
-            )
+        if xmin < xmax and ymin < ymax:
+            if bg_alpha:
+                rect = np.full((ymax-ymin, xmax-xmin, 3), bg_color, dtype="uint8")
+                image[ymin:ymax, xmin:xmax, :] = cv2.addWeighted(
+                    image[ymin:ymax, xmin:xmax, :],
+                    1-bg_alpha,
+                    rect,
+                    bg_alpha,
+                    0
+                )
+            else:
+                cv2.rectangle(
+                    image,
+                    (xmin, ymin),
+                    (xmax, ymax),
+                    bg_color,
+                    -1
+                )
 
     for i, line in enumerate(reversed(lines)):
         dy = i * (text_h + scale * line_space)
