@@ -34,6 +34,7 @@ class FaceRecognition:
         rec_params = config["face_recognition"]["params"]
         logger.debug(f"Face recognition params {config['face_recognition']}")
         self._face_recognition = model_catalog[rec_model](**rec_params)
+        self._scale_bb = config["face_detector"]["face_box_scale"]
 
         self._do_extraction = do_extraction
         self._do_recognition = do_recognition
@@ -70,7 +71,10 @@ class FaceRecognition:
         image = image.image
         bb = face.bounding_box
         if bb is not None:
-            image = bb.crop_image(image)
+            scaled_bb = bb.scale(self._scale_bb)
+            if scaled_bb.is_empty():
+                return face
+            image = scaled_bb.crop_image(image)
         features = self._face_recognition.predict_features(image)
         face.features = features.tolist()
         face.features_algorithm = self._face_recognition.algorithm_name
@@ -90,7 +94,10 @@ class FaceRecognition:
 
         face_instances = self._face_detector.predict(image.image)
         for face_ins in face_instances:
-            crop = face_ins.bounding_box.crop_image(image.image)
+            scaled_bb = face_ins.bounding_box.scale(self._scale_bb)
+            if scaled_bb.is_empty():
+                continue
+            crop = scaled_bb.crop_image(image.image)
             features = self._face_recognition.predict_features(crop)
             data_models.append(
                 DataModels.Face(

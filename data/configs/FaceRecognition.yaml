@@ -11,6 +11,7 @@ face_recognition:
   domain: Celeb
 
 face_detector:
+  face_box_scale: 1.2
   model_name: face_detector_retinaface
   params:
     weights_path: !ENV ${TOOLBOX_DATA}/models/face_detector_retinaface/Resnet50_Final.pth
