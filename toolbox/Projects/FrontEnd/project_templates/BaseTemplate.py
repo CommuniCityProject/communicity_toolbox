@@ -16,6 +16,7 @@ class BaseTemplate:
                  context_cli: Optional[ContextCli] = None,
                  image_storage_cli: Optional[ImageStorageCli] = None,
                  context_broker_links: bool = True, description_path: str = "",
+                 public_context_broker_url: Optional[str] = None,
                  **kwargs):
         """Initialize a project template.
 
@@ -32,6 +33,9 @@ class BaseTemplate:
                 Context Broker entities. Defaults to True.
             description_path (str, optional): Path to a txt file with the
                 project description. Defaults to "".
+            public_context_broker_url (Optional[str], optional): Context broker
+                public base URL used to show the context broker links. If None
+                the URL from ``context_cli`` will be used. Defaults to None.
         """
         self.logger = get_logger("toolbox.FrontEnd." + name.replace(" ", "_"))
         self.name = name
@@ -42,6 +46,9 @@ class BaseTemplate:
         self.context_cli = context_cli
         self.image_storage_cli = image_storage_cli
         self.context_broker_links = context_broker_links
+        self.public_context_broker_url = (public_context_broker_url
+            if public_context_broker_url is not None
+            else self.context_cli.broker_url)
 
         if description_path:
             with open(description_path, "r") as f:

@@ -6,12 +6,15 @@ pagination_limit: &pagination_limit
   30
 
 context_broker_links: &context_broker_links
-  True
+  !ENV ${FR_BROKER_LINKS}
+
+public_context_broker_url: &public_context_broker_url
+  !ENV ${PUBLIC_BROKER_URL}
 # ==============================================================================
 
 use_cookies: True
 show_agreement: True
-agreement_text: ./toolbox/Projects/FrontEnd/res/texts/agreement.txt
+agreement_text: !ENV ${TOOLBOX_DATA}/front_end/res/texts/agreement.txt
 
 context_broker:
   host: !ENV ${BROKER_HOST}
@@ -29,47 +32,62 @@ projects:
     pagination_limit: *pagination_limit
     url_path: /
     refresh_rate: 10 # seconds
-    description_path: ./toolbox/Projects/FrontEnd/res/texts/context_broker.txt
+    description_path: !ENV ${TOOLBOX_DATA}/front_end/res/texts/context_broker.txt
     template: ContextBrokerTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url
   - name: Image Storage
     template: ImageStorageTemplate
     pagination_limit: *pagination_limit
     context_broker_links: *context_broker_links
-    description_path: ./toolbox/Projects/FrontEnd/res/texts/image_storage.txt
+    public_context_broker_url: *public_context_broker_url
+    description_path: !ENV ${TOOLBOX_DATA}/front_end/res/texts/image_storage.txt
     <<: *image_storage
   - name: Face Detection
     port: !ENV ${FACE_DETECTION_PORT}
     host: !ENV ${HOST}
     url_path: /
-    description_path: ./toolbox/Projects/FrontEnd/res/texts/face_detection.txt
+    description_path: !ENV ${TOOLBOX_DATA}/front_end/res/texts/face_detection.txt
     template: SimplePredictTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url
   - name: Face Recognition
     port: !ENV ${FACE_RECOGNITION_PORT}
     host: !ENV ${HOST}
     url_path: /
-    description_path: ./toolbox/Projects/FrontEnd/res/texts/face_recognition.txt
+    description_path: !ENV ${TOOLBOX_DATA}/front_end/res/texts/face_recognition.txt
     template: FaceRecognitionTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url
   - name: Face Emotions
     port: !ENV ${FACE_EMOTIONS_PORT}
     host: !ENV ${HOST}
     url_path: /
-    description_path: ./toolbox/Projects/FrontEnd/res/texts/face_emotions.txt
+    description_path: !ENV ${TOOLBOX_DATA}/front_end/res/texts/face_emotions.txt
     template: SimplePredictTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url
   - name: Age Gender
     port: !ENV ${AGE_GENDER_PORT}
     host: !ENV ${HOST}
     url_path: /
-    description_path: ./toolbox/Projects/FrontEnd/res/texts/age_gender.txt
+    description_path: !ENV ${TOOLBOX_DATA}/front_end/res/texts/age_gender.txt
     template: SimplePredictTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url
   - name: Instance Segmentation
     port: !ENV ${INSTANCE_SEGMENTATION_PORT}
     host: !ENV ${HOST}
     url_path: /
-    description_path: ./toolbox/Projects/FrontEnd/res/texts/instance_segmentation.txt
+    description_path: !ENV ${TOOLBOX_DATA}/front_end/res/texts/instance_segmentation.txt
     template: SimplePredictTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url
   - name: Keypoints
     port: !ENV ${KEYPOINTS_PORT}
     host: !ENV ${HOST}
     url_path: /
-    description_path: ./toolbox/Projects/FrontEnd/res/texts/keypoints.txt
+    description_path: !ENV ${TOOLBOX_DATA}/front_end/res/texts/keypoints.txt
     template: SimplePredictTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url

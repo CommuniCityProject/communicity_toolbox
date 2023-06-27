@@ -13,9 +13,7 @@ class FaceRecognitionTemplate(SimplePredictTemplate):
         # Title
         title_info = st.empty()
         if self.description:
-            description = self.description + \
-                f" The API documentation can be found at: " +\
-                f'<a href="{self.docs_url}">{self.docs_url}</a>'
+            description = self.description
             utils.write_title_info_toggle(
                 self.name,
                 description,

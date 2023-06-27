@@ -16,7 +16,7 @@ face_detector:
     use_cuda: False
 
 context_broker:
-  host: 192.168.0.100
+  host: http://192.168.0.100
   port: 1026
   # URI where notifications will be sent
   notification_uri: http://192.168.0.100:8080/ngsi-ld/v1/notify

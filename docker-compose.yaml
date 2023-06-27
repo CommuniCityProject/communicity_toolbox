@@ -1,5 +1,8 @@
 version: "3.9"
 
+x-public_context_broker_url: &x-public_context_broker_url
+  https://communicity.portodigital.pt:1026/
+
 x-common-env: &common-env
   HOST: http://192.168.0.100
   BROKER_HOST: http://192.168.0.100
@@ -124,6 +127,8 @@ services:
       AGE_GENDER_PORT: 9003
       INSTANCE_SEGMENTATION_PORT: 9005
       KEYPOINTS_PORT: 9006
+      PUBLIC_BROKER_URL: *x-public_context_broker_url
+      FR_BROKER_LINKS: True
     ports:
       - "9000:8080"
     command: python -m streamlit run --server.headless true --runner.magicEnabled false --server.port 8080 ./toolbox/Projects/FrontEnd/app.py -- --config /etc/communicity_toolbox/configs/FrontEnd.yaml

@@ -170,7 +170,7 @@ class ContextBrokerTemplate(BaseTemplate):
                 if subscription is not None:
                     if self.context_broker_links:
                         url = utils.get_subscription_broker_link(
-                            self.context_cli.broker_url,
+                            self.public_context_broker_url,
                             subscription.subscription_id
                         )
                         st.markdown(
@@ -191,7 +191,7 @@ class ContextBrokerTemplate(BaseTemplate):
                     with st.expander(parsed_id):
                         if self.context_broker_links:
                             url = utils.get_subscription_broker_link(
-                                self.context_cli.broker_url,
+                                self.public_context_broker_url,
                                 sub.subscription_id
                             )
                             st.markdown(
@@ -269,7 +269,7 @@ class ContextBrokerTemplate(BaseTemplate):
                 if entity is not None:
                     if self.context_broker_links:
                         url = utils.get_entities_broker_link(
-                            self.context_cli.broker_url,
+                            self.public_context_broker_url,
                             entity["id"]
                         )
                         st.markdown(
@@ -290,7 +290,7 @@ class ContextBrokerTemplate(BaseTemplate):
                     with st.expander(parsed_id):
                         if self.context_broker_links:
                             url = utils.get_entities_broker_link(
-                                self.context_cli.broker_url,
+                                self.public_context_broker_url,
                                 ent["id"]
                             )
                             st.markdown(
@@ -314,9 +314,7 @@ class ContextBrokerTemplate(BaseTemplate):
         # Title
         title_info = st.empty()
         if self.description:
-            description = self.description + \
-                f" The context broker can be found at: " +\
-                f'<a href="{self.url}">{self.url}</a>'
+            description = self.description
             utils.write_title_info_toggle(
                 self.name,
                 description,

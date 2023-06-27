@@ -132,6 +132,5 @@ dmypy.json
 # toolbox data
 data/models
 data/samples
-data/ssl
 
 .vscode

@@ -1,7 +1,6 @@
 import streamlit as st
 
 from toolbox.Projects.FrontEnd.utils import utils
-from toolbox.utils.utils import urljoin
 
 from . import BaseTemplate
 
@@ -12,7 +11,6 @@ class ImageStorageTemplate(BaseTemplate):
         """Create the SimplePredict Project template.
         """
         super().__init__(**kwargs)
-        self.docs_url = urljoin(self.url, "docs")
         self.pagination_limit = kwargs.get("pagination_limit", 100)
 
     def _init_session_state(self):
@@ -62,7 +60,7 @@ class ImageStorageTemplate(BaseTemplate):
                 st.image(image.image, channels="BGR")
                 if self.context_broker_links:
                     url = utils.get_entities_broker_link(
-                        self.context_cli.broker_url,
+                        self.public_context_broker_url,
                         image.id
                     )
                     st.markdown(
@@ -89,7 +87,7 @@ class ImageStorageTemplate(BaseTemplate):
                         with col2:
                             if self.context_broker_links:
                                 url = utils.get_entities_broker_link(
-                                    self.context_cli.broker_url,
+                                    self.public_context_broker_url,
                                     image.id
                                 )
                                 st.markdown(
@@ -231,9 +229,7 @@ class ImageStorageTemplate(BaseTemplate):
         # Title
         title_info = st.empty()
         if self.description:
-            description = self.description + \
-                f" The API documentation can be found at: " +\
-                f'<a href="{self.docs_url}">{self.docs_url}</a>'
+            description = self.description
             utils.write_title_info_toggle(
                 self.name,
                 description,

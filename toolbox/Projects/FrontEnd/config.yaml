@@ -1,14 +1,21 @@
 # ======= Anchors ==============================================================
 common_host: &common_host
-  127.0.0.1
+  http://127.0.0.1
 
 pagination_limit: &pagination_limit
   30
+
+context_broker_links: &context_broker_links
+  True
+
+public_context_broker_url: &public_context_broker_url
+  https://127.0.0.1:1026/
+
 # ==============================================================================
 
 use_cookies: True
 show_agreement: True
-agreement_text: res/texts/agreement.txt
+agreement_text: ../../../data/front_end/res/texts/agreement.txt
 
 context_broker:
   host: *common_host
@@ -26,46 +33,62 @@ projects:
     pagination_limit: *pagination_limit
     url_path: /
     refresh_rate: 10 # seconds
-    description_path: res/texts/context_broker.txt
+    description_path: ../../../data/front_end/res/texts/context_broker.txt
     template: ContextBrokerTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url
   - name: Image Storage
     template: ImageStorageTemplate
     pagination_limit: *pagination_limit
-    description_path: res/texts/image_storage.txt
+    description_path: ../../../data/front_end/res/texts/image_storage.txt
     <<: *image_storage
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url
   - name: Face Detection
     port: 9007
     host: *common_host
     url_path: /
-    description_path: res/texts/face_detection.txt
+    description_path: ../../../data/front_end/res/texts/face_detection.txt
     template: SimplePredictTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url
   - name: Face Recognition
     port: 9002
     host: *common_host
     url_path: /
-    description_path: res/texts/face_recognition.txt
+    description_path: ../../../data/front_end/res/texts/face_recognition.txt
     template: FaceRecognitionTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url
   - name: Face Emotions
     port: 9004
     host: *common_host
     url_path: /
-    description_path: res/texts/face_emotions.txt
+    description_path: ../../../data/front_end/res/texts/face_emotions.txt
     template: SimplePredictTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url
   - name: Age Gender
     port: 9003
     host: *common_host
     url_path: /
-    description_path: res/texts/age_gender.txt
+    description_path: ../../../data/front_end/res/texts/age_gender.txt
     template: SimplePredictTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url
   - name: Instance Segmentation
     port: 9005
     host: *common_host
     url_path: /
-    description_path: res/texts/instance_segmentation.txt
+    description_path: ../../../data/front_end/res/texts/instance_segmentation.txt
     template: SimplePredictTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url
   - name: Keypoints
     port: 9006
     host: *common_host
     url_path: /
-    description_path: res/texts/keypoints.txt
+    description_path: ../../../data/front_end/res/texts/keypoints.txt
     template: SimplePredictTemplate
+    context_broker_links: *context_broker_links
+    public_context_broker_url: *public_context_broker_url

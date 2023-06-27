@@ -4,7 +4,6 @@ import requests
 import streamlit as st
 
 from toolbox.Projects.FrontEnd.utils import utils
-from toolbox.utils.utils import urljoin
 
 from . import BaseTemplate
 
@@ -31,8 +30,6 @@ class SimplePredictTemplate(BaseTemplate):
 
         self._upload_mimes = ["png", "jpg", "jpeg", "bmp", "tiff"]
 
-        self.docs_url = urljoin(self.url, "docs")
-
     def _init_session_state(self):
         """Initialize the session state variables.
         """
@@ -49,9 +46,7 @@ class SimplePredictTemplate(BaseTemplate):
         # Title
         title_info = st.empty()
         if self.description:
-            description = self.description + \
-                f" The API documentation can be found at: " +\
-                f'<a href="{self.docs_url}">{self.docs_url}</a>'
+            description = self.description
             utils.write_title_info_toggle(
                 self.name,
                 description,
@@ -275,7 +270,7 @@ class SimplePredictTemplate(BaseTemplate):
                 if self.context_broker_links:
                     ids = [e["id"] for e in st.session_state.output_json]
                     broker_url = utils.get_entities_broker_link(
-                        self.context_cli.broker_url,
+                        self.public_context_broker_url,
                         ids
                     )
                     link = f"[See the entities on the context broker]" \
